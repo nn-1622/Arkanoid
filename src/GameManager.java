@@ -54,6 +54,10 @@ public class GameManager {
                 } else if(menuScene.exitClick(e)) {
                     System.exit(0);
                 }
+            } else if(gstate==State.SETTING) {
+                if(settingScene.exitClicked(e)) {
+                    gstate=State.MENU;
+                }
             }
             
         });
