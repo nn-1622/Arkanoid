@@ -1,8 +1,10 @@
-public class MovableObject extends GameObject {
+import javafx.scene.canvas.GraphicsContext;
+
+public abstract class MovableObject extends GameObject {
     private double x;
     private double y;
     public MovableObject(double x, double y) {
-        super();
+        super(x,y);
         this.x = x;
         this.y = y;
     }
@@ -22,4 +24,5 @@ public class MovableObject extends GameObject {
         x += dx;
         y += dy;
     }
+    public abstract void draw(GraphicsContext g);
 }

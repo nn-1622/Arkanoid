@@ -1,3 +1,5 @@
+import javafx.scene.canvas.GraphicsContext;
+
 public abstract class GameObject {
     protected double x;
     protected double y;
@@ -5,8 +7,5 @@ public abstract class GameObject {
         this.x = x;
         this.y = y;
     }
-
-    public GameObject() {
-
-    }
+    public abstract void draw(GraphicsContext g);
 }
