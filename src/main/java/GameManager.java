@@ -51,6 +51,8 @@ public class GameManager {
             gameScene.drawGameScene(gc);
         } else if(Objects.requireNonNull(gstate == State.PAUSED)) {
             //will add later
+        } else if(Objects.requireNonNull(gstate == State.LOSS)) {
+            //will add later
         }
     }
 
@@ -87,6 +89,7 @@ public class GameManager {
             switch (e.getCode()) {
                 case A -> leftpressed = true;
                 case D -> rightpressed = true;
+                case SPACE -> gameScene.launchBall();
             }
         });
 
