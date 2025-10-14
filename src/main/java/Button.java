@@ -7,10 +7,8 @@ import javafx.scene.text.Text;
 public class Button extends Utility {
     private Image imgButton;
     private Image imgHoverButton;
-    private String text;
     private boolean isHover;
-    public Button(String text, double x, double y, double width, double height) {
-        this.text = text;
+    public Button(double x, double y, double width, double height) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -29,16 +27,9 @@ public class Button extends Utility {
         isHover = hover;
     }
 
-    public void setText(String text) {
-        this.text = text;
-    }
 
     public boolean isHover(){
         return isHover;
-    }
-
-    public String getText(){
-        return text;
     }
 
     public void setHovering(MouseEvent m){
@@ -50,13 +41,10 @@ public class Button extends Utility {
     }
     
     public void draw(GraphicsContext gc){
-        Text te = new Text(text);
         if(!isHover){
             gc.drawImage(imgButton, x, y, width, height);
         } else{
             gc.drawImage(imgHoverButton, x, y, width, height);
         }
-        gc.setFill(Color.BLACK);
-        gc.fillText(text, x + width/2, y + height/2);
     }
 }

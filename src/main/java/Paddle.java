@@ -14,7 +14,7 @@ public class Paddle extends MovableObject {
         this.v = 5;
     }
     public double getCenterX(){
-        return (x + length )/ 2;
+        return (this.getX() + length )/ 2;
     }
     public void setV(double v){
         this.v = v;
@@ -24,13 +24,13 @@ public class Paddle extends MovableObject {
     }
     @Override
     public void draw(GraphicsContext render) {
-        render.drawImage(paddleImg, x, y, length, height);
+        render.drawImage(paddleImg, this.getX(), this.getY(), length, height);
     }
     public void move(boolean left, boolean right){
         if(left){
-            x-=v;
+            this.setX(this.getX() - this.v);
         } else if(right){
-            x+=v;
+            this.setX(this.getX() + this.v);
         }
     }
 }

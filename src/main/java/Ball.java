@@ -17,6 +17,6 @@ public class Ball extends MovableObject {
 
     @Override
     public void draw(GraphicsContext render) {
-        render.drawImage(ballImg, x - radius, y-radius, radius *2, radius*2);
+        render.drawImage(ballImg, this.getX() - radius, this.getY()-radius, radius *2, radius*2);
     }
 }

@@ -7,29 +7,26 @@ import javafx.scene.input.MouseEvent;
 
 public class MenuScene {
     private Image background;
-    private Image logo;
     Button start;
     Button settings;
     Button exit;
     public MenuScene() {
         background = new Image(getClass().getResource("/bg.jpg").toExternalForm());
-        logo = new Image(getClass().getResource("/logo.png").toExternalForm());
 
-        start = new Button("Start!", 200.1, 378, 199.8, 41.9);
+        start = new Button( 225.6, 377, 148.8, 65.6);
         start.setImgButton("/Start.png");
-        start.setImgHoverButton("/StartHover.jpg");
+        start.setImgHoverButton("/StartHover.png");
 
-        settings = new Button("Settings", 200.1, 450.8, 199.8, 41.9);
-        settings.setImgButton("/Start.png");
-        settings.setImgHoverButton("/StartHover.jpg");
+        settings = new Button( 225.6, 462.4, 148.8, 65.6);
+        settings.setImgButton("/Setting.png");
+        settings.setImgHoverButton("/SettingHover.png");
 
-        exit = new Button("Exit", 200.1, 523.8, 199.8, 41.9);
-        exit.setImgButton("/Start.png");
-        exit.setImgHoverButton("/StartHover.jpg");
+        exit = new Button( 225.6, 548, 148.8, 65.6);
+        exit.setImgButton("/Exit.png");
+        exit.setImgHoverButton("/ExitHover.png");
     }
     public void drawMenuScene(GraphicsContext render) {
         render.drawImage(background, 0, 0, 600, 650);
-        render.drawImage(logo, 144.7, 84.2, 310.6, 200.1);
         start.draw(render);
         settings.draw(render);
         exit.draw(render);

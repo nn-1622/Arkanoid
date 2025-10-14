@@ -1,14 +1,1 @@
-State.class
-Ball.class
-Button.class
-GameManager.class
-GameScene.class
-Utility.class
-GameObject.class
-GameManager$1.class
-MovableObject.class
-MenuScene.class
-Game$1.class
-Game.class
-Paddle.class
-SettingScene.class
+Brick.class
