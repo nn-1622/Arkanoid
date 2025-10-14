@@ -31,7 +31,7 @@ public class GameScene {
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
             this.currentBallState = BallState.LAUNCHED;
-            ball.setVx(5);
+            ball.setVx(0);
             ball.setVy(-5); 
         }
     }
@@ -78,15 +78,22 @@ public class GameScene {
 
             if (ball.getEdgeBottom() >= canvasHeight) {
                 resetPosition();
-                currentBallState = BallState.ATTACHED;
             }
 
-            if (ball.getEdgeBottom() >= paddle.getY() && 
-                ball.getEdgeBottom() <= paddle.getY() + paddle.getHeight() && 
-                ball.getCenter() >= paddle.getX() &&
-                ball.getCenter() <= paddle.getX() + paddle.getLength() &&
-                ball.getVy() > 0) {
-                ball.reverseVy();
+            if (ball.getEdgeBottom() >= paddle.getY() &&
+                    ball.getEdgeTop() <= paddle.getY() + paddle.getHeight() &&
+                    ball.getCenter() >= paddle.getX() &&
+                    ball.getCenter() <= paddle.getX() + paddle.getLength() &&
+                    ball.getVy() > 0) {
+
+                double paddleCenter = paddle.getX() + paddle.getLength() / 2;
+                double diff = (ball.getCenter() - paddleCenter) / (paddle.getLength() / 2);
+
+                double speed = Math.sqrt(ball.getVx() * ball.getVx() + ball.getVy() * ball.getVy());
+                double angle = diff * Math.toRadians(60);
+
+                ball.setVx(speed * Math.sin(angle));
+                ball.setVy(-speed * Math.cos(angle));
             }
         }
     }
