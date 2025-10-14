@@ -30,14 +30,16 @@ public abstract class MovableObject extends GameObject {
         this.vy = vy;
     }
 
-    public void move(double vx, double vy) {
-        this.x += vx;
-        this.y += vy;
+    public void move() {
+        x += vx;
+        y += vy;
     }
     
-    public void reserve(double vx, double vy) {
-        this.x -= vx;
-        this.y -= vy;
+    public void reverseVx() {
+        vx = -vx;
+    }
+    public void reverseVy() {
+        vy = -vy;
     }
 
     public abstract void draw(GraphicsContext g);

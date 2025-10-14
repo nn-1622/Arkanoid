@@ -3,15 +3,18 @@ public abstract class Utility {
     protected double y;
     protected double width;
     protected double height;
+
     public Utility() {
         this.x = 0;
         this.y = 0;
         this.width = 0;
         this.height = 0;
     }
+
     public double getX() {
         return x;
     }
+
     public void setX(double x) {
         this.x = x;
     }

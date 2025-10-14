@@ -11,7 +11,8 @@ public class MenuScene {
     Button start;
     Button settings;
     Button exit;
-    public MenuScene() {
+
+    public MenuScene(double canvasWidth, double canvasHeight) {
         background = new Image(getClass().getResource("/bg.jpg").toExternalForm());
         logo = new Image(getClass().getResource("/logo.png").toExternalForm());
 
@@ -27,6 +28,7 @@ public class MenuScene {
         exit.setImgButton("/Start.png");
         exit.setImgHoverButton("/StartHover.jpg");
     }
+
     public void drawMenuScene(GraphicsContext render) {
         render.drawImage(background, 0, 0, 600, 650);
         render.drawImage(logo, 144.7, 84.2, 310.6, 200.1);
@@ -34,15 +36,20 @@ public class MenuScene {
         settings.draw(render);
         exit.draw(render);
     }
+
     public void checkHover(MouseEvent e) {
         start.setHovering(e);
         settings.setHovering(e);
         exit.setHovering(e);
     }
+
     public boolean settingClick(MouseEvent e) {
         return settings.isClicked(e);
     }
+
     public boolean exitClick(MouseEvent e) {
         return exit.isClicked(e);
     }
+
+    public boolean startClick(MouseEvent e) { return start.isClicked(e); }
 }
