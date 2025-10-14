@@ -2,8 +2,6 @@ import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 
 public class Ball extends MovableObject {
-    private double x;
-    private double y;
     private double radius;
     private Image ballImg;
 

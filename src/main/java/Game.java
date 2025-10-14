@@ -14,7 +14,7 @@ public class Game extends Application {
     public void start(Stage stage) {
         gm = new GameManager();
         stage.setScene(gm.getScene());
-        stage.setTitle("Kobeni!!");
+        stage.setTitle("Arkanoid");
         stage.show();
         new AnimationTimer() {
             @Override

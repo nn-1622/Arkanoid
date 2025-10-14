@@ -45,4 +45,5 @@ public class MenuScene {
     public boolean exitClick(MouseEvent e) {
         return exit.isClicked(e);
     }
+    public boolean startClick(MouseEvent e) { return start.isClicked(e); }
 }

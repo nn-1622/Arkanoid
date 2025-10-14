@@ -13,10 +13,13 @@ public class GameManager {
     private Scene scene;
     private MenuScene menuScene = new MenuScene();
     private SettingScene settingScene = new SettingScene();
+    private GameScene gameScene = new GameScene();
     private GraphicsContext gc;
     private static State gstate;
     private Canvas canvas;
     private MouseEvent e;
+    private boolean leftpressed;
+    private boolean rightpressed;
     public GameManager() {
         root = new Group();
         gstate = State.MENU;
@@ -28,12 +31,17 @@ public class GameManager {
     }
     public void update(){
         render(gc);
+        if(gstate==State.PLAY){
+            gameScene.update(leftpressed, rightpressed);
+        }
     }
     public void render(GraphicsContext gc){
         if (Objects.requireNonNull(gstate) == State.MENU) {
             menuScene.drawMenuScene(gc);
         } else if(Objects.requireNonNull(gstate) == State.SETTING) {
             settingScene.drawSettingScene(gc);
+        } else if(Objects.requireNonNull(gstate)== State.PLAY) {
+            gameScene.drawGameScene(gc);
         }
     }
     public Scene getScene() {
@@ -53,13 +61,26 @@ public class GameManager {
                     gstate=State.SETTING;
                 } else if(menuScene.exitClick(e)) {
                     System.exit(0);
+                } else if(menuScene.startClick(e)) {
+                    gstate=State.PLAYING;
                 }
             } else if(gstate==State.SETTING) {
                 if(settingScene.exitClicked(e)) {
                     gstate=State.MENU;
                 }
             }
-            
+        });
+        scene.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case A -> leftpressed = true;
+                case D -> rightpressed = true;
+            }
+        });
+        scene.setOnKeyReleased(e -> {
+            switch (e.getCode()) {
+                case A -> leftpressed = false;
+                case D -> rightpressed = false;
+            }
         });
     }
 }
