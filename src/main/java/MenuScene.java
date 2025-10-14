@@ -12,20 +12,20 @@ public class MenuScene {
     Button settings;
     Button exit;
     public MenuScene() {
-        background = new Image(getClass().getResource("/Assets/bg.jpg").toExternalForm());
-        logo = new Image(getClass().getResource("/Assets/logo.png").toExternalForm());
+        background = new Image(getClass().getResource("/bg.jpg").toExternalForm());
+        logo = new Image(getClass().getResource("/logo.png").toExternalForm());
 
         start = new Button("Start!", 200.1, 378, 199.8, 41.9);
-        start.setImgButton("/Assets/Start.png");
-        start.setImgHoverButton("/Assets/StartHover.jpg");
+        start.setImgButton("/Start.png");
+        start.setImgHoverButton("/StartHover.jpg");
 
         settings = new Button("Settings", 200.1, 450.8, 199.8, 41.9);
-        settings.setImgButton("/Assets/Start.png");
-        settings.setImgHoverButton("/Assets/StartHover.jpg");
+        settings.setImgButton("/Start.png");
+        settings.setImgHoverButton("/StartHover.jpg");
 
         exit = new Button("Exit", 200.1, 523.8, 199.8, 41.9);
-        exit.setImgButton("/Assets/Start.png");
-        exit.setImgHoverButton("/Assets/StartHover.jpg");
+        exit.setImgButton("/Start.png");
+        exit.setImgHoverButton("/StartHover.jpg");
     }
     public void drawMenuScene(GraphicsContext render) {
         render.drawImage(background, 0, 0, 600, 650);

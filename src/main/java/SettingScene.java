@@ -9,10 +9,12 @@ public class SettingScene {
     private Image settings;
     private Button exit;
     public SettingScene() {
-        settingBg = new Image(getClass().getResourceAsStream("Assets/settingBg.png"));
+        settingBg = new Image(getClass().getResource("/settingBg.png").toExternalForm());
+
         exit = new Button("Exit", 200.1, 523.8, 199.8, 41.9);
-        exit.setImgButton("/Assets/Start.png");
-        exit.setImgHoverButton("/Assets/StartHover.jpg");
+        
+        exit.setImgButton("/Start.png");
+        exit.setImgHoverButton("/StartHover.jpg");
     }
     public void drawSettingScene(GraphicsContext render) {
         render.drawImage(settingBg,0, 0, 600, 650);
