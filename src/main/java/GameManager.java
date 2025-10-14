@@ -31,7 +31,7 @@ public class GameManager {
     }
     public void update(){
         render(gc);
-        if(gstate==State.PLAY){
+        if(gstate==State.PLAYING){
             gameScene.update(leftpressed, rightpressed);
         }
     }
@@ -40,7 +40,7 @@ public class GameManager {
             menuScene.drawMenuScene(gc);
         } else if(Objects.requireNonNull(gstate) == State.SETTING) {
             settingScene.drawSettingScene(gc);
-        } else if(Objects.requireNonNull(gstate)== State.PLAY) {
+        } else if(Objects.requireNonNull(gstate)== State.PLAYING) {
             gameScene.drawGameScene(gc);
         }
     }
