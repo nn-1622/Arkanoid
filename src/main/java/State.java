@@ -1,6 +1,7 @@
 public enum State {
     MENU,
-    PLAY,
+    PLAYING,
+    PAUSED,
     SETTING,
     LOSS
 }

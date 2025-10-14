@@ -16,30 +16,39 @@ public class Button extends Utility {
         this.width = width;
         this.height = height;
     }
+
     public void setImgButton(String link) {
         this.imgButton = new Image(getClass().getResource(link).toExternalForm());
     }
+
     public void setImgHoverButton(String link) {
         this.imgHoverButton = new Image(getClass().getResource(link).toExternalForm());
     }
+
     public void setHover(boolean hover) {
         isHover = hover;
     }
+
     public void setText(String text) {
         this.text = text;
     }
+
     public boolean isHover(){
         return isHover;
     }
+
     public String getText(){
         return text;
     }
+
     public void setHovering(MouseEvent m){
         isHover = m.getX() > x && m.getX() < x + width && m.getY() > y && m.getY() < y + height;
     }
+
     public boolean isClicked(MouseEvent m){
         return m.getX() > x && m.getX() < x + width && m.getY() > y && m.getY() < y + height;
     }
+    
     public void draw(GraphicsContext gc){
         Text te = new Text(text);
         if(!isHover){
