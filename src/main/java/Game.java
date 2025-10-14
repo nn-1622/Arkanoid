@@ -15,7 +15,6 @@ public class Game extends Application {
         gm = new GameManager();
         stage.setScene(gm.getScene());
         stage.setTitle("Arkanoid");
-        stage.setResizable(false);
         stage.show();
         new AnimationTimer() {
             @Override

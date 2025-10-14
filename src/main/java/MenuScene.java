@@ -10,7 +10,7 @@ public class MenuScene {
     Button start;
     Button settings;
     Button exit;
-    public MenuScene() {
+    public MenuScene(double canvasWidth, double canvasHeight) {
         background = new Image(getClass().getResource("/bg.jpg").toExternalForm());
 
         start = new Button( 225.6, 377, 148.8, 65.6);
