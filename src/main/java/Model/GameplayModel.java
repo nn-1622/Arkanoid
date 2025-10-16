@@ -13,12 +13,13 @@ public class GameplayModel {
     private double canvasWidth;
     private double canvasHeight;
     private BallState currentBallState;
-    private int level;
-    private ArrayList<Brick> brick;
+    private boolean rendered = false;
+    private ArrayList<Brick> brick = new ArrayList<>();
+    ArrayList<Brick> toRemove = new ArrayList<>();
     public GameplayModel(double canvasWidth, double canvasHeight) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
-        double paddleLength = 100;
+        double paddleLength = 110;
         double paddleHeight = 20;
 
         paddle = new Paddle(canvasWidth / 2 - paddleLength / 2,
@@ -26,8 +27,6 @@ public class GameplayModel {
 
         ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
-        level = 1;
-        brick = new ArrayList<>();
     }
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
@@ -36,33 +35,38 @@ public class GameplayModel {
             ball.setVy(-5);
         }
     }
+    public void addBrickType(int type, double x, double y) {
+        Brick newBrick = new Brick(x, y);
+        newBrick.setBrickType(type);
+        brick.add(newBrick);
+    }
     public void renderMap() {
-        try {
-            InputStream map = getClass().getResourceAsStream(String.format("/map/%d.txt", level));
-            Scanner scan = new Scanner(map);
-            int spawnX = 0;
-            int spawnY = 0;
+        try (InputStream map = getClass().getResourceAsStream("/map/4.txt");
+            Scanner scan = new Scanner(map)) {
+            double spawnX = 0;
+            double spawnY = 0;
             while (scan.hasNextLine()) {
                 String line = scan.nextLine();
                 for (char num : line.toCharArray()) {
                     switch (num) {
+                        case '0':
+                        break;
+
                         case '1':
-                        Brick brick0 = new Brick(spawnX * 50, spawnY * 25);
-                        brick0.setBrickType(0);
-                        brick.add(brick0);
+                        addBrickType(1, spawnX * 50, spawnY * 25);
                         break;
 
                         case '2':
-                            Brick brick1 = new Brick(spawnX * 50, spawnY * 25);
-                            brick1.setBrickType(1);
-                            brick.add(brick1);
-                            break;
+                        addBrickType(2, spawnX * 50, spawnY * 25);
+                        break;
 
                         case '3':
-                            Brick brick2 = new Brick(spawnX * 50, spawnY * 25);
-                            brick2.setBrickType(2);
-                            brick.add(brick2);
-                            break;
+                        addBrickType(3, spawnX * 50, spawnY * 25);
+                        break;
+
+                        case '4':
+                        addBrickType(4, spawnX * 50, spawnY * 25);
+                        break;
                     }
                     spawnX++;
                 }
@@ -82,38 +86,42 @@ public class GameplayModel {
         ball.setVy(0);
         currentBallState = BallState.ATTACHED;
     }
+    public Image getBackground() {
+        return background;
+    }
     public Paddle getPaddle() {
         return paddle;
     }
     public Ball getBall() {
         return ball;
     }
-    public int  getLevel() {
-        return level;
+    public boolean getRendered() {
+        return rendered;
     }
-    public void setLevel(int level) {
-        this.level = level;
-    }
-    public ArrayList<Brick> getBrick() {
-        return brick;
+    public void setRendered(boolean rendered) {
+        this.rendered = rendered;
     }
     public ArrayList<Brick> getBricks() {
         return brick;
     }
-    public void update(boolean leftpressed, boolean rightpressed) {
-        paddle.move(leftpressed,rightpressed);
+    public void hitReg(Brick b) {
+        b.setBrickType(b.getBrickType() - 1);
+        if (b.getBrickType() <= 0) {
+            b.setBrickType(0);
+            toRemove.add(b);
+        }
+    }
+    public void checkCollisions() {
         if (paddle.getX() < 0) {
             paddle.setX(0);
         }
         if (paddle.getX() >= canvasWidth - paddle.getLength()) {
             paddle.setX(canvasWidth - paddle.getLength());
         }
-
         if (currentBallState == BallState.ATTACHED) {
             ball.setX(paddle.getX() + paddle.getLength() / 2);
             ball.setY(paddle.getY() - paddle.getHeight() / 2);
         } else if (currentBallState == BallState.LAUNCHED) {
-            ball.move();
             if (ball.getEdgeLeft() <= 0 || ball.getEdgeRight() >= canvasWidth) {
                 ball.reverseVx();
             }
@@ -127,20 +135,57 @@ public class GameplayModel {
             }
 
             if (ball.getEdgeBottom() >= paddle.getY() &&
-                    ball.getEdgeTop() <= paddle.getY() + paddle.getHeight() &&
-                    ball.getCenter() >= paddle.getX() &&
-                    ball.getCenter() <= paddle.getX() + paddle.getLength() &&
-                    ball.getVy() > 0) {
+                ball.getEdgeTop() <= paddle.getY() + paddle.getHeight() &&
+                ball.getCenter() >= paddle.getX() &&
+                ball.getCenter() <= paddle.getX() + paddle.getLength() &&
+                ball.getVy() > 0) {
 
                 double paddleCenter = paddle.getX() + paddle.getLength() / 2;
                 double diff = (ball.getCenter() - paddleCenter) / (paddle.getLength() / 2);
 
                 double speed = Math.sqrt(ball.getVx() * ball.getVx() + ball.getVy() * ball.getVy());
-                double angle = diff * Math.toRadians(60);
+                double angle = diff * Math.toRadians(75);
 
                 ball.setVx(speed * Math.sin(angle));
                 ball.setVy(-speed * Math.cos(angle));
             }
+            
+            for (Brick b : brick) {
+                if (b.getEdgeBottom() > ball.getEdgeTop() &&
+                    b.getEdgeTop() < ball.getEdgeBottom() && 
+                    b.getEdgeRight() > ball.getEdgeLeft() && 
+                    b.getEdgeLeft() < ball.getEdgeRight()) {
+
+                    double overlapX = Math.min(ball.getEdgeRight() - b.getEdgeLeft(), b.getEdgeRight() - ball.getEdgeLeft());
+                    double overlapY = Math.min(ball.getEdgeBottom() - b.getEdgeTop(), b.getEdgeBottom() - ball.getEdgeTop());
+
+                    if (overlapX < overlapY) {
+                        hitReg(b);
+                        if (ball.getX() < b.getX()) {
+                            ball.setX(b.getEdgeLeft() - ball.getRadius());
+                        } else {
+                            ball.setX(b.getEdgeRight() + ball.getRadius());
+                        }
+                        ball.reverseVx();
+                    } else if (overlapY < overlapX) {
+                        hitReg(b);
+                        if (ball.getY() < b.getY()) {
+                            ball.setY(b.getEdgeTop() - ball.getRadius());
+                        } else {
+                            ball.setY(b.getEdgeBottom() + ball.getRadius());
+                        }
+                        ball.reverseVy();
+                    }
+                    break;
+                }
+            }
+            brick.removeAll(toRemove);
+            toRemove.clear();
         }
+    }
+    public void update(boolean left, boolean right) {
+        this.getPaddle().move(left, right);
+        ball.move();
+        checkCollisions();
     }
 }
