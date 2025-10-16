@@ -15,7 +15,7 @@ public class GameplayModel {
     private BallState currentBallState;
     private boolean rendered = false;
     private ArrayList<Brick> brick = new ArrayList<>();
-    ArrayList<Brick> toRemove = new ArrayList<>();
+    private ArrayList<Brick> toRemove = new ArrayList<>();
     public GameplayModel(double canvasWidth, double canvasHeight) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
