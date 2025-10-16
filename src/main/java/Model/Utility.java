@@ -1,3 +1,5 @@
+package Model;
+
 public abstract class Utility {
     protected double x;
     protected double y;

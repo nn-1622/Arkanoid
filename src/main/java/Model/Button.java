@@ -1,8 +1,8 @@
+package Model;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 
 public class Button extends Utility {
     private Image imgButton;

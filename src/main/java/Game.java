@@ -1,8 +1,8 @@
+import Controller.GameController;
+import Model.GameModel;
+import Model.State;
+import View.GameView;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 
@@ -14,8 +14,8 @@ public class Game extends Application {
 
     @Override
     public void start(Stage stage) {
-        model = new GameModel();
-        view = new GameView(model);
+        model = new GameModel(650,600);
+        view = new GameView();
         controller = new GameController(model, view);
         stage.setScene(view.getScene());
         stage.setTitle("Arkanoid!");

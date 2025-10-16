@@ -1,3 +1,7 @@
+package View;
+
+import Model.GameModel;
+import Model.State;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -7,24 +11,21 @@ public class GameView {
     private Group root;
     private Scene scene;
     private MenuScene menuScene;
-    private GameplayModel gameplayModel;
     private GameModel gameModel;
     private SettingScene settingScene;
-    private GameScene gameScene;
+    private GameplayView gameplayView;
     private GraphicsContext gc;
     private Canvas canvas;
-    public GameView(GameModel model) {
+    public GameView() {
         root = new Group();
         scene = new Scene(root, 600,650);
         canvas = new Canvas(600,650);
         root.getChildren().add(canvas);
         gc  = canvas.getGraphicsContext2D();
 
-        this.gameModel = model;
-        gameplayModel = new GameplayModel();
         menuScene = new MenuScene(canvas.getWidth(),canvas.getHeight());
         settingScene = new SettingScene(canvas.getWidth(),canvas.getHeight());
-        gameScene = new GameScene(gameplayModel);
+        gameplayView = new GameplayView();
     }
     public Scene getScene() {
         return scene;
@@ -35,7 +36,7 @@ public class GameView {
         } else if(model.getGstate() == State.SETTING){
             settingScene.drawSettingScene(gc);
         } else if(model.getGstate() == State.PLAYING){
-            gameScene.drawGameScene(gc);
+            gameplayView.drawGameScene(gc, model.getGameplayModel());
         }
     }
     public MenuScene getMenuScene() {
@@ -44,7 +45,7 @@ public class GameView {
     public SettingScene getSettingScene() {
         return settingScene;
     }
-    public GameScene getGameScene() {
-        return gameScene;
+    public GameplayView getGameScene() {
+        return gameplayView;
     }
 }

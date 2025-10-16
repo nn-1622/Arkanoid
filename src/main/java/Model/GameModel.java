@@ -1,9 +1,15 @@
+package Model;
+
 public class GameModel {
     private State gstate;
     private GameplayModel gameModel;
-    public GameModel() {
+    private double canvasHeight;
+    private double canvasWidth;
+    public GameModel(double  canvasHeight, double canvasWidth) {
         gstate = State.MENU;
-        this.gameModel = new GameplayModel();
+        this.canvasHeight = canvasHeight;
+        this.canvasWidth = canvasWidth;
+        this.gameModel = new GameplayModel(this.canvasWidth, this.canvasHeight);
     }
     public void  setGstate(State gstate) {
         this.gstate = gstate;

@@ -1,5 +1,11 @@
-import javafx.scene.canvas.Canvas;
+package Controller;
+
+import Model.GameModel;
+import Model.State;
+import View.GameView;
 import javafx.scene.input.MouseEvent;
+
+
 
 public class GameController {
     private boolean leftpressed;

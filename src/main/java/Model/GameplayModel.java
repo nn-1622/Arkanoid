@@ -1,3 +1,5 @@
+package Model;
+
 import javafx.scene.image.Image;
 
 public class GameplayModel {
@@ -7,7 +9,7 @@ public class GameplayModel {
     private double canvasWidth;
     private double canvasHeight;
     private BallState currentBallState;
-    public GameplayModel() {
+    public GameplayModel(double canvasWidth, double canvasHeight) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
         double paddleLength = 100;
@@ -17,6 +19,7 @@ public class GameplayModel {
                 canvasHeight - 100, paddleLength, paddleHeight);
 
         ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
+        currentBallState = BallState.ATTACHED;
     }
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {

@@ -1,3 +1,5 @@
+package Model;
+
 import javafx.scene.canvas.GraphicsContext;
 
 public abstract class MovableObject extends GameObject {
