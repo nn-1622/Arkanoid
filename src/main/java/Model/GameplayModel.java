@@ -1,5 +1,9 @@
 package Model;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Scanner;
+
 import javafx.scene.image.Image;
 
 public class GameplayModel {
@@ -9,6 +13,8 @@ public class GameplayModel {
     private double canvasWidth;
     private double canvasHeight;
     private BallState currentBallState;
+    private boolean rendered = false;
+    private ArrayList<Brick> brick = new ArrayList<>();
     public GameplayModel(double canvasWidth, double canvasHeight) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
@@ -28,6 +34,37 @@ public class GameplayModel {
             ball.setVy(-5);
         }
     }
+    public void renderMap(ArrayList<Brick> brick) {
+        try {
+            InputStream map = getClass().getResourceAsStream("/map.txt");
+            Scanner scan = new Scanner(map);
+            int spawnX = 0;
+            int spawnY = 0;
+            while (scan.hasNextLine()) {
+                String line = scan.nextLine();
+                for (char num : line.toCharArray()) {
+                    switch (num) {
+                        case '0':
+                        Brick brick0 = new Brick(spawnX * 56, spawnY * 25);
+                        brick0.setBrickType(0);
+                        brick.add(brick0);
+                        break;
+
+                        case '1':
+                        Brick brick1 = new Brick(spawnX * 56, spawnY * 25);
+                        brick1.setBrickType(1);
+                        brick.add(brick1);
+                        break;
+                    }
+                    spawnX++;
+                }
+                spawnX = 0;
+                spawnY++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void resetPosition() {
         paddle.setX(canvasWidth / 2 - paddle.getLength() / 2);
         paddle.setY(canvasHeight - 100);
@@ -42,6 +79,15 @@ public class GameplayModel {
     }
     public Ball getBall() {
         return ball;
+    }
+    public boolean getRendered() {
+        return rendered;
+    }
+    public void setRendered(boolean rendered) {
+        this.rendered = rendered;
+    }
+    public ArrayList<Brick> getBricks() {
+        return brick;
     }
     public void update() {
         if (paddle.getX() < 0) {
