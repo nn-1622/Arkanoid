@@ -1,5 +1,6 @@
 package Model;
 
+
 public class GameModel {
     private State gstate;
     private GameplayModel gameModel;

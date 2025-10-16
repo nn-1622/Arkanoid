@@ -13,8 +13,8 @@ public class GameplayModel {
     private double canvasWidth;
     private double canvasHeight;
     private BallState currentBallState;
-    private boolean rendered = false;
-    private ArrayList<Brick> brick = new ArrayList<>();
+    private int level;
+    private ArrayList<Brick> brick;
     public GameplayModel(double canvasWidth, double canvasHeight) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
@@ -26,6 +26,8 @@ public class GameplayModel {
 
         ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
+        level = 1;
+        brick = new ArrayList<>();
     }
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
@@ -34,9 +36,9 @@ public class GameplayModel {
             ball.setVy(-5);
         }
     }
-    public void renderMap(ArrayList<Brick> brick) {
+    public void renderMap() {
         try {
-            InputStream map = getClass().getResourceAsStream("/map.txt");
+            InputStream map = getClass().getResourceAsStream(String.format("/map/%d.txt", level));
             Scanner scan = new Scanner(map);
             int spawnX = 0;
             int spawnY = 0;
@@ -44,17 +46,23 @@ public class GameplayModel {
                 String line = scan.nextLine();
                 for (char num : line.toCharArray()) {
                     switch (num) {
-                        case '0':
-                        Brick brick0 = new Brick(spawnX * 56, spawnY * 25);
+                        case '1':
+                        Brick brick0 = new Brick(spawnX * 50, spawnY * 25);
                         brick0.setBrickType(0);
                         brick.add(brick0);
                         break;
 
-                        case '1':
-                        Brick brick1 = new Brick(spawnX * 56, spawnY * 25);
-                        brick1.setBrickType(1);
-                        brick.add(brick1);
-                        break;
+                        case '2':
+                            Brick brick1 = new Brick(spawnX * 50, spawnY * 25);
+                            brick1.setBrickType(1);
+                            brick.add(brick1);
+                            break;
+
+                        case '3':
+                            Brick brick2 = new Brick(spawnX * 50, spawnY * 25);
+                            brick2.setBrickType(2);
+                            brick.add(brick2);
+                            break;
                     }
                     spawnX++;
                 }
@@ -80,16 +88,20 @@ public class GameplayModel {
     public Ball getBall() {
         return ball;
     }
-    public boolean getRendered() {
-        return rendered;
+    public int  getLevel() {
+        return level;
     }
-    public void setRendered(boolean rendered) {
-        this.rendered = rendered;
+    public void setLevel(int level) {
+        this.level = level;
+    }
+    public ArrayList<Brick> getBrick() {
+        return brick;
     }
     public ArrayList<Brick> getBricks() {
         return brick;
     }
-    public void update() {
+    public void update(boolean leftpressed, boolean rightpressed) {
+        paddle.move(leftpressed,rightpressed);
         if (paddle.getX() < 0) {
             paddle.setX(0);
         }

@@ -1,6 +1,7 @@
 package Controller;
 
 import Model.GameModel;
+import Model.GameplayModel;
 import Model.State;
 import View.GameView;
 import javafx.scene.input.MouseEvent;
@@ -8,11 +9,11 @@ import javafx.scene.input.MouseEvent;
 
 
 public class GameController {
-    private boolean leftpressed;
-    private boolean rightpressed;
     private GameModel model;
     private GameView view;
     private MouseEvent e;
+    private boolean leftpressed;
+    private boolean rightpressed;
     public GameController(GameModel gm, GameView gv) {
         this.model = gm;
         this.view = gv;
@@ -21,8 +22,7 @@ public class GameController {
     public void update() {
         view.render(model);
         if (model.getGstate() == State.PLAYING) {
-            this.model.getGameplayModel().getPaddle().move(leftpressed,rightpressed);
-            this.model.getGameplayModel().update();
+            this.model.getGameplayModel().update(leftpressed,rightpressed);
         }
     }
     public void setInput() {
@@ -37,6 +37,7 @@ public class GameController {
             if(model.getGstate() == State.MENU) {
                 if(view.getMenuScene().startClick(e)) {
                     model.setGstate(State.PLAYING);
+                    model.getGameplayModel().renderMap();
                 } else if(view.getMenuScene().settingClick(e)) {
                     model.setGstate(State.SETTING);
                 } else if(view.getMenuScene().exitClick(e)) {

@@ -17,12 +17,6 @@ public class GameplayView {
         model.getPaddle().draw(gc);
         model.getBall().draw(gc);
 
-        if (!model.getRendered()) {
-            model.renderMap(model.getBricks());
-            model.setRendered(true);
-            System.out.println("Rendered");
-        }
-
         ArrayList<Brick> brickMap = model.getBricks();
 
         for (Brick brick : brickMap) {
