@@ -7,19 +7,23 @@ import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 
 public class Game extends Application {
-    private GameManager gm;
-    private GraphicsContext gc;
+    private GameController controller;
+    private GameModel model;
+    private GameView view;
+    public static State gstate;
 
     @Override
     public void start(Stage stage) {
-        gm = new GameManager();
-        stage.setScene(gm.getScene());
-        stage.setTitle("Arkanoid");
+        model = new GameModel();
+        view = new GameView(model);
+        controller = new GameController(model, view);
+        stage.setScene(view.getScene());
+        stage.setTitle("Arkanoid!");
         stage.show();
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                gm.update();
+                controller.update();
             }
         } .start();
     }
