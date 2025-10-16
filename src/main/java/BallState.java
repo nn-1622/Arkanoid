@@ -1,0 +1,4 @@
+enum BallState {
+    ATTACHED,
+    LAUNCHED
+}
