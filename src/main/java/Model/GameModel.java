@@ -10,6 +10,8 @@ public class GameModel {
         gstate = State.MENU;
         this.canvasHeight = canvasHeight;
         this.canvasWidth = canvasWidth;
+    }
+    public void CreateGameplay(){
         this.gameModel = new GameplayModel(this.canvasWidth, this.canvasHeight);
     }
     public void  setGstate(State gstate) {

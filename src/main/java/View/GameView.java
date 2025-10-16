@@ -14,6 +14,8 @@ public class GameView {
     private GameModel gameModel;
     private SettingScene settingScene;
     private GameplayView gameplayView;
+    private LoseView loseView;
+    private VictoryView victoryView;
     private GraphicsContext gc;
     private Canvas canvas;
     public GameView() {
@@ -26,6 +28,8 @@ public class GameView {
         menuScene = new MenuScene(canvas.getWidth(),canvas.getHeight());
         settingScene = new SettingScene(canvas.getWidth(),canvas.getHeight());
         gameplayView = new GameplayView();
+        loseView = new LoseView();
+        victoryView = new VictoryView();
     }
     public Scene getScene() {
         return scene;
@@ -37,6 +41,10 @@ public class GameView {
             settingScene.drawSettingScene(gc);
         } else if(model.getGstate() == State.PLAYING){
             gameplayView.drawGameScene(gc, model.getGameplayModel());
+        } else if(model.getGstate() == State.LOSS){
+            loseView.drawLoseScene(gc);
+        } else if(model.getGstate() == State.VICTORY){
+            victoryView.drawWinScene(gc);
         }
     }
     public MenuScene getMenuScene() {
@@ -47,5 +55,11 @@ public class GameView {
     }
     public GameplayView getGameScene() {
         return gameplayView;
+    }
+    public LoseView getLoseScene() {
+        return loseView;
+    }
+    public  VictoryView getVictoryScene() {
+        return victoryView;
     }
 }

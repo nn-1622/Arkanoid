@@ -7,12 +7,6 @@ public class Ball extends MovableObject {
     private double radius;
     private Image ballImg;
 
-    public Ball(double x, double y,  double radius) {
-        super(x,y);
-        this.radius = radius;
-        ballImg = new Image("/DefaultBall.png");
-    }
-
     public Ball(double x, double y, double vx, double vy, double radius) {
         super(x,y,vx,vy);
         this.radius = radius;

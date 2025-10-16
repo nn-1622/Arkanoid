@@ -23,7 +23,7 @@ public class Game extends Application {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
-                controller.update();
+                controller.update(now);
             }
         } .start();
     }

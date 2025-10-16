@@ -7,12 +7,51 @@ public class Brick extends GameObject{
     private Image image = new Image("/Sprite.png");
     private final double width = 50;
     private final double height = 25;
-    private double sx = 32, sy = 160, sw = 32, sh = 16;
+    private static final double sx = 32, sy = 176, sw = 32, sh = 16;
     private int brickType;
+    private int currentFrame;
+    private boolean breaking;
+    private boolean destroyed;
+    public double frameTimer = 0;
+    private int totalFrames = 10;
+    private double frameDuration = 0.05;
     public Brick(double x, double y) {
         super(x,y);
         this.brickType = 0;
+        this.breaking = false;
+        this.destroyed = false;
+        currentFrame = 0;
     }
+    public void update(double deltaTime) {
+        if (breaking) {
+            frameTimer += deltaTime;
+            if (frameTimer >= frameDuration) {
+                frameTimer = 0;
+                currentFrame++;
+                if (currentFrame >= totalFrames) {
+                    destroyed = true;
+                    breaking = false;
+                }
+            }
+        }
+    }
+
+    public void hit() {
+        brickType--;
+        if (brickType == 0 && !breaking) {
+            breaking = true;
+            currentFrame = 0;
+        }
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
+    public boolean isBreaking() {
+        return breaking;
+    }
+
     public int getBrickType(){
         return this.brickType;
     }
@@ -33,6 +72,10 @@ public class Brick extends GameObject{
     }
     @Override
     public void draw(GraphicsContext render) {
-        render.drawImage(image, sx, sy + brickType * 16, sw, sh, x, y, width, height);
+        if(!isBreaking()) {
+            render.drawImage(image, sx, sy + (brickType-1) * 16, sw, sh, x, y, width, height);
+        } else {
+            render.drawImage(image, sx + 32*currentFrame, sy, sw, sh, x, y, width, height);
+        }
     }
 }

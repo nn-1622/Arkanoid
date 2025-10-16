@@ -14,8 +14,10 @@ public class GameplayModel {
     private double canvasHeight;
     private BallState currentBallState;
     private boolean rendered = false;
-    private ArrayList<Brick> brick = new ArrayList<>();
-    ArrayList<Brick> toRemove = new ArrayList<>();
+    private ArrayList<Brick> brick;
+    private int level;
+    private int lives;
+
     public GameplayModel(double canvasWidth, double canvasHeight) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
@@ -27,6 +29,9 @@ public class GameplayModel {
 
         ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
+        lives = 5;
+        level = 1;
+        renderMap();
     }
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
@@ -41,7 +46,8 @@ public class GameplayModel {
         brick.add(newBrick);
     }
     public void renderMap() {
-        try (InputStream map = getClass().getResourceAsStream("/map/4.txt");
+        this.brick = new ArrayList<>();
+        try (InputStream map = getClass().getResourceAsStream(String.format("/map/%d.txt", level));
             Scanner scan = new Scanner(map)) {
             double spawnX = 0;
             double spawnY = 0;
@@ -104,13 +110,7 @@ public class GameplayModel {
     public ArrayList<Brick> getBricks() {
         return brick;
     }
-    public void hitReg(Brick b) {
-        b.setBrickType(b.getBrickType() - 1);
-        if (b.getBrickType() <= 0) {
-            b.setBrickType(0);
-            toRemove.add(b);
-        }
-    }
+
     public void checkCollisions() {
         if (paddle.getX() < 0) {
             paddle.setX(0);
@@ -132,6 +132,7 @@ public class GameplayModel {
 
             if (ball.getEdgeBottom() >= canvasHeight) {
                 resetPosition();
+                lives--;
             }
 
             if (ball.getEdgeBottom() >= paddle.getY() &&
@@ -151,6 +152,7 @@ public class GameplayModel {
             }
             
             for (Brick b : brick) {
+                if(b.isBreaking()) continue;
                 if (b.getEdgeBottom() > ball.getEdgeTop() &&
                     b.getEdgeTop() < ball.getEdgeBottom() && 
                     b.getEdgeRight() > ball.getEdgeLeft() && 
@@ -160,7 +162,7 @@ public class GameplayModel {
                     double overlapY = Math.min(ball.getEdgeBottom() - b.getEdgeTop(), b.getEdgeBottom() - ball.getEdgeTop());
 
                     if (overlapX < overlapY) {
-                        hitReg(b);
+                        b.hit();
                         if (ball.getX() < b.getX()) {
                             ball.setX(b.getEdgeLeft() - ball.getRadius());
                         } else {
@@ -168,7 +170,7 @@ public class GameplayModel {
                         }
                         ball.reverseVx();
                     } else if (overlapY < overlapX) {
-                        hitReg(b);
+                        b.hit();
                         if (ball.getY() < b.getY()) {
                             ball.setY(b.getEdgeTop() - ball.getRadius());
                         } else {
@@ -179,13 +181,33 @@ public class GameplayModel {
                     break;
                 }
             }
-            brick.removeAll(toRemove);
-            toRemove.clear();
         }
     }
-    public void update(boolean left, boolean right) {
+
+    public void Initialize(){
+        level++;
+        if (level <= 5) {
+            renderMap();
+            resetPosition();
+            lives = 5;
+        }
+    }
+    public void update(boolean left, boolean right, double deltaTime) {
         this.getPaddle().move(left, right);
         ball.move();
+        for (Brick b : brick) {
+            b.update(deltaTime);
+        }
         checkCollisions();
+        brick.removeIf(Brick::isDestroyed);
+    }
+    public boolean checkLose(){
+        return lives <= 0;
+    }
+    public boolean checkWin(){
+        return brick.isEmpty();
+    }
+    public boolean checkVictory(){
+        return level == 6;
     }
 }
