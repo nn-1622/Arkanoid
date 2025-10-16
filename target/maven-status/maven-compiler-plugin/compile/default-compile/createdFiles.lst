@@ -1,17 +1,1 @@
-Controller\GameController.class
-Model\Brick.class
-Model\Button.class
 Controller\GameController$1.class
-Model\Utility.class
-Model\Ball.class
-Model\MovableObject.class
-View\GameplayView.class
-Model\Paddle.class
-View\SettingScene.class
-View\GameView.class
-Model\State.class
-Model\GameplayModel.class
-Model\GameObject.class
-Model\GameModel.class
-View\MenuScene.class
-Model\BallState.class
