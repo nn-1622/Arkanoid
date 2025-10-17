@@ -2,6 +2,7 @@ package Model;
 
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.media.AudioClip;
 
 public class Brick extends GameObject{
     private Image image = new Image("/Sprite.png");

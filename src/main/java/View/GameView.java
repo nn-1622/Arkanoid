@@ -6,6 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class GameView {
     private Group root;
@@ -45,6 +46,12 @@ public class GameView {
             loseView.drawLoseScene(gc);
         } else if(model.getGstate() == State.VICTORY){
             victoryView.drawWinScene(gc);
+        } else if(model.getGstate() == State.FADE){
+            final double fadeTime = 2.0;
+            double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;
+            double opacity = Math.min(1.0, (timeElapsed / fadeTime));
+            gc.setFill(new Color(0,0,0,opacity));
+            gc.fillRect(0,0, canvas.getWidth(), canvas.getHeight());
         }
     }
     public MenuScene getMenuScene() {

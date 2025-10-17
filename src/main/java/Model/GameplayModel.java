@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Controller.GameEventListener;
 import javafx.scene.image.Image;
 
 public class GameplayModel {
@@ -13,10 +14,13 @@ public class GameplayModel {
     private double canvasWidth;
     private double canvasHeight;
     private BallState currentBallState;
+    private double currentVx;
     private boolean rendered = false;
     private ArrayList<Brick> brick;
     private int level;
     private int lives;
+
+    private GameEventListener gameEventListener;
 
     public GameplayModel(double canvasWidth, double canvasHeight) {
         this.canvasWidth = canvasWidth;
@@ -31,13 +35,14 @@ public class GameplayModel {
         currentBallState = BallState.ATTACHED;
         lives = 5;
         level = 1;
+        currentVx = 0;
         renderMap();
     }
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
             this.currentBallState = BallState.LAUNCHED;
             ball.setVx(0);
-            ball.setVy(-5);
+            ball.setVy(-5 - currentVx);
         }
     }
     public void addBrickType(int type, double x, double y) {
@@ -110,6 +115,9 @@ public class GameplayModel {
     public ArrayList<Brick> getBricks() {
         return brick;
     }
+    public int getLives() {
+        return lives;
+    }
 
     public void checkCollisions() {
         if (paddle.getX() < 0) {
@@ -161,8 +169,12 @@ public class GameplayModel {
                     double overlapX = Math.min(ball.getEdgeRight() - b.getEdgeLeft(), b.getEdgeRight() - ball.getEdgeLeft());
                     double overlapY = Math.min(ball.getEdgeBottom() - b.getEdgeTop(), b.getEdgeBottom() - ball.getEdgeTop());
 
+                    b.hit();
+                    if(gameEventListener != null) {
+                        gameEventListener.onBrickHit();
+                    }
+
                     if (overlapX < overlapY) {
-                        b.hit();
                         if (ball.getX() < b.getX()) {
                             ball.setX(b.getEdgeLeft() - ball.getRadius());
                         } else {
@@ -170,7 +182,6 @@ public class GameplayModel {
                         }
                         ball.reverseVx();
                     } else if (overlapY < overlapX) {
-                        b.hit();
                         if (ball.getY() < b.getY()) {
                             ball.setY(b.getEdgeTop() - ball.getRadius());
                         } else {
@@ -189,6 +200,7 @@ public class GameplayModel {
         if (level <= 5) {
             renderMap();
             resetPosition();
+            currentVx++;
             lives = 5;
         }
     }
@@ -200,14 +212,24 @@ public class GameplayModel {
         }
         checkCollisions();
         brick.removeIf(Brick::isDestroyed);
+        if (brick.isEmpty()) {
+            if(gameEventListener != null) {
+                gameEventListener.onLevelCompleted();
+            }
+        }
+        if (level ==6) {
+            if(gameEventListener != null) {
+                gameEventListener.onVictory();
+            }
+        }
+        if (lives <= 0) {
+            if(gameEventListener != null) {
+                gameEventListener.onGameOver();
+            }
+        }
     }
-    public boolean checkLose(){
-        return lives <= 0;
-    }
-    public boolean checkWin(){
-        return brick.isEmpty();
-    }
-    public boolean checkVictory(){
-        return level == 6;
+
+    public void setGameEventListener(GameEventListener gameEventListener) {
+        this.gameEventListener = gameEventListener;
     }
 }

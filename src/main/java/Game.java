@@ -19,6 +19,7 @@ public class Game extends Application {
         controller = new GameController(model, view);
         stage.setScene(view.getScene());
         stage.setTitle("Arkanoid!");
+        stage.setResizable(false);
         stage.show();
         new AnimationTimer() {
             @Override

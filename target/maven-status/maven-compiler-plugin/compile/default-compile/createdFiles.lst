@@ -1,3 +1,5 @@
+Controller\SoundManager.class
 Controller\GameController$1.class
+Controller\GameEventListener.class
 View\VictoryView.class
 View\LoseView.class

@@ -6,5 +6,6 @@ public enum State {
     PAUSED,
     SETTING,
     LOSS,
-    VICTORY
+    VICTORY,
+    FADE
 }
