@@ -21,7 +21,6 @@ public class GameplayModel {
     private double canvasHeight;
     private BallState currentBallState;
     private double currentVx;
-    private boolean rendered = false;
     private ArrayList<Brick> brick;
     private int level;
     private int lives;
@@ -160,22 +159,6 @@ public class GameplayModel {
     }
 
     /**
-     * Kiểm tra xem việc kết xuất ban đầu đã xảy ra chưa.
-     * @return true nếu đã kết xuất, ngược lại là false.
-     */
-    public boolean getRendered() {
-        return rendered;
-    }
-
-    /**
-     * Đặt trạng thái đã kết xuất.
-     * @param rendered Trạng thái kết xuất mới.
-     */
-    public void setRendered(boolean rendered) {
-        this.rendered = rendered;
-    }
-
-    /**
      * Lấy danh sách các viên gạch hiện có trong trò chơi.
      * @return Một ArrayList chứa các đối tượng Brick.
      */
@@ -288,7 +271,7 @@ public class GameplayModel {
 
                     b.hit();
                     comboHit();
-                    scorePoint(１);
+                    scorePoint(1);
                     if(gameEventListener != null) {
                         gameEventListener.onBrickHit();
                     }
