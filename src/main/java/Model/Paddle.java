@@ -3,36 +3,70 @@ package Model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+/**
+ * Lớp đại diện cho thanh trượt (paddle) của người chơi.
+ * Kế thừa từ {@link MovableObject}, lớp này quản lý vị trí, kích thước, hình ảnh
+ * và logic di chuyển ngang của thanh trượt dựa trên đầu vào của người dùng.
+ */
 public class Paddle extends MovableObject {
     private double length;
     private double height;
     private Image paddleImg;
 
+    /**
+     * Khởi tạo một đối tượng Paddle mới.
+     * @param x Tọa độ x ban đầu của góc trên bên trái thanh trượt.
+     * @param y Tọa độ y ban đầu của góc trên bên trái thanh trượt.
+     * @param length Chiều dài (chiều rộng) của thanh trượt.
+     * @param height Chiều cao của thanh trượt.
+     */
     public Paddle(double x, double y, double length, double height) {
         super(x, y);
         this.length = length;
         this.height = height;
         this.paddleImg = new Image("/DefaultPaddle.png");
-        setVx(5);
+        setVx(5); // Đặt tốc độ di chuyển mặc định
     }
 
+    /**
+     * Lấy chiều dài của thanh trượt.
+     * @return Chiều dài của thanh trượt.
+     */
     public double getLength() {
         return length;
     }
 
+    /**
+     * Lấy chiều cao của thanh trượt.
+     * @return Chiều cao của thanh trượt.
+     */
     public double getHeight() {
         return height;
     }
 
+    /**
+     * Thiết lập một hình ảnh mới cho thanh trượt.
+     * @param paddleImg Đối tượng Image mới để hiển thị cho thanh trượt.
+     */
     public void setPaddleImg(Image paddleImg) {
         this.paddleImg = paddleImg;
     }
 
+    /**
+     * {@inheritDoc}
+     * Vẽ hình ảnh của thanh trượt lên canvas tại vị trí hiện tại của nó.
+     */
     @Override
     public void draw(GraphicsContext render) {
         render.drawImage(paddleImg, x, y, length, height);
     }
 
+    /**
+     * Di chuyển thanh trượt sang trái hoặc sang phải dựa trên đầu vào của người dùng.
+     * Vị trí x của thanh trượt được cập nhật dựa trên vận tốc đã đặt.
+     * @param left  true nếu phím di chuyển sang trái được nhấn.
+     * @param right true nếu phím di chuyển sang phải được nhấn.
+     */
     public void move(boolean left, boolean right){
         if(left){
             x -= this.getVx();

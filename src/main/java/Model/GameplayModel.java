@@ -7,6 +7,12 @@ import java.util.Scanner;
 import Controller.GameEventListener;
 import javafx.scene.image.Image;
 
+/**
+ * Quản lý trạng thái và logic của trò chơi.
+ * Lớp này chứa tất cả các đối tượng trong trò chơi như bóng, thanh trượt và gạch,
+ * đồng thời chứa các cơ chế cốt lõi của trò chơi bao gồm phát hiện va chạm,
+ * tính điểm và tiến trình qua các cấp độ.
+ */
 public class GameplayModel {
     private Image background;
     private Ball ball;
@@ -19,9 +25,16 @@ public class GameplayModel {
     private ArrayList<Brick> brick;
     private int level;
     private int lives;
+    private int score;
+    private int combo;
 
     private GameEventListener gameEventListener;
 
+    /**
+     * Xây dựng một GameplayModel mới và khởi tạo trạng thái trò chơi.
+     * @param canvasWidth  Chiều rộng của khung vẽ trò chơi.
+     * @param canvasHeight Chiều cao của khung vẽ trò chơi.
+     */
     public GameplayModel(double canvasWidth, double canvasHeight) {
         this.canvasWidth = canvasWidth;
         this.canvasHeight = canvasHeight;
@@ -35,9 +48,16 @@ public class GameplayModel {
         currentBallState = BallState.ATTACHED;
         lives = 5;
         level = 1;
+        score = 0;
+        combo = 0;
         currentVx = 0;
         renderMap();
     }
+
+    /**
+     * Phóng quả bóng từ thanh trượt nếu nó hiện đang ở trạng thái ATTACHED (gắn liền).
+     * Quả bóng được cung cấp một vận tốc ban đầu theo chiều dọc.
+     */
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
             this.currentBallState = BallState.LAUNCHED;
@@ -45,11 +65,23 @@ public class GameplayModel {
             ball.setVy(-5 - currentVx);
         }
     }
+
+    /**
+     * Thêm một viên gạch thuộc loại được chỉ định vào trò chơi tại một vị trí nhất định.
+     * @param type Loại của viên gạch, quyết định các thuộc tính của nó.
+     * @param x Tọa độ x cho vị trí của viên gạch.
+     * @param y Tọa độ y cho vị trí của viên gạch.
+     */
     public void addBrickType(int type, double x, double y) {
         Brick newBrick = new Brick(x, y);
         newBrick.setBrickType(type);
         brick.add(newBrick);
     }
+
+    /**
+     * Đọc bố cục bản đồ cho cấp độ hiện tại từ một tệp tài nguyên
+     * và điền vào danh sách gạch tương ứng.
+     */
     public void renderMap() {
         this.brick = new ArrayList<>();
         try (InputStream map = getClass().getResourceAsStream(String.format("/map/%d.txt", level));
@@ -88,6 +120,11 @@ public class GameplayModel {
             e.printStackTrace();
         }
     }
+
+    /**
+     * Đặt lại quả bóng và thanh trượt về vị trí xuất phát ban đầu.
+     * Trạng thái của quả bóng được đặt thành ATTACHED (gắn liền).
+     */
     public void resetPosition() {
         paddle.setX(canvasWidth / 2 - paddle.getLength() / 2);
         paddle.setY(canvasHeight - 100);
@@ -97,28 +134,107 @@ public class GameplayModel {
         ball.setVy(0);
         currentBallState = BallState.ATTACHED;
     }
+
+    /**
+     * Lấy ảnh nền.
+     * @return Ảnh nền.
+     */
     public Image getBackground() {
         return background;
     }
+
+    /**
+     * Lấy đối tượng thanh trượt.
+     * @return Thanh trượt của trò chơi.
+     */
     public Paddle getPaddle() {
         return paddle;
     }
+
+    /**
+     * Lấy đối tượng bóng.
+     * @return Quả bóng của trò chơi.
+     */
     public Ball getBall() {
         return ball;
     }
+
+    /**
+     * Kiểm tra xem việc kết xuất ban đầu đã xảy ra chưa.
+     * @return true nếu đã kết xuất, ngược lại là false.
+     */
     public boolean getRendered() {
         return rendered;
     }
+
+    /**
+     * Đặt trạng thái đã kết xuất.
+     * @param rendered Trạng thái kết xuất mới.
+     */
     public void setRendered(boolean rendered) {
         this.rendered = rendered;
     }
+
+    /**
+     * Lấy danh sách các viên gạch hiện có trong trò chơi.
+     * @return Một ArrayList chứa các đối tượng Brick.
+     */
     public ArrayList<Brick> getBricks() {
         return brick;
     }
+
+    /**
+     * Lấy số mạng còn lại.
+     * @return Số mạng hiện tại.
+     */
     public int getLives() {
         return lives;
     }
 
+    /**
+     * Lấy điểm số hiện tại.
+     * @return Điểm của người chơi.
+     */
+    public int getScore() {
+        return score;
+    }
+
+    /**
+     * Cộng điểm vào tổng điểm, được nhân với combo hiện tại.
+     * @param points Số điểm cơ bản để cộng.
+     */
+    public void scorePoint(int points) {
+        score += points * combo;
+    }
+
+    /**
+     * Lấy hệ số nhân combo hiện tại.
+     * @return Giá trị combo.
+     */
+    public int getCombo() {
+        return combo;
+    }
+
+    /**
+     * Đặt hệ số nhân combo.
+     * @param combo Giá trị combo mới.
+     */
+    public void setCombo(int combo) {
+        this.combo = combo;
+    }
+
+    /**
+     * Tăng hệ số nhân combo lên một.
+     */
+    public void comboHit() {
+        combo++;
+    }
+
+    /**
+     * Kiểm tra và xử lý tất cả các va chạm trong trò chơi. Điều này bao gồm
+     * va chạm giữa bóng-tường, bóng-thanh trượt, và bóng-gạch. Nó cũng thực thi
+     * các giới hạn di chuyển của thanh trượt.
+     */
     public void checkCollisions() {
         if (paddle.getX() < 0) {
             paddle.setX(0);
@@ -141,6 +257,7 @@ public class GameplayModel {
             if (ball.getEdgeBottom() >= canvasHeight) {
                 resetPosition();
                 lives--;
+                setCombo(0);
             }
 
             if (ball.getEdgeBottom() >= paddle.getY() &&
@@ -170,6 +287,8 @@ public class GameplayModel {
                     double overlapY = Math.min(ball.getEdgeBottom() - b.getEdgeTop(), b.getEdgeBottom() - ball.getEdgeTop());
 
                     b.hit();
+                    comboHit();
+                    scorePoint(50);
                     if(gameEventListener != null) {
                         gameEventListener.onBrickHit();
                     }
@@ -195,6 +314,10 @@ public class GameplayModel {
         }
     }
 
+    /**
+     * Khởi tạo cấp độ tiếp theo của trò chơi. Phương thức này tăng biến đếm cấp độ,
+     * kết xuất bản đồ mới, đặt lại vị trí các đối tượng, và đặt lại số mạng và combo.
+     */
     public void Initialize(){
         level++;
         if (level <= 5) {
@@ -202,8 +325,18 @@ public class GameplayModel {
             resetPosition();
             currentVx++;
             lives = 5;
+            setCombo(0);
         }
     }
+
+    /**
+     * Cập nhật trạng thái trò chơi cho mỗi khung hình. Phương thức này di chuyển thanh trượt và bóng,
+     * cập nhật hoạt ảnh của gạch, kiểm tra va chạm, loại bỏ các viên gạch đã bị phá hủy,
+     * và kiểm tra các thay đổi trạng thái trò chơi như hoàn thành cấp độ hoặc thua cuộc.
+     * @param left      true nếu phím di chuyển sang trái được nhấn.
+     * @param right     true nếu phím di chuyển sang phải được nhấn.
+     * @param deltaTime Thời gian đã trôi qua kể từ khung hình cuối cùng.
+     */
     public void update(boolean left, boolean right, double deltaTime) {
         this.getPaddle().move(left, right);
         ball.move();
@@ -217,7 +350,7 @@ public class GameplayModel {
                 gameEventListener.onLevelCompleted();
             }
         }
-        if (level ==6) {
+        if (level == 6) {
             if(gameEventListener != null) {
                 gameEventListener.onVictory();
             }
@@ -229,6 +362,10 @@ public class GameplayModel {
         }
     }
 
+    /**
+     * Đặt bộ lắng nghe cho các sự kiện của trò chơi.
+     * @param gameEventListener Bộ lắng nghe sẽ được thông báo về các sự kiện của trò chơi.
+     */
     public void setGameEventListener(GameEventListener gameEventListener) {
         this.gameEventListener = gameEventListener;
     }
