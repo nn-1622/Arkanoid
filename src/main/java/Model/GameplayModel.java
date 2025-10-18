@@ -288,7 +288,7 @@ public class GameplayModel {
 
                     b.hit();
                     comboHit();
-                    scorePoint(50);
+                    scorePoint(１);
                     if(gameEventListener != null) {
                         gameEventListener.onBrickHit();
                     }
