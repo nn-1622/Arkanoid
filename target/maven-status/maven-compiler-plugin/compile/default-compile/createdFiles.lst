@@ -1,12 +1,5 @@
-State.class
-Ball.class
-Button.class
-GameManager.class
-Utility.class
-GameObject.class
-MovableObject.class
-MenuScene.class
-Game$1.class
-Game.class
-Paddle.class
-SettingScene.class
+Controller\SoundManager.class
+Controller\GameController$1.class
+Controller\GameEventListener.class
+View\VictoryView.class
+View\LoseView.class
