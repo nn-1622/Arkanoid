@@ -1,5 +1,6 @@
 import Controller.GameController;
 import Model.GameModel;
+import Model.GameplayModel;
 import Model.State;
 import View.GameView;
 import javafx.application.Application;

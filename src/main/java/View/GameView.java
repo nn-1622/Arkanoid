@@ -1,6 +1,7 @@
 package View;
 
 import Model.GameModel;
+import Model.GameplayModel;
 import Model.State;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -40,7 +41,6 @@ public class GameView {
         menuScene = new MenuScene(canvas.getWidth(),canvas.getHeight());
         settingScene = new SettingScene(canvas.getWidth(),canvas.getHeight());
         gameplayView = new GameplayView();
-        loseView = new LoseView();
         victoryView = new VictoryView();
     }
 
@@ -108,6 +108,11 @@ public class GameView {
      * @return Đối tượng LoseView.
      */
     public LoseView getLoseScene() {
+        if (loseView == null) {
+            loseView = new LoseView(GameplayModel.getScore());
+        } else {
+            loseView.updateScore(GameplayModel.getScore());
+        }
         return loseView;
     }
 

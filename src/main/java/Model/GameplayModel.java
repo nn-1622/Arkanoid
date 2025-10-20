@@ -24,7 +24,7 @@ public class GameplayModel {
     private ArrayList<Brick> brick;
     private int level;
     private int lives;
-    private int score;
+    private static int score;
     private int combo;
 
     private GameEventListener gameEventListener;
@@ -178,7 +178,7 @@ public class GameplayModel {
      * Lấy điểm số hiện tại.
      * @return Điểm của người chơi.
      */
-    public int getScore() {
+    public static int getScore() {
         return score;
     }
 
