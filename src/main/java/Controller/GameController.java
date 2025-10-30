@@ -87,12 +87,16 @@ public class GameController implements GameEventListener {
     public void setInput() {
         // Xử lý sự kiện di chuyển chuột để tạo hiệu ứng hover cho các nút
         view.getScene().setOnMouseMoved(e -> {
-            model.getCurrentView().checkHover(e);
+            if (model.getCurrentView() != null) {
+                model.getCurrentView().checkHover(e);
+            }
         });
 
         // Xử lý sự kiện nhấp chuột để tương tác với các nút trong các màn hình khác nhau
         view.getScene().setOnMouseClicked(e -> {
-            model.getCurrentView().handleClick(e);
+            if (model.getCurrentView() != null) {
+                model.getCurrentView().handleClick(e);
+            }
         });
 
         // Xử lý sự kiện nhấn phím

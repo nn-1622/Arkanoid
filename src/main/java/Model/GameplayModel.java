@@ -40,7 +40,7 @@ public class GameplayModel implements UltilityValues {
         ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
         lives = 5;
-        level = 1;
+        level = 5;
         score = 0;
         combo = 0;
         currentVx = 0;
@@ -247,7 +247,7 @@ public class GameplayModel implements UltilityValues {
                 double diff = (ball.getCenter() - paddleCenter) / (paddle.getLength() / 2);
 
                 double speed = Math.sqrt(ball.getVx() * ball.getVx() + ball.getVy() * ball.getVy());
-                double angle = diff * Math.toRadians(75);
+                double angle = diff * Math.toRadians(70);
 
                 ball.setVx(speed * Math.sin(angle));
                 ball.setVy(-speed * Math.cos(angle));
@@ -313,6 +313,11 @@ public class GameplayModel implements UltilityValues {
      * @param deltaTime Thời gian đã trôi qua kể từ khung hình cuối cùng.
      */
     public void update(boolean left, boolean right, double deltaTime) {
+        long frameTime = 16_666_667 / 1_000_000_000;
+
+        if (deltaTime < frameTime) {
+            return;
+        }
         this.paddle.move(left, right);
         ball.move();
         for (Brick b : brick) {
