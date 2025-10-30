@@ -4,6 +4,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Controller.EventLoader;
+import Controller.GameEvent;
 import Controller.GameEventListener;
 import javafx.scene.image.Image;
 
@@ -13,12 +15,10 @@ import javafx.scene.image.Image;
  * đồng thời chứa các cơ chế cốt lõi của trò chơi bao gồm phát hiện va chạm,
  * tính điểm và tiến trình qua các cấp độ.
  */
-public class GameplayModel {
+public class GameplayModel implements UltilityValues {
     private Image background;
     private Ball ball;
     private Paddle paddle;
-    private double canvasWidth;
-    private double canvasHeight;
     private BallState currentBallState;
     private double currentVx;
     private ArrayList<Brick> brick;
@@ -27,21 +27,15 @@ public class GameplayModel {
     private int score;
     private int combo;
 
-    private GameEventListener gameEventListener;
+    private EventLoader eventLoader;
 
     /**
      * Xây dựng một GameplayModel mới và khởi tạo trạng thái trò chơi.
-     * @param canvasWidth  Chiều rộng của khung vẽ trò chơi.
-     * @param canvasHeight Chiều cao của khung vẽ trò chơi.
      */
-    public GameplayModel(double canvasWidth, double canvasHeight) {
-        this.canvasWidth = canvasWidth;
-        this.canvasHeight = canvasHeight;
-        double paddleLength = 110;
-        double paddleHeight = 20;
+    public GameplayModel(EventLoader eventLoader) {
+        this.eventLoader = eventLoader;
 
-        paddle = new Paddle(canvasWidth / 2 - paddleLength / 2,
-                canvasHeight - 100, paddleLength, paddleHeight);
+        paddle = Paddle.getPaddle();
 
         ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
@@ -272,9 +266,7 @@ public class GameplayModel {
                     b.hit();
                     comboHit();
                     scorePoint(1);
-                    if(gameEventListener != null) {
-                        gameEventListener.onBrickHit();
-                    }
+                    eventLoader.loadEvent(GameEvent.BALL_HIT);
 
                     if (overlapX < overlapY) {
                         if (ball.getX() < b.getX()) {
@@ -321,7 +313,7 @@ public class GameplayModel {
      * @param deltaTime Thời gian đã trôi qua kể từ khung hình cuối cùng.
      */
     public void update(boolean left, boolean right, double deltaTime) {
-        this.getPaddle().move(left, right);
+        this.paddle.move(left, right);
         ball.move();
         for (Brick b : brick) {
             b.update(deltaTime);
@@ -329,27 +321,13 @@ public class GameplayModel {
         checkCollisions();
         brick.removeIf(Brick::isDestroyed);
         if (brick.isEmpty()) {
-            if(gameEventListener != null) {
-                gameEventListener.onLevelCompleted();
-            }
+            eventLoader.loadEvent(GameEvent.LEVEL_COMPLETE);
         }
         if (level == 6) {
-            if(gameEventListener != null) {
-                gameEventListener.onVictory();
-            }
+            eventLoader.loadEvent(GameEvent.GAME_WIN);
         }
         if (lives <= 0) {
-            if(gameEventListener != null) {
-                gameEventListener.onGameOver();
-            }
+            eventLoader.loadEvent(GameEvent.GAME_LOST);
         }
-    }
-
-    /**
-     * Đặt bộ lắng nghe cho các sự kiện của trò chơi.
-     * @param gameEventListener Bộ lắng nghe sẽ được thông báo về các sự kiện của trò chơi.
-     */
-    public void setGameEventListener(GameEventListener gameEventListener) {
-        this.gameEventListener = gameEventListener;
     }
 }

@@ -1,5 +1,7 @@
 package Model;
 
+import Controller.GameCommand;
+import Controller.GameController;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -13,6 +15,7 @@ public class Button extends Utility {
     private Image imgButton;
     private Image imgHoverButton;
     private boolean isHover;
+    private GameCommand command;
 
     /**
      * Khởi tạo một đối tượng Button mới với vị trí và kích thước được chỉ định.
@@ -21,11 +24,12 @@ public class Button extends Utility {
      * @param width Chiều rộng của nút.
      * @param height Chiều cao của nút.
      */
-    public Button(double x, double y, double width, double height) {
+    public Button(double x, double y, double width, double height, GameCommand command) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.command = command;
     }
 
     /**
@@ -89,5 +93,9 @@ public class Button extends Utility {
         } else{
             gc.drawImage(imgHoverButton, x, y, width, height);
         }
+    }
+
+    public void activate() {
+        command.execute();
     }
 }

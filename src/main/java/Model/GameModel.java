@@ -1,48 +1,67 @@
 package Model;
 
 
+import Controller.EventLoader;
+import Controller.GameController;
 import Controller.GameEventListener;
+import View.*;
+
+import java.util.EnumMap;
+import java.util.Map;
 
 /**
  * Lớp model chính của toàn bộ ứng dụng trò chơi.
  * Lớp này quản lý trạng thái tổng thể của ứng dụng (ví dụ: đang ở MENU, đang PLAYING, SETTING, v.v.)
  * và chứa một đối tượng {@link GameplayModel} để xử lý logic cụ thể của màn chơi.
  */
-public class GameModel {
+public class GameModel implements UltilityValues {
+    private final EventLoader eventLoader;
+    private static GameModel model;
     private State gstate;
+    private View currentView;
     private GameplayModel gameModel;
-    private double canvasHeight;
-    private double canvasWidth;
+    private final Map<State, View> viewMap = new EnumMap<State, View>(State.class);
     private long fadeStartTime = 0;
 
     /**
      * Khởi tạo một đối tượng GameModel mới.
      * Trạng thái ban đầu của trò chơi được đặt là MENU.
-     * @param canvasHeight Chiều cao của khu vực vẽ (canvas).
-     * @param canvasWidth  Chiều rộng của khu vực vẽ (canvas).
      */
-    public GameModel(double  canvasHeight, double canvasWidth) {
-        gstate = State.MENU;
-        this.canvasHeight = canvasHeight;
-        this.canvasWidth = canvasWidth;
+    private GameModel() {
+        eventLoader = new EventLoader();
+
+        viewMap.put(State.MENU, new MenuScene(this));
+        viewMap.put(State.LOSS, new LoseView(this));
+        viewMap.put(State.PLAYING, new GameplayView(this));
+        viewMap.put(State.SETTING, new SettingScene(this));
+        viewMap.put(State.VICTORY, new VictoryView(this));
+
+        setGstate(State.MENU);
+    }
+
+    public static GameModel getGameModel() {
+        if (model == null) {
+            model = new GameModel();
+        }
+        return model;
     }
 
     /**
      * Tạo và khởi tạo một phiên chơi mới (GameplayModel).
      * Phương thức này được gọi khi bắt đầu một màn chơi mới hoặc chơi lại.
-     * @param gameEventListener Đối tượng lắng nghe sự kiện (thường là GameController) để nhận các thông báo từ màn chơi.
      */
-    public void CreateGameplay(GameEventListener gameEventListener) {
-        gameModel = new GameplayModel(this.canvasWidth, this.canvasHeight);
-        gameModel.setGameEventListener(gameEventListener);
+    public void CreateGameplay() {
+        gameModel = new GameplayModel(eventLoader);
     }
 
     /**
      * Thiết lập trạng thái hiện tại của trò chơi.
      * @param gstate Trạng thái mới (ví dụ: State.PLAYING, State.MENU).
      */
-    public void  setGstate(State gstate) {
+    public void setGstate(State gstate) {
         this.gstate = gstate;
+
+        this.currentView = viewMap.get(gstate);
     }
 
     /**
@@ -76,5 +95,17 @@ public class GameModel {
      */
     public long getFadeStartTime() {
         return fadeStartTime;
+    }
+
+    /**
+     * trả về view hiện tại
+     * @return view
+     */
+    public View getCurrentView() {
+        return currentView;
+    }
+
+    public EventLoader getEventLoader() {
+        return eventLoader;
     }
 }

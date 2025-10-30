@@ -1,4 +1,10 @@
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\AdjustVolumeCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ChangeStateCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\EventLoader.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ExitCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\GameCommand.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\GameController.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\GameEvent.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\GameEventListener.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\SoundManager.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Game.java
@@ -12,10 +18,13 @@ C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\GameplayModel.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\MovableObject.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\Paddle.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\State.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\UltilityValues.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\Utility.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\GameplayView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\GameView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\LoseView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\MenuScene.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\SceneActions.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\SettingScene.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\VictoryView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\View.java

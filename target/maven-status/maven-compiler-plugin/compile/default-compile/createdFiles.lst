@@ -1,5 +1,15 @@
 Controller\SoundManager.class
 Controller\GameController$1.class
+Controller\GameEvent.class
 Controller\GameEventListener.class
 View\VictoryView.class
+Controller\ChangeStateCmd.class
+Controller\AdjustVolumeCmd.class
+Controller\ExitCmd.class
+Model\UltilityValues.class
 View\LoseView.class
+View\View.class
+View\SceneActions.class
+Controller\GameCommand.class
+Controller\EventLoader.class
+Controller\SoundManager$1.class
