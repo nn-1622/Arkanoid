@@ -1,5 +1,10 @@
 package Model;
 
+//import 2 class để save game
+import Controller.ScoreManager;
+import Model.GameSaveData;
+
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -213,6 +218,10 @@ public class GameplayModel {
         combo++;
     }
 
+    public int getLevel() {
+        return level;
+    }
+
     /**
      * Kiểm tra và xử lý tất cả các va chạm trong trò chơi. Điều này bao gồm
      * va chạm giữa bóng-tường, bóng-thanh trượt, và bóng-gạch. Nó cũng thực thi
@@ -313,6 +322,33 @@ public class GameplayModel {
     }
 
     /**
+     * SaveGame
+     */
+    public void saveGame() {
+        GameSaveData data = new GameSaveData(getScore(), getLevel(), getLives());
+        ScoreManager.saveGame(data);
+    }
+
+    /**
+     * LoadGame
+     */
+    public void loadGame() {
+        GameSaveData saved = ScoreManager.loadGame();
+        if (saved != null) {
+            this.score = saved.getScore();
+            this.level = saved.getLevel();
+            this.lives = saved.getLives();
+
+            System.out.println("Downloading " + saved);
+            renderMap();       // Vẽ lại bản đồ theo level
+            resetPosition();   // Đặt lại bóng và thanh trượt
+        } else {
+            System.out.println("Not Found Saved Game");
+        }
+    }
+
+
+    /**
      * Cập nhật trạng thái trò chơi cho mỗi khung hình. Phương thức này di chuyển thanh trượt và bóng,
      * cập nhật hoạt ảnh của gạch, kiểm tra va chạm, loại bỏ các viên gạch đã bị phá hủy,
      * và kiểm tra các thay đổi trạng thái trò chơi như hoàn thành cấp độ hoặc thua cuộc.
@@ -331,16 +367,22 @@ public class GameplayModel {
         if (brick.isEmpty()) {
             if(gameEventListener != null) {
                 gameEventListener.onLevelCompleted();
+                //Lưu điểm khi qua màn
+                saveGame();
             }
         }
         if (level == 6) {
             if(gameEventListener != null) {
                 gameEventListener.onVictory();
+                //Lưu điểm khi thắng
+                saveGame();
             }
         }
         if (lives <= 0) {
             if(gameEventListener != null) {
                 gameEventListener.onGameOver();
+                //Lưu điểm khi thua
+                saveGame();
             }
         }
     }

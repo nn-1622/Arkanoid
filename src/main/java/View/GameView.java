@@ -66,6 +66,8 @@ public class GameView {
         } else if(model.getGstate() == State.PLAYING){
             gameplayView.drawGameScene(gc, model.getGameplayModel());
         } else if(model.getGstate() == State.LOSS){
+            //Update truyền điểm hiện tại vào LoseView để kiểm tra kỷ lục mới
+            loseView.setScore(model.getGameplayModel().getScore());
             loseView.drawLoseScene(gc);
         } else if(model.getGstate() == State.VICTORY){
             victoryView.drawWinScene(gc);

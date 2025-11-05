@@ -1,9 +1,13 @@
 package View;
 
+import Controller.ScoreManager;
 import Model.Button;
+import Model.GameSaveData;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 
 /**
  * Lớp chịu trách nhiệm hiển thị màn hình thua cuộc (Game Over).
@@ -14,6 +18,10 @@ public class LoseView {
     private Image lose = new Image("/lose.jpg");
     private Button replay;
     private Button menu;
+
+    // update thêm hiển thị highscore
+    private int currentScore;
+    private boolean isNewHighScore = false;
 
     /**
      * Khởi tạo một LoseView mới.
@@ -31,6 +39,26 @@ public class LoseView {
     }
 
     /**
+     * Thiết lập điểm của người chơi và kiểm tra xem có phải điểm cao mới hay không.
+     * @param score Điểm đạt được sau khi thua cuộc.
+     */
+    public void setScore(int score) {
+        this.currentScore = score;
+        GameSaveData saved = ScoreManager.loadGame();
+
+        System.out.println("Current Score: " + score); // Debug điểm hiện tại
+        System.out.println("Saved Data: " + saved); // Debug dữ liệu từ file
+
+        if (saved == null || score > saved.getScore()) {
+            // Cập nhật điểm cao mới
+            ScoreManager.saveGame(new GameSaveData(score, 1, 5));
+            isNewHighScore = true;
+        } else {
+            isNewHighScore = false;
+        }
+    }
+
+    /**
      * Vẽ toàn bộ màn hình thua cuộc lên canvas.
      * @param gc Đối tượng GraphicsContext được sử dụng để thực hiện các thao tác vẽ.
      */
@@ -38,6 +66,28 @@ public class LoseView {
         gc.drawImage(lose, 0, 0,600,650);
         replay.draw(gc);
         menu.draw(gc);
+
+        gc.setFill(Color.WHITE);
+        gc.setFont(Font.font("Arial", 28));
+
+        // Hiển thị điểm người chơi
+        gc.fillText("Điểm của bạn: " + currentScore, 200, 300);
+
+        GameSaveData highScoreData = ScoreManager.loadGame();
+        int highScore = (highScoreData != null) ? highScoreData.getScore() : 0;
+
+        // Thêm dòng hiển thị điểm cao nhất
+        gc.fillText("Điểm cao nhất: " + highScore, 200, 330);
+
+        //Thêm dòng này vào để debug lỗi
+        System.out.println("Drawing - Current Score: " + currentScore + ", High Score: " + highScore + ", isNewHighScore: " + isNewHighScore);
+
+        // Nếu đạt điểm cao mới
+        if (isNewHighScore) {
+            gc.setFill(Color.YELLOW);
+            gc.setFont(Font.font("Arial", 30));
+            gc.fillText("Chúc mừng kỷ lục mới!", 130, 340);
+        }
     }
 
     /**
