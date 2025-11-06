@@ -13,5 +13,6 @@ public enum State {
     SETTING,
     LOSS,
     VICTORY,
-    FADE
+    FADE,
+    HIGHSCORE //update them state highscore
 }

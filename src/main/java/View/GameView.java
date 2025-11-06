@@ -24,6 +24,8 @@ public class GameView {
     private VictoryView victoryView;
     private GraphicsContext gc;
     private Canvas canvas;
+    //update highscore view
+    private HighScoreView highScoreView;
 
     /**
      * Khởi tạo GameView.
@@ -42,6 +44,8 @@ public class GameView {
         gameplayView = new GameplayView();
         loseView = new LoseView();
         victoryView = new VictoryView();
+        //update highscore view
+        highScoreView = new HighScoreView();
     }
 
     /**
@@ -79,6 +83,18 @@ public class GameView {
             gc.setFill(new Color(0,0,0,opacity));
             gc.fillRect(0,0, canvas.getWidth(), canvas.getHeight());
         }
+        //Update thêm xử lý highscoreview
+        else if(model.getGstate() == State.HIGHSCORE){
+            highScoreView.drawHighScoreScene(gc);
+        }
+    }
+
+    /**
+     * Lấy đối tượng highscoreview từ màn hình loseview
+     * @return màn hình highscoreview
+     */
+    public HighScoreView getHighScoreView() {
+        return highScoreView;
     }
 
     /**

@@ -122,6 +122,8 @@ public class GameController implements GameEventListener {
                 view.getLoseScene().checkHover(e);
             } else if(model.getGstate() == State.VICTORY){
                 view.getVictoryScene().checkHover(e);
+            } else if(model.getGstate() == State.HIGHSCORE) { //update xử lý hover
+                view.getHighScoreView().checkHover(e); // Gọi checkHover của HighScoreView
             }
         });
 
@@ -153,12 +155,22 @@ public class GameController implements GameEventListener {
                     model.setGstate(State.PLAYING);
                     model.CreateGameplay(this);
                 }
+                //Update thêm xử lý phần highscoreview
+                else if(view.getLoseScene().checkClickHighScore(e)) {
+                    model.setGstate(State.HIGHSCORE);
+                }
             }   else if(model.getGstate() == State.VICTORY) {
                 if(view.getVictoryScene().checkClickMenu(e)) {
                     model.setGstate(State.MENU);
                 } else if (view.getVictoryScene().checkClickReplay(e)) {
                     model.setGstate(State.PLAYING);
                     model.CreateGameplay(this);
+                }
+            }
+            //Thêm phần xử lý khi đang trong highscoreview
+            else if(model.getGstate() == State.HIGHSCORE) {
+                if(view.getHighScoreView().checkClickMenu(e)) {
+                    model.setGstate(State.MENU);  // Quay lại menu
                 }
             }
         });
