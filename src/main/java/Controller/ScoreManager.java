@@ -16,6 +16,7 @@ public class ScoreManager {
      * Nếu điểm hiện tại cao hơn điểm đã lưu trước đó cập nhật file
      */
     public static void saveGame(GameSaveData newData) {
+        isNewHighScore = false; //reset mỗi khi save highscore mới
         try {
             GameSaveData oldData = loadGame();
 

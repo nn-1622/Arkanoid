@@ -32,7 +32,7 @@ public class LoseView {
     public LoseView() {
         replay = new Button(225.6,378.4, 148.8, 65.6);
         menu = new Button(225.6,475.4, 148.8, 65.6);
-        highScore = new Button(225.6,299.8, 148.8, 65.6);
+        highScore = new Button(225.6,281.4, 148.8, 65.6);
 
 
         replay.setImgButton("/Start.png"); // Sử dụng lại ảnh nút Start cho Replay

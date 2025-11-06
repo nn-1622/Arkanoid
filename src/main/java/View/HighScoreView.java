@@ -42,17 +42,17 @@ public class HighScoreView {
         // Lấy điểm cao nhất từ file
         GameSaveData highScoreData = ScoreManager.loadGame();
         int highScore = (highScoreData != null) ? highScoreData.getScore() : 0;
+        int level = (highScoreData != null) ? highScoreData.getLevel() : 0;
+        int lives = (highScoreData != null) ? highScoreData.getLives() : 0;
 
         // Hiển thị tiêu đề và điểm cao nhất
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Arial", 32));
-        gc.fillText("Điểm Cao Nhất", 200, 200);
+        gc.fillText("Thành thích xuất sắc nhất", 130, 200);
 
         gc.setFont(Font.font("Arial", 28));
-        gc.fillText("Điểm: " + highScore, 200, 300);
+        gc.fillText("Điểm: " + highScore + "   |   level: " + level + "   |   số mạng: " + lives , 70, 300);
 
-        // Debug
-        System.out.println("drawHighScoreScene - High Score: " + highScore);
     }
 
     /**
