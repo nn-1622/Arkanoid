@@ -40,7 +40,7 @@ public class GameplayModel implements UltilityValues {
         ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
         lives = 5;
-        level = 5;
+        level = 1;
         score = 0;
         combo = 0;
         currentVx = 0;
@@ -247,7 +247,7 @@ public class GameplayModel implements UltilityValues {
                 double diff = (ball.getCenter() - paddleCenter) / (paddle.getLength() / 2);
 
                 double speed = Math.sqrt(ball.getVx() * ball.getVx() + ball.getVy() * ball.getVy());
-                double angle = diff * Math.toRadians(70);
+                double angle = diff * Math.toRadians(60);
 
                 ball.setVx(speed * Math.sin(angle));
                 ball.setVy(-speed * Math.cos(angle));

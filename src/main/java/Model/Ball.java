@@ -73,7 +73,7 @@ public class Ball extends MovableObject {
     public double getCenter() {
         return x;
     }
-
+    
     /**
      * Đặt một hình ảnh mới cho quả bóng.
      * @param ballImg Đối tượng Image mới để hiển thị cho quả bóng.
