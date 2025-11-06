@@ -9,6 +9,7 @@ import java.io.*;
  */
 public class ScoreManager {
     private static final String SAVE_PATH = "savegame.dat";
+    private static boolean isNewHighScore = false;
 
     /**
      * Lưu dữ liệu trò chơi
@@ -23,6 +24,7 @@ public class ScoreManager {
                 System.out.println("Game saved for the first time" + newData);
             } else if (newData.getScore() > oldData.getScore()) {
                 writeData(newData);
+                isNewHighScore = true;
                 System.out.println("New highest score" + newData);
             } else {
                 System.out.println("GameScore" + newData.getScore() +
@@ -32,6 +34,14 @@ public class ScoreManager {
             System.err.println("Failed to save game");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * getIsNewHighScore
+     * @return true or false;
+     */
+    public static boolean getIsNewHighScore() {
+        return isNewHighScore;
     }
 
     /**

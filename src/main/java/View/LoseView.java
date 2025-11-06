@@ -21,7 +21,7 @@ public class LoseView {
 
     // update thêm hiển thị highscore
     private int currentScore;
-    private boolean isNewHighScore = false;
+    private boolean isNewHighScore;
 
     /**
      * Khởi tạo một LoseView mới.
@@ -45,17 +45,6 @@ public class LoseView {
     public void setScore(int score) {
         this.currentScore = score;
         GameSaveData saved = ScoreManager.loadGame();
-
-        System.out.println("Current Score: " + score); // Debug điểm hiện tại
-        System.out.println("Saved Data: " + saved); // Debug dữ liệu từ file
-
-        if (saved == null || score > saved.getScore()) {
-            // Cập nhật điểm cao mới
-            ScoreManager.saveGame(new GameSaveData(score, 1, 5));
-            isNewHighScore = true;
-        } else {
-            isNewHighScore = false;
-        }
     }
 
     /**
@@ -74,19 +63,17 @@ public class LoseView {
         gc.fillText("Điểm của bạn: " + currentScore, 200, 300);
 
         GameSaveData highScoreData = ScoreManager.loadGame();
+        isNewHighScore = ScoreManager.getIsNewHighScore();
         int highScore = (highScoreData != null) ? highScoreData.getScore() : 0;
 
         // Thêm dòng hiển thị điểm cao nhất
         gc.fillText("Điểm cao nhất: " + highScore, 200, 330);
 
-        //Thêm dòng này vào để debug lỗi
-        System.out.println("Drawing - Current Score: " + currentScore + ", High Score: " + highScore + ", isNewHighScore: " + isNewHighScore);
-
         // Nếu đạt điểm cao mới
         if (isNewHighScore) {
             gc.setFill(Color.YELLOW);
             gc.setFont(Font.font("Arial", 30));
-            gc.fillText("Chúc mừng kỷ lục mới!", 130, 340);
+            gc.fillText("Chúc mừng kỷ lục mới!", 130, 360);
         }
     }
 
