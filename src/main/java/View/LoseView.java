@@ -15,7 +15,7 @@ import javafx.scene.input.MouseEvent;
  * như "Chơi lại" (Replay) và "Menu".
  */
 public class LoseView extends View {
-    private Image lose = new Image("/lose.jpg");
+    private Image lose = new Image("/lose.png");
     private Button replay;
     private Button menu;
 
@@ -27,11 +27,11 @@ public class LoseView extends View {
     public LoseView(GameModel model) {
         super(model);
 
-        replay = new Button(225.6,378.4, 148.8, 65.6, new ChangeStateCmd(model, State.PLAYING));
-        menu = new Button(225.6,475.4, 148.8, 65.6,  new ChangeStateCmd(model, State.MENU));
+        replay = new Button(139.3,428.5, 321.4, 80.3, new ChangeStateCmd(model, State.PLAYING));
+        menu = new Button(194.5,508.9, 211, 81.1,  new ChangeStateCmd(model, State.MENU));
 
-        replay.setImgButton("/Start.png"); // Sử dụng lại ảnh nút Start cho Replay
-        replay.setImgHoverButton("/StartHover.png");
+        replay.setImgButton("/Replay.png"); // Sử dụng lại ảnh nút Start cho Replay
+        replay.setImgHoverButton("/ReplayHover.png");
         menu.setImgButton("/Exit.png"); // Sử dụng lại ảnh nút Exit cho Menu
         menu.setImgHoverButton("/ExitHover.png");
 

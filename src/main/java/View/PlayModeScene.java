@@ -10,6 +10,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
+import java.util.Objects;
+
 public class PlayModeScene extends View implements SceneActions {
     private Image background;
     Button One_Player;
@@ -18,15 +20,15 @@ public class PlayModeScene extends View implements SceneActions {
     public PlayModeScene(GameModel model) {
         super(model);
 
-        background = new javafx.scene.image.Image(getClass().getResource("/bg.png").toExternalForm());
+        background = new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResource("/bg2.png")).toExternalForm());
 
-        One_Player = new Button(225.6, 377, 148.8, 65.6, new ChangeStateCmd(model, State.PLAYING));
-        One_Player.setImgButton("/p1.png");
-        One_Player.setImgHoverButton("/p1.png");
+        One_Player = new Button(149.2, 169.8, 301.6, 75.4, new ChangeStateCmd(model, State.PLAYING));
+        One_Player.setImgButton("/1Player.png");
+        One_Player.setImgHoverButton("/1PlayerHover.png");
 
-        Two_Player = new Button(225.6, 462.4, 148.8, 65.6, new ChangeStateCmd(model, State.PLAYING));
-        Two_Player.setImgButton("/p2.png");
-        Two_Player.setImgHoverButton("/p2.png");
+        Two_Player = new Button(153.3, 288.3, 293.5, 73.4, new ChangeStateCmd(model, State.PLAYING));
+        Two_Player.setImgButton("/2Player.png");
+        Two_Player.setImgHoverButton("/2PlayerHover.png");
 
         buttons.add(One_Player);
         buttons.add(Two_Player);

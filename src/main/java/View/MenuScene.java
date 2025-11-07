@@ -31,15 +31,15 @@ public class MenuScene extends View implements SceneActions {
 
         background = new Image(getClass().getResource("/bg.png").toExternalForm());
 
-        start = new Button( 225.6, 377, 148.8, 65.6, new ChangeStateCmd(model, State.PLAY_MODE));
+        start = new Button( 177.9, 274.5, 244.2, 61, new ChangeStateCmd(model, State.PLAY_MODE));
         start.setImgButton("/Start.png");
         start.setImgHoverButton("/StartHover.png");
 
-        settings = new Button( 225.6, 462.4, 148.8, 65.6, new ChangeStateCmd(model, State.SETTING));
+        settings = new Button( 184, 346.8, 231.9, 64.4, new ChangeStateCmd(model, State.SETTING));
         settings.setImgButton("/Setting.png");
         settings.setImgHoverButton("/SettingHover.png");
 
-        exit = new Button( 225.6, 548, 148.8, 65.6, new ExitCmd());
+        exit = new Button( 212.5, 411.2, 175, 67.3, new ExitCmd());
         exit.setImgButton("/Exit.png");
         exit.setImgHoverButton("/ExitHover.png");
 

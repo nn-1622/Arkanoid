@@ -15,7 +15,7 @@ import javafx.scene.input.MouseEvent;
  * như "Chơi lại" (Replay) và "Menu".
  */
 public class VictoryView extends View {
-    private Image win = new Image("/win.jpg");
+    private Image win = new Image("/win.png");
     private Button replay;
     private Button menu;
 
@@ -26,11 +26,11 @@ public class VictoryView extends View {
      */
     public VictoryView(GameModel model) {
         super(model);
-        replay = new Button(225.6,378.4, 148.8, 65.6, new ChangeStateCmd(model, State.PLAYING));
-        menu = new Button(225.6,475.4, 148.8, 65.6, new ChangeStateCmd(model, State.MENU));
+        replay = new Button(54.7, 559.3,245.3, 61.3, new ChangeStateCmd(model, State.PLAYING));
+        menu = new Button(349.7,553.4, 190.3, 73.2, new ChangeStateCmd(model, State.MENU));
 
-        replay.setImgButton("/Start.png"); // Sử dụng lại ảnh nút Start cho Replay
-        replay.setImgHoverButton("/StartHover.png");
+        replay.setImgButton("/Replay.png"); // Sử dụng lại ảnh nút Start cho Replay
+        replay.setImgHoverButton("/ReplayHover.png");
         menu.setImgButton("/Exit.png"); // Sử dụng lại ảnh nút Exit cho Menu
         menu.setImgHoverButton("/ExitHover.png");
 
