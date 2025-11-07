@@ -3,6 +3,7 @@ package View;
 import java.util.ArrayList;
 
 import Model.Brick;
+import Model.GameModel;
 import Model.GameplayModel;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -15,7 +16,12 @@ import javafx.scene.text.FontWeight;
  * Lớp này lấy dữ liệu từ {@link GameplayModel} và sử dụng {@link GraphicsContext} để
  * vẽ các đối tượng như thanh trượt, bóng, gạch và giao diện người dùng (UI).
  */
-public class GameplayView {
+public class GameplayView extends View {
+
+    public GameplayView(GameModel model) {
+        super(model);
+    }
+
     /**
      * Hình ảnh được sử dụng để hiển thị thanh máu/mạng sống của người chơi.
      */
@@ -27,7 +33,8 @@ public class GameplayView {
      * @param gc    Đối tượng GraphicsContext được sử dụng để thực hiện các thao tác vẽ trên canvas.
      * @param model Đối tượng GameplayModel chứa tất cả dữ liệu và trạng thái của màn chơi cần vẽ.
      */
-    public void drawGameScene(GraphicsContext gc, GameplayModel model) {
+    public void draw(GraphicsContext gc, GameplayModel model) {
+
         // Vẽ nền đen
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, gc.getCanvas().getWidth(), gc.getCanvas().getHeight());

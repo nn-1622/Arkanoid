@@ -16,7 +16,6 @@ import javafx.scene.input.MouseEvent;
 public class GameController implements GameEventListener {
     private GameModel model;
     private GameView view;
-    private SoundManager soundManager;
     private MouseEvent e;
     private boolean leftpressed;
     private boolean rightpressed;
@@ -27,55 +26,28 @@ public class GameController implements GameEventListener {
      * @param gm Model của trò chơi, chứa dữ liệu và trạng thái game.
      * @param gv View của trò chơi, chịu trách nhiệm hiển thị.
      */
-    public GameController(GameModel gm, GameView gv) {
+    public GameController(GameModel gm, GameView gv, SoundManager soundManager) {
         this.model = gm;
         this.view = gv;
-        this.soundManager = new SoundManager();
         setInput();
+        gm.getEventLoader().register(this);
+        gm.getEventLoader().register(soundManager);
     }
 
-    /**
-     * {@inheritDoc}
-     * Được gọi khi người chơi hoàn thành một cấp độ.
-     * Chuyển trạng thái trò chơi sang FADE để tạo hiệu ứng chuyển cảnh và phát âm thanh chiến thắng.
-     */
     @Override
-    public void onLevelCompleted() {
-        model.setGstate(State.FADE);
-        model.setFadeStartTime(System.nanoTime());
-        soundManager.playWinSound();
-    }
-
-    /**
-     * {@inheritDoc}
-     * Được gọi khi người chơi thua cuộc (hết mạng).
-     * Chuyển trạng thái trò chơi sang LOSS và phát âm thanh thua cuộc.
-     */
-    @Override
-    public void onGameOver() {
-        model.setGstate(State.LOSS);
-        soundManager.playLoseSound();
-    }
-
-    /**
-     * {@inheritDoc}
-     * Được gọi mỗi khi bóng va vào một viên gạch.
-     * Phát âm thanh va chạm.
-     */
-    @Override
-    public void onBrickHit() {
-        soundManager.playHitSound();
-    }
-
-    /**
-     * {@inheritDoc}
-     * Được gọi khi người chơi hoàn thành tất cả các cấp độ và chiến thắng trò chơi.
-     * Chuyển trạng thái trò chơi sang VICTORY và phát âm thanh chiến thắng.
-     */
-    @Override
-    public void onVictory() {
-        soundManager.playWinSound();
-        model.setGstate(State.VICTORY);
+    public void onGameEvent (GameEvent event) {
+        switch (event) {
+            case GAME_WIN:
+                model.setGstate(State.VICTORY);
+                break;
+            case GAME_LOST:
+                model.setGstate(State.LOSS);
+                break;
+            case LEVEL_COMPLETE:
+                model.setFadeStartTime(System.nanoTime());
+                model.setGstate(State.FADE);
+                break;
+        }
     }
 
     /**
@@ -96,10 +68,11 @@ public class GameController implements GameEventListener {
         view.render(model);
         if (model.getGstate() == State.PLAYING) {
             this.model.getGameplayModel().update(leftpressed,rightpressed,deltaTime);
-        } else if(model.getGstate() == State.FADE){
+        } else if (model.getGstate() == State.FADE) {
             double timeElapsed = (now - model.getFadeStartTime()) / 1_000_000_000.0;
             final double FADE_DURATION = 2.0;
-            if(timeElapsed >= FADE_DURATION){
+
+            if (timeElapsed >= FADE_DURATION) {
                 model.getGameplayModel().Initialize();
                 model.setGstate(State.PLAYING);
             }
@@ -114,52 +87,15 @@ public class GameController implements GameEventListener {
     public void setInput() {
         // Xử lý sự kiện di chuyển chuột để tạo hiệu ứng hover cho các nút
         view.getScene().setOnMouseMoved(e -> {
-            if(model.getGstate() == State.MENU) {
-                view.getMenuScene().checkHover(e);
-            } else if(model.getGstate() == State.SETTING){
-                view.getSettingScene().checkHover(e);
-            } else if(model.getGstate() == State.LOSS){
-                view.getLoseScene().checkHover(e);
-            } else if(model.getGstate() == State.VICTORY){
-                view.getVictoryScene().checkHover(e);
+            if (model.getCurrentView() != null) {
+                model.getCurrentView().checkHover(e);
             }
         });
 
         // Xử lý sự kiện nhấp chuột để tương tác với các nút trong các màn hình khác nhau
         view.getScene().setOnMouseClicked(e -> {
-            if(model.getGstate() == State.MENU) {
-                if(view.getMenuScene().startClick(e)) {
-                    model.setGstate(State.PLAYING);
-                    model.CreateGameplay(this);
-                } else if(view.getMenuScene().settingClick(e)) {
-                    model.setGstate(State.SETTING);
-                } else if(view.getMenuScene().exitClick(e)) {
-                    System.exit(0);
-                }
-            }  else if(model.getGstate() == State.SETTING) {
-                if(view.getSettingScene().exitClicked(e)) {
-                    model.setGstate(State.MENU);
-                } else if (view.getSettingScene().lowVolumeClicked(e)) {
-                    soundManager.decreaseVolume();
-                    soundManager.playTestSound();
-                } else if(view.getSettingScene().highVolumeClicked(e)) {
-                    soundManager.increaseVolume();
-                    soundManager.playTestSound();
-                }
-            }  else if(model.getGstate() == State.LOSS) {
-                if(view.getLoseScene().checkClickMenu(e)) {
-                    model.setGstate(State.MENU);
-                } else if (view.getLoseScene().checkClickReplay(e)) {
-                    model.setGstate(State.PLAYING);
-                    model.CreateGameplay(this);
-                }
-            }   else if(model.getGstate() == State.VICTORY) {
-                if(view.getVictoryScene().checkClickMenu(e)) {
-                    model.setGstate(State.MENU);
-                } else if (view.getVictoryScene().checkClickReplay(e)) {
-                    model.setGstate(State.PLAYING);
-                    model.CreateGameplay(this);
-                }
+            if (model.getCurrentView() != null) {
+                model.getCurrentView().handleClick(e);
             }
         });
 

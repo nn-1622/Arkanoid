@@ -8,6 +8,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+
 /**
  * Lớp View chính, chịu trách nhiệm quản lý và hiển thị các màn hình khác nhau của trò chơi.
  * Lớp này hoạt động như một bộ điều phối, quyết định màn hình nào (menu, game, cài đặt, v.v.)
@@ -16,12 +18,6 @@ import javafx.scene.paint.Color;
 public class GameView {
     private Group root;
     private Scene scene;
-    private MenuScene menuScene;
-    private GameModel gameModel;
-    private SettingScene settingScene;
-    private GameplayView gameplayView;
-    private LoseView loseView;
-    private VictoryView victoryView;
     private GraphicsContext gc;
     private Canvas canvas;
 
@@ -30,24 +26,14 @@ public class GameView {
      * Thiết lập các thành phần cơ bản của JavaFX như Scene, Group, Canvas và GraphicsContext.
      * Đồng thời, khởi tạo tất cả các đối tượng view con (sub-views) cho các màn hình khác nhau.
      */
-    public GameView() {
+    public GameView(GameModel gameModel) {
         root = new Group();
         scene = new Scene(root, 600,650);
         canvas = new Canvas(600,650);
         root.getChildren().add(canvas);
         gc  = canvas.getGraphicsContext2D();
-
-        menuScene = new MenuScene(canvas.getWidth(),canvas.getHeight());
-        settingScene = new SettingScene(canvas.getWidth(),canvas.getHeight());
-        gameplayView = new GameplayView();
-        loseView = new LoseView();
-        victoryView = new VictoryView();
     }
 
-    /**
-     * Lấy đối tượng Scene chính của ứng dụng.
-     * @return Scene chính.
-     */
     public Scene getScene() {
         return scene;
     }
@@ -59,63 +45,16 @@ public class GameView {
      * @param model Đối tượng GameModel chứa trạng thái hiện tại của game.
      */
     public void render(GameModel model) {
-        if(model.getGstate() == State.MENU){
-            menuScene.drawMenuScene(gc);
-        } else if(model.getGstate() == State.SETTING){
-            settingScene.drawSettingScene(gc);
-        } else if(model.getGstate() == State.PLAYING){
-            gameplayView.drawGameScene(gc, model.getGameplayModel());
-        } else if(model.getGstate() == State.LOSS){
-            loseView.drawLoseScene(gc);
-        } else if(model.getGstate() == State.VICTORY){
-            victoryView.drawWinScene(gc);
-        } else if(model.getGstate() == State.FADE){
+        if(model.getGstate() == State.FADE){
             // Xử lý hiệu ứng chuyển cảnh mờ dần
             final double fadeTime = 2.0;
             double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;
             double opacity = Math.min(1.0, (timeElapsed / fadeTime));
             gc.setFill(new Color(0,0,0,opacity));
             gc.fillRect(0,0, canvas.getWidth(), canvas.getHeight());
+        } else {
+            model.getCurrentView().draw(gc, model.getGameplayModel());
         }
     }
 
-    /**
-     * Lấy đối tượng view của màn hình menu.
-     * @return Đối tượng MenuScene.
-     */
-    public MenuScene getMenuScene() {
-        return menuScene;
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình cài đặt.
-     * @return Đối tượng SettingScene.
-     */
-    public SettingScene getSettingScene() {
-        return settingScene;
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình chơi game.
-     * @return Đối tượng GameplayView.
-     */
-    public GameplayView getGameScene() {
-        return gameplayView;
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình thua cuộc.
-     * @return Đối tượng LoseView.
-     */
-    public LoseView getLoseScene() {
-        return loseView;
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình chiến thắng.
-     * @return Đối tượng VictoryView.
-     */
-    public  VictoryView getVictoryScene() {
-        return victoryView;
-    }
 }

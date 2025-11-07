@@ -1,4 +1,5 @@
 import Controller.GameController;
+import Controller.SoundManager;
 import Model.GameModel;
 import Model.State;
 import View.GameView;
@@ -14,6 +15,7 @@ import javafx.animation.AnimationTimer;
  */
 public class Game extends Application {
     private GameController controller;
+    private SoundManager soundManager;
     private GameModel model;
     private GameView view;
     public static State gstate;
@@ -29,9 +31,10 @@ public class Game extends Application {
     @Override
     public void start(Stage stage) {
         // Khởi tạo các thành phần Model, View, và Controller
-        model = new GameModel(650,600);
-        view = new GameView();
-        controller = new GameController(model, view);
+        model = GameModel.getGameModel();
+        soundManager = new SoundManager();
+        view = new GameView(model);
+        controller = new GameController(model, view, soundManager);
 
         // Thiết lập và hiển thị cửa sổ game
         stage.setScene(view.getScene());

@@ -8,7 +8,8 @@ import javafx.scene.image.Image;
  * Kế thừa từ {@link MovableObject}, lớp này quản lý vị trí, kích thước, hình ảnh
  * và logic di chuyển ngang của thanh trượt dựa trên đầu vào của người dùng.
  */
-public class Paddle extends MovableObject {
+public class Paddle extends MovableObject implements UltilityValues {
+    private static Paddle paddle;
     private double length;
     private double height;
     private Image paddleImg;
@@ -20,12 +21,20 @@ public class Paddle extends MovableObject {
      * @param length Chiều dài (chiều rộng) của thanh trượt.
      * @param height Chiều cao của thanh trượt.
      */
-    public Paddle(double x, double y, double length, double height) {
+    private Paddle(double x, double y, double length, double height) {
         super(x, y);
         this.length = length;
         this.height = height;
         this.paddleImg = new Image("/DefaultPaddle.png");
         setVx(5); // Đặt tốc độ di chuyển mặc định
+    }
+
+    public static Paddle getPaddle() {
+        if (paddle == null) {
+            paddle = new Paddle(canvasWidth / 2 - paddleLength / 2,
+                    canvasHeight - 100, paddleLength, paddleHeight);
+        }
+        return paddle;
     }
 
     /**
@@ -43,6 +52,8 @@ public class Paddle extends MovableObject {
     public double getHeight() {
         return height;
     }
+
+    public void setLength
 
     /**
      * Thiết lập một hình ảnh mới cho thanh trượt.

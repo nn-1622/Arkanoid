@@ -10,13 +10,13 @@ import javafx.scene.media.MediaPlayer;
  * Lớp này chịu trách nhiệm tải, phát và điều chỉnh âm lượng
  * của các đoạn âm thanh ngắn (AudioClip) như tiếng va chạm, thắng, thua.
  */
-public class SoundManager {
-    private AudioClip hitSound;
-    private AudioClip winSound;
-    private AudioClip loseSound;
-    private AudioClip testSound;
-    private double masterVolume = 0.5;
-    private double volStep = 0.2;
+public class SoundManager implements GameEventListener {
+    private static AudioClip hitSound;
+    private static AudioClip winSound;
+    private static AudioClip loseSound;
+    private static AudioClip testSound;
+    private static double masterVolume = 0.5;
+    private static final double volStep = 0.2;
 
     /**
      * Khởi tạo SoundManager.
@@ -30,32 +30,19 @@ public class SoundManager {
         testSound = new AudioClip(getClass().getResource("/sound/test.wav").toExternalForm());
     }
 
-    /**
-     * Phát âm thanh va chạm (khi bóng trúng gạch).
-     */
-    public void playHitSound() {
-        hitSound.play();
-    }
-
-    /**
-     * Phát âm thanh chiến thắng (khi hoàn thành một cấp độ hoặc cả trò chơi).
-     */
-    public void playWinSound() {
-        winSound.play();
-    }
-
-    /**
-     * Phát âm thanh thua cuộc (khi người chơi hết mạng).
-     */
-    public void playLoseSound() {
-        loseSound.play();
-    }
-
-    /**
-     * Phát một âm thanh thử nghiệm, thường được sử dụng khi điều chỉnh âm lượng trong menu cài đặt.
-     */
-    public void playTestSound() {
-        testSound.play();
+    @Override
+    public void onGameEvent (GameEvent event) {
+        switch (event) {
+            case GAME_WIN:
+                winSound.play();
+                break;
+            case GAME_LOST:
+                loseSound.play();
+                break;
+            case BALL_HIT:
+                hitSound.play();
+                break;
+        }
     }
 
     /**
@@ -63,8 +50,8 @@ public class SoundManager {
      * Âm lượng được giới hạn trong khoảng từ 0.0 (tắt tiếng) đến 1.0 (tối đa).
      * @param volume Giá trị âm lượng mới (từ 0.0 đến 1.0).
      */
-    public void setMasterVolume(double volume) {
-        this.masterVolume = Math.max(0.0, Math.min(1.0, volume));
+    public static void setMasterVolume(double volume) {
+        masterVolume = Math.max(0.0, Math.min(1.0, volume));
 
         hitSound.setVolume(masterVolume);
         winSound.setVolume(masterVolume);
@@ -76,16 +63,18 @@ public class SoundManager {
      * Tăng âm lượng chính lên một bậc.
      * Lượng tăng được xác định bởi biến {@code volStep}.
      */
-    public void increaseVolume() {
+    public static void increaseVolume() {
         setMasterVolume(masterVolume + volStep);
+        testSound.play();
     }
 
     /**
      * Giảm âm lượng chính xuống một bậc.
      * Lượng giảm được xác định bởi biến {@code volStep}.
      */
-    public void decreaseVolume() {
+    public static void decreaseVolume() {
         setMasterVolume(masterVolume - volStep);
+        testSound.play();
     }
 
 }
