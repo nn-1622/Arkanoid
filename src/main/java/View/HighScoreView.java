@@ -11,33 +11,33 @@ import javafx.scene.text.Font;
 
 /**
  * Lớp chịu trách nhiệm hiển thị màn hình điểm cao nhất (High Score Screen)
- * Hiển thị điểm cao nhất từ file savegame.dat và nút để quay lại menu chính
+ * Hiển thị điểm cao nhất từ file savegame.dat và nút để quay lại
  */
 public class HighScoreView {
     private Image background = new Image("/lose.jpg"); //Dùng tạm cái hình exit
-    private Button menu;
+    private Button exit;
 
     /**
      * Khởi tạo HighScoreView.
-     * Thiết lập nút "Menu" với vị trí, kích thước, và hình ảnh tương tự LoseView.
+     * Thiết lập nút "exit" với vị trí, kích thước, và hình ảnh tương tự LoseView.
      */
     public HighScoreView() {
-        menu = new Button(225.6, 475.4, 148.8, 65.6);
-        menu.setImgButton("/Exit.png"); // Sử dụng lại ảnh Exit cho Menu
-        menu.setImgHoverButton("/ExitHover.png");
+        exit = new Button(225.6, 475.4, 148.8, 65.6);
+        exit.setImgButton("/Exit.png"); // Sử dụng lại ảnh Exit cho Menu
+        exit.setImgHoverButton("/ExitHover.png");
     }
 
     /**
      * Vẽ màn hình điểm cao nhất lên canvas.
-     * Hiển thị nền, điểm cao nhất, và nút Menu.
-     * @param gc Đối tượng GraphicsContext để vẽ.
+     * Hiển thị nền, điểm cao nhất, và nút exit
+     * @param gc Đối tượng GraphicsContext để vẽ
      */
     public void drawHighScoreScene(GraphicsContext gc) {
         // Vẽ nền
         gc.drawImage(background, 0, 0, 600, 650);
 
         // Vẽ nút Menu
-        menu.draw(gc);
+        exit.draw(gc);
 
         // Lấy điểm cao nhất từ file
         GameSaveData highScoreData = ScoreManager.loadGame();
@@ -56,19 +56,19 @@ public class HighScoreView {
     }
 
     /**
-     * Kiểm tra và cập nhật trạng thái di chuột cho nút Menu
+     * Kiểm tra và cập nhật trạng thái di chuột cho nút exit
      * @param e Sự kiện chuột
      */
     public void checkHover(MouseEvent e) {
-        menu.setHovering(e);
+        exit.setHovering(e);
     }
 
     /**
-     * Kiểm tra xem nút "Menu" có được nhấp không.
+     * Kiểm tra xem nút "exit" có được nhấp không.
      * @param e Mouse event
      * @return true ...
      */
     public boolean checkClickMenu(MouseEvent e) {
-        return menu.isClicked(e);
+        return exit.isClicked(e);
     }
 }

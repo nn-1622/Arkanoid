@@ -170,7 +170,7 @@ public class GameController implements GameEventListener {
             //Thêm phần xử lý khi đang trong highscoreview
             else if(model.getGstate() == State.HIGHSCORE) {
                 if(view.getHighScoreView().checkClickMenu(e)) {
-                    model.setGstate(State.MENU);  // Quay lại menu
+                    model.setGstate(State.LOSS);  // Quay lại
                 }
             }
         });
