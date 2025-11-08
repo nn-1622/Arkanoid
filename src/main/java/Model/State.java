@@ -14,5 +14,6 @@ public enum State {
     LOSS,
     VICTORY,
     FADE,
-    HIGHSCORE //update them state highscore
+    HIGHSCORE, //update them state highscore
+    CONTINUE_SCREEN //update thêm state màn hình continue/newgame
 }

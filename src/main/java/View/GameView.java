@@ -24,10 +24,9 @@ public class GameView {
     private VictoryView victoryView;
     private GraphicsContext gc;
     private Canvas canvas;
-    //update highscore view
-    private HighScoreView highScoreView;
-    //update pause view
-    private PauseOverlayView pauseOverlayView;
+    private HighScoreView highScoreView; //update highscore view
+    private PauseOverlayView pauseOverlayView; //update pause overlay
+    private ContinueOverlayView continueOverlayView; //update continue overlay
 
     /**
      * Khởi tạo GameView.
@@ -46,10 +45,9 @@ public class GameView {
         gameplayView = new GameplayView();
         loseView = new LoseView();
         victoryView = new VictoryView();
-        //update highscore view
         highScoreView = new HighScoreView();
-        //update pause view
         pauseOverlayView = new PauseOverlayView(canvas.getWidth(), canvas.getHeight());
+        continueOverlayView = new ContinueOverlayView(canvas.getWidth(), canvas.getHeight());
     }
 
     /**
@@ -91,12 +89,16 @@ public class GameView {
         else if(model.getGstate() == State.HIGHSCORE){
             highScoreView.drawHighScoreScene(gc);
         }
-        //Update thêm phần xử lý pause game
-        else if(model.getGstate() == State.PAUSED) {  // THÊM MỚI
-            // Vẽ game bình thường trước (để pause giữ hình ảnh hiện tại)
+        //Update thêm phần xử lý pauseOverlay
+        else if(model.getGstate() == State.PAUSED) {
             gameplayView.drawGameScene(gc, model.getGameplayModel());
-            // Overlay pause lên trên
             pauseOverlayView.draw(gc, canvas.getWidth(), canvas.getHeight());
+        }
+        //Update thêm phần xử lý continueOverlay view
+        else if(model.getGstate() == State.CONTINUE_SCREEN) {
+            System.out.println("vẽ CONTINUE_SCREEN"); //DEBUG
+            menuScene.drawMenuScene(gc);
+            continueOverlayView.draw(gc, canvas.getWidth(), canvas.getHeight());
         }
     }
 
@@ -155,6 +157,13 @@ public class GameView {
      */
     public PauseOverlayView getPauseOverlayView() {
         return pauseOverlayView;
+    }
+    /**
+     * Lấy đối tượng Continue Overlay
+     * @return đối tượng continueoverlay
+     */
+    public ContinueOverlayView getContinueOverlayView() {
+        return continueOverlayView;
     }
 
 

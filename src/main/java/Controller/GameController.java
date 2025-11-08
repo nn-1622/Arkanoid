@@ -7,6 +7,8 @@ import View.GameView;
 import View.PauseOverlayView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.KeyCode;
+import View.ContinueOverlayView;
+import java.io.File;
 
 /**
  * Lớp điều khiển chính của trò chơi.
@@ -135,6 +137,8 @@ public class GameController implements GameEventListener {
                 view.getVictoryScene().checkHover(e);
             } else if(model.getGstate() == State.HIGHSCORE) {
                 view.getHighScoreView().checkHover(e);
+            } else if(model.getGstate() == State.CONTINUE_SCREEN) {
+                view.getContinueOverlayView().checkHover(e);
             }
         });
 
@@ -152,8 +156,15 @@ public class GameController implements GameEventListener {
                 }
             } else if(model.getGstate() == State.MENU) {
                 if(view.getMenuScene().startClick(e)) {
-                    model.setGstate(State.PLAYING);
-                    model.CreateGameplay(this);
+                    if(model.getGameplayModel() !=  null && model.getGameplayModel().hasPauseData()){
+                        model.setGstate(State.CONTINUE_SCREEN);
+                        System.out.println("Tìm thấy file save game, hiển thị màn hình lựa chọn");
+                    }
+                    else{
+                        model.setGstate(State.PLAYING);
+                        model.CreateGameplay(this);
+                        System.out.println("bắt đầu game mới");
+                    }
                 } else if(view.getMenuScene().settingClick(e)) {
                     model.setGstate(State.SETTING);
                 } else if(view.getMenuScene().exitClick(e)) {
@@ -171,8 +182,10 @@ public class GameController implements GameEventListener {
                 }
             } else if(model.getGstate() == State.LOSS) {
                 if(view.getLoseScene().checkClickMenu(e)) {
+                    new File("pause.dat").delete();
                     model.setGstate(State.MENU);
                 } else if (view.getLoseScene().checkClickReplay(e)) {
+                    new File("pause.dat").delete();
                     model.setGstate(State.PLAYING);
                     model.CreateGameplay(this);
                 } else if(view.getLoseScene().checkClickHighScore(e)) {
@@ -188,6 +201,18 @@ public class GameController implements GameEventListener {
             } else if(model.getGstate() == State.HIGHSCORE) {
                 if(view.getHighScoreView().checkClickMenu(e)) {
                     model.setGstate(State.LOSS);
+                }
+            } else if(model.getGstate() == State.CONTINUE_SCREEN) { //update xử lý với state CONTINUE_SCREEN
+                if (view.getContinueOverlayView().continueClicked(e)) {
+                    model.CreateGameplay(this);
+                    model.getGameplayModel().loadPause();
+                    model.setGstate(State.PAUSED);
+                    System.out.println("Continued from pause!");
+                } else if (view.getContinueOverlayView().newGameClicked(e)) {
+                    new File("pause.dat").delete();
+                    model.setGstate(State.PLAYING);
+                    model.CreateGameplay(this);
+                    System.out.println("New game started! Pause deleted.");
                 }
             }
         });

@@ -8,9 +8,11 @@ import Model.GameSaveData;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
-
 import Controller.GameEventListener;
 import javafx.scene.image.Image;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 
 /**
  * Quản lý trạng thái và logic của trò chơi.
@@ -438,6 +440,12 @@ public class GameplayModel {
                 b.setFrameTimer(bd.getFrameTimer()); // Sử dụng setter
                 brick.add(b);
             }
+            // Khôi phục trạng thái bóng
+            if (pauseData.getBallVy() != 0){
+                currentBallState = BallState.LAUNCHED;
+            } else{
+                currentBallState = BallState.ATTACHED;
+            }
 
             System.out.println("Pause loaded!");
         } catch (Exception e) {
@@ -462,4 +470,24 @@ public class GameplayModel {
      * @param lives so mang
      */
     private void setLives(int lives) { this.lives = lives; }
+
+    /**
+     * Check xem file pause có hợp lệ
+     * @return boolean hasPausedata
+     */
+    public boolean hasPauseData() {
+        File pauseFile = new File("pause.dat");
+        if (!pauseFile.exists()) {
+            return false;
+        }
+
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("pause.dat"))) {
+            ois.readObject();
+            return true;
+        } catch (Exception e) {
+            System.err.println("file bị lỗi, đang xoá");
+            pauseFile.delete();
+            return false;
+        }
+    }
 }
