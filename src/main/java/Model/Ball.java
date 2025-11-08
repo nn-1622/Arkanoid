@@ -91,4 +91,5 @@ public class Ball extends MovableObject {
     public void draw(GraphicsContext render) {
         render.drawImage(ballImg, x - radius, y - radius, radius *2, radius*2);
     }
+
 }

@@ -2,11 +2,13 @@ package Model;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 
 import Controller.EventLoader;
 import Controller.GameEvent;
 import Controller.GameEventListener;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 /**
@@ -22,6 +24,9 @@ public class GameplayModel implements UltilityValues {
     private BallState currentBallState;
     private double currentVx;
     private ArrayList<Brick> brick;
+    private ArrayList<Ball> balls = new ArrayList<>();
+    private ArrayList<MovableObject> fallingPowerUps = new ArrayList<>();
+    private ArrayList<LaserShot> lasers = new ArrayList<>();
     private int level;
     private int lives;
     private int score;
@@ -39,6 +44,7 @@ public class GameplayModel implements UltilityValues {
 
         ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
+        balls.add(ball);
         lives = 5;
         level = 1;
         score = 0;
@@ -144,12 +150,19 @@ public class GameplayModel implements UltilityValues {
         return paddle;
     }
 
+    public ArrayList<MovableObject> getFallingPowerUps() {
+        return fallingPowerUps;
+    }
     /**
      * Lấy đối tượng bóng.
      * @return Quả bóng của trò chơi.
      */
     public Ball getBall() {
         return ball;
+    }
+
+    public ArrayList<Ball> getBalls() {
+        return balls;
     }
 
     /**
@@ -166,6 +179,10 @@ public class GameplayModel implements UltilityValues {
      */
     public int getLives() {
         return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
     }
 
     /**
@@ -206,6 +223,23 @@ public class GameplayModel implements UltilityValues {
     public void comboHit() {
         combo++;
     }
+
+    public void spawnPowerUp(double x, double y) {
+        Random rand = new Random();
+        int type = rand.nextInt(4); // 4 loại power-up
+
+        MovableObject pu;
+        switch (type) {
+            case 0 -> pu = new PU_Expand(x, y, 0, 2, 15);
+            case 1 -> pu = new PU_MultiBall(x, y, 0, 2, 15);
+            case 2 -> pu = new PU_Laser(x, y, 0, 2, 15);
+            case 3 -> pu = new PU_ExtraLive(x, y, 0, 2, 15);
+            default -> pu = new PU_Expand(x, y, 0, 2, 15);
+        }
+
+        fallingPowerUps.add(pu);
+    }
+
 
     /**
      * Kiểm tra và xử lý tất cả các va chạm trong trò chơi. Điều này bao gồm
@@ -322,9 +356,55 @@ public class GameplayModel implements UltilityValues {
         ball.move();
         for (Brick b : brick) {
             b.update(deltaTime);
+            if (b.isDestroyed()) {
+                if (Math.random() < 0.3) { // 20% xác suất
+                    double dropX = b.getX() + b.getWidth() / 2;
+                    double dropY = b.getY() + b.getHeight() / 2;
+                    spawnPowerUp(dropX, dropY);
+                }
+            }
         }
         checkCollisions();
         brick.removeIf(Brick::isDestroyed);
+
+        for (int i = 0; i < fallingPowerUps.size(); i++) {
+            MovableObject pu = fallingPowerUps.get(i);
+            pu.move(); // rơi xuống
+
+            // Va chạm với paddle
+            boolean overlapX = pu.getX() + pu.getWidth() >= paddle.getX() &&
+                    pu.getX() <= paddle.getX() + paddle.getLength();
+            boolean overlapY = pu.getY() + pu.getHeight() >= paddle.getY() &&
+                    pu.getY() <= paddle.getY() + paddle.getHeight();
+
+            if (overlapX && overlapY && pu instanceof PowerUp powerUp) {
+                powerUp.apply(this);        // kích hoạt hiệu ứng
+                System.out.println(powerUp.getName());
+                fallingPowerUps.remove(i);  // xóa vật phẩm đã nhặt
+                if(deltaTime > powerUp.getDurationMs()) powerUp.remove(this);
+                i--;
+                continue;
+            }
+
+            // Nếu rơi khỏi màn hình thì xóa
+            if (pu.getY() > canvasHeight) {
+                fallingPowerUps.remove(i);
+                i--;
+            }
+        }
+
+        if (lasers != null && !lasers.isEmpty()) {
+            for (int i = 0; i < lasers.size(); i++) {
+                LaserShot l = lasers.get(i);
+                l.update();
+                l.checkLaser(this);
+                if (l.isDestroyed()) {
+                    lasers.remove(i);
+                    i--;
+                }
+            }
+        }
+
         if (brick.isEmpty()) {
             eventLoader.loadEvent(GameEvent.LEVEL_COMPLETE);
         }

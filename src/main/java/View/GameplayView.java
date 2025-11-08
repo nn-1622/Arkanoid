@@ -2,9 +2,8 @@ package View;
 
 import java.util.ArrayList;
 
-import Model.Brick;
-import Model.GameModel;
-import Model.GameplayModel;
+import Model.*;
+import com.sun.scenario.effect.impl.prism.ps.PPSBlend_ADDPeer;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
@@ -47,6 +46,12 @@ public class GameplayView extends View {
         for (Brick brick : brickMap) {
             brick.draw(gc);
         }
+
+        ArrayList<MovableObject> pu = model.getFallingPowerUps();
+        for (MovableObject x : pu) {
+            x.draw(gc);
+        }
+
     }
 
     /**

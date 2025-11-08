@@ -97,4 +97,7 @@ public abstract class MovableObject extends GameObject {
      * Phương thức trừu tượng để vẽ đối tượng. Các lớp con phải triển khai phương thức này.
      */
     public abstract void draw(GraphicsContext g);
+    public double getWidth() { return 0; }
+    public double getHeight() { return 0; }
+
 }

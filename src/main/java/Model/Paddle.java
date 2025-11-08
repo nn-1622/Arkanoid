@@ -44,7 +44,9 @@ public class Paddle extends MovableObject implements UltilityValues {
     public double getLength() {
         return length;
     }
-
+    public void setLength(double length) {
+        this.length = length;
+    }
     /**
      * Lấy chiều cao của thanh trượt.
      * @return Chiều cao của thanh trượt.
@@ -53,7 +55,7 @@ public class Paddle extends MovableObject implements UltilityValues {
         return height;
     }
 
-    public void setLength
+    //public void setLength;
 
     /**
      * Thiết lập một hình ảnh mới cho thanh trượt.

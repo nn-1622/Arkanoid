@@ -132,6 +132,14 @@ public class Brick extends GameObject{
         return this.x + this.width;
     }
 
+    public double getHeight() {
+        return height;
+    }
+
+    public double getWidth() {
+        return width;
+    }
+
     /**
      * {@inheritDoc}
      * Vẽ viên gạch lên canvas.
@@ -145,7 +153,7 @@ public class Brick extends GameObject{
             render.drawImage(image, sx, sy + (brickType-1) * 16, sw, sh, x, y, width, height);
         } else {
             // Cắt và vẽ frame hiện tại của animation phá gạch từ spritesheet
-            render.drawImage(image, sx + 32*currentFrame, sy, sw, sh, x, y, width, height);
+            render.drawImage(image, sx + 32 * currentFrame, sy, sw, sh, x, y, width, height);
         }
     }
 }
