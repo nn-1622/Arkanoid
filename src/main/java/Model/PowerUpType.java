@@ -1,7 +1,7 @@
 package Model;
 
 public enum PowerUpType {
-    MultiBall,
+    Multi_Ball,
     Expand_Paddle,
     Extra_Live,
     Laser
