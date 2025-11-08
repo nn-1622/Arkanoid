@@ -91,4 +91,17 @@ public class Ball extends MovableObject {
     public void draw(GraphicsContext render) {
         render.drawImage(ballImg, x - radius, y - radius, radius *2, radius*2);
     }
+
+    //UPDATE
+    /**
+     * setter cho toa do x
+     * @param x Tọa độ x mới.
+     */
+    public void setX(double x) { this.x = x; }
+
+    /**
+     * setter cho toa do y
+     * @param y Tọa độ y mới.
+     */
+    public void setY(double y) { this.y = y; }
 }

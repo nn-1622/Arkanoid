@@ -26,6 +26,8 @@ public class GameView {
     private Canvas canvas;
     //update highscore view
     private HighScoreView highScoreView;
+    //update pause view
+    private PauseOverlayView pauseOverlayView;
 
     /**
      * Khởi tạo GameView.
@@ -46,6 +48,8 @@ public class GameView {
         victoryView = new VictoryView();
         //update highscore view
         highScoreView = new HighScoreView();
+        //update pause view
+        pauseOverlayView = new PauseOverlayView(canvas.getWidth(), canvas.getHeight());
     }
 
     /**
@@ -86,6 +90,13 @@ public class GameView {
         //Update thêm xử lý highscoreview
         else if(model.getGstate() == State.HIGHSCORE){
             highScoreView.drawHighScoreScene(gc);
+        }
+        //Update thêm phần xử lý pause game
+        else if(model.getGstate() == State.PAUSED) {  // THÊM MỚI
+            // Vẽ game bình thường trước (để pause giữ hình ảnh hiện tại)
+            gameplayView.drawGameScene(gc, model.getGameplayModel());
+            // Overlay pause lên trên
+            pauseOverlayView.draw(gc, canvas.getWidth(), canvas.getHeight());
         }
     }
 
@@ -136,4 +147,15 @@ public class GameView {
     public  VictoryView getVictoryScene() {
         return victoryView;
     }
+
+    //Update getter pauseview
+    /**
+     * Lấy đối tượng paused overlay view
+     * @return pauseoverlayview
+     */
+    public PauseOverlayView getPauseOverlayView() {
+        return pauseOverlayView;
+    }
+
+
 }

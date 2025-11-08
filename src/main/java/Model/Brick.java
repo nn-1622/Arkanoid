@@ -148,4 +148,30 @@ public class Brick extends GameObject{
             render.drawImage(image, sx + 32*currentFrame, sy, sw, sh, x, y, width, height);
         }
     }
+
+    // Update thêm setter
+    /**
+     * setter cho breaking
+     * @param b isBreaking
+     */
+    public void setBreaking(boolean b) { breaking = b; }
+
+    /**
+     * setter cho destroy
+     * @param d isDestroyed
+     */
+    public void setDestroyed(boolean d) { destroyed = d; }
+
+    public int getCurrentFrame() {
+        return currentFrame;
+    }
+    public void setCurrentFrame(int currentFrame) {
+        this.currentFrame = currentFrame;
+    }
+    public double getFrameTimer() {
+        return frameTimer;
+    }
+    public void setFrameTimer(double frameTimer) {
+        this.frameTimer = frameTimer;
+    }
 }

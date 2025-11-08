@@ -5,7 +5,7 @@ import Controller.ScoreManager;
 import Model.GameSaveData;
 
 
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -394,4 +394,72 @@ public class GameplayModel {
     public void setGameEventListener(GameEventListener gameEventListener) {
         this.gameEventListener = gameEventListener;
     }
+
+
+    //UPDATE THÊM METHOD PAUSED GAME
+    //Lưu pause vào file pause.dat
+    public void savePause() {
+        PauseData pauseData = new PauseData(this);
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream("pause.dat"))) {
+            oos.writeObject(pauseData);
+            System.out.println("Pause saved!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // THÊM MỚI: Load pause từ file và khôi phục chính xác
+    public void loadPause() {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream("pause.dat"))) {
+            PauseData pauseData = (PauseData) ois.readObject();
+
+            // Khôi phục data cơ bản
+            setScore(pauseData.getScore());
+            setLevel(pauseData.getLevel());
+            setLives(pauseData.getLives());
+
+            // Khôi phục paddle
+            getPaddle().setX(pauseData.getPaddleX());
+
+            // Khôi phục ball
+            getBall().setX(pauseData.getBallX());
+            getBall().setY(pauseData.getBallY());
+            getBall().setVx(pauseData.getBallVx());
+            getBall().setVy(pauseData.getBallVy());
+
+            // Khôi phục toàn bộ bricks
+            brick.clear();
+            for (PauseData.BrickData bd : pauseData.getBricks()) {
+                Brick b = new Brick(bd.getX(), bd.getY());
+                b.setBrickType(bd.getType());
+                b.setBreaking(bd.isBreaking()); // Sử dụng setter
+                b.setDestroyed(bd.isDestroyed()); // Sử dụng setter
+                b.setCurrentFrame(bd.getCurrentFrame()); // Sử dụng setter
+                b.setFrameTimer(bd.getFrameTimer()); // Sử dụng setter
+                brick.add(b);
+            }
+
+            System.out.println("Pause loaded!");
+        } catch (Exception e) {
+            System.out.println("No pause file found.");
+        }
+    }
+    // THÊM setters
+
+    /**
+     * Setter cho Score
+     * @param score diem
+     */
+    private void setScore(int score) { this.score = score; }
+
+    /**
+     * Setter cho Level
+     * @param level man
+     */
+    private void setLevel(int level) { this.level = level; }
+    /**
+     * setter cho lives
+     * @param lives so mang
+     */
+    private void setLives(int lives) { this.lives = lives; }
 }

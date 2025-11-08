@@ -4,8 +4,9 @@ import Model.GameModel;
 import Model.GameplayModel;
 import Model.State;
 import View.GameView;
+import View.PauseOverlayView;
 import javafx.scene.input.MouseEvent;
-
+import javafx.scene.input.KeyCode;
 
 /**
  * Lớp điều khiển chính của trò chơi.
@@ -21,6 +22,7 @@ public class GameController implements GameEventListener {
     private boolean leftpressed;
     private boolean rightpressed;
     private long lastUpdateTime = 0;
+    private PauseOverlayView pauseOverlay;
 
     /**
      * Khởi tạo một GameController mới với GameModel và GameView được cung cấp.
@@ -31,6 +33,7 @@ public class GameController implements GameEventListener {
         this.model = gm;
         this.view = gv;
         this.soundManager = new SoundManager();
+        pauseOverlay = view.getPauseOverlayView(); //update pauseoverlayview
         setInput();
     }
 
@@ -94,9 +97,13 @@ public class GameController implements GameEventListener {
         lastUpdateTime = now;
 
         view.render(model);
+
+        //Chỉ update gameplay khi PLAYING (không update khi PAUSED)
         if (model.getGstate() == State.PLAYING) {
-            this.model.getGameplayModel().update(leftpressed,rightpressed,deltaTime);
-        } else if(model.getGstate() == State.FADE){
+            this.model.getGameplayModel().update(leftpressed, rightpressed, deltaTime);
+        }
+        // Xử lý FADE
+        else if(model.getGstate() == State.FADE){
             double timeElapsed = (now - model.getFadeStartTime()) / 1_000_000_000.0;
             final double FADE_DURATION = 2.0;
             if(timeElapsed >= FADE_DURATION){
@@ -114,7 +121,11 @@ public class GameController implements GameEventListener {
     public void setInput() {
         // Xử lý sự kiện di chuyển chuột để tạo hiệu ứng hover cho các nút
         view.getScene().setOnMouseMoved(e -> {
-            if(model.getGstate() == State.MENU) {
+            // Update xử lý hover cho paused
+            if(model.getGstate() == State.PAUSED) {
+                pauseOverlay.checkHover(e);
+            }
+            else if(model.getGstate() == State.MENU) {
                 view.getMenuScene().checkHover(e);
             } else if(model.getGstate() == State.SETTING){
                 view.getSettingScene().checkHover(e);
@@ -122,14 +133,24 @@ public class GameController implements GameEventListener {
                 view.getLoseScene().checkHover(e);
             } else if(model.getGstate() == State.VICTORY){
                 view.getVictoryScene().checkHover(e);
-            } else if(model.getGstate() == State.HIGHSCORE) { //update xử lý hover
-                view.getHighScoreView().checkHover(e); // Gọi checkHover của HighScoreView
+            } else if(model.getGstate() == State.HIGHSCORE) {
+                view.getHighScoreView().checkHover(e);
             }
         });
 
         // Xử lý sự kiện nhấp chuột để tương tác với các nút trong các màn hình khác nhau
         view.getScene().setOnMouseClicked(e -> {
-            if(model.getGstate() == State.MENU) {
+            // Update xử lý click cho pause, resume, save
+            if(model.getGstate() == State.PAUSED) {
+                if (pauseOverlay.saveClicked(e)) {
+                    model.getGameplayModel().savePause();
+                    model.setGstate(State.MENU); //về menu sau khi save
+                    System.out.println("Game saved and returned to menu");
+                } else if (pauseOverlay.menuClicked(e)) {
+                    model.setGstate(State.MENU); // về menu mà ko save
+                    System.out.println("Returned to menu without saving");
+                }
+            } else if(model.getGstate() == State.MENU) {
                 if(view.getMenuScene().startClick(e)) {
                     model.setGstate(State.PLAYING);
                     model.CreateGameplay(this);
@@ -138,7 +159,7 @@ public class GameController implements GameEventListener {
                 } else if(view.getMenuScene().exitClick(e)) {
                     System.exit(0);
                 }
-            }  else if(model.getGstate() == State.SETTING) {
+            } else if(model.getGstate() == State.SETTING) {
                 if(view.getSettingScene().exitClicked(e)) {
                     model.setGstate(State.MENU);
                 } else if (view.getSettingScene().lowVolumeClicked(e)) {
@@ -148,29 +169,25 @@ public class GameController implements GameEventListener {
                     soundManager.increaseVolume();
                     soundManager.playTestSound();
                 }
-            }  else if(model.getGstate() == State.LOSS) {
+            } else if(model.getGstate() == State.LOSS) {
                 if(view.getLoseScene().checkClickMenu(e)) {
                     model.setGstate(State.MENU);
                 } else if (view.getLoseScene().checkClickReplay(e)) {
                     model.setGstate(State.PLAYING);
                     model.CreateGameplay(this);
-                }
-                //Update thêm xử lý phần highscoreview
-                else if(view.getLoseScene().checkClickHighScore(e)) {
+                } else if(view.getLoseScene().checkClickHighScore(e)) {
                     model.setGstate(State.HIGHSCORE);
                 }
-            }   else if(model.getGstate() == State.VICTORY) {
+            } else if(model.getGstate() == State.VICTORY) {
                 if(view.getVictoryScene().checkClickMenu(e)) {
                     model.setGstate(State.MENU);
                 } else if (view.getVictoryScene().checkClickReplay(e)) {
                     model.setGstate(State.PLAYING);
                     model.CreateGameplay(this);
                 }
-            }
-            //Thêm phần xử lý khi đang trong highscoreview
-            else if(model.getGstate() == State.HIGHSCORE) {
+            } else if(model.getGstate() == State.HIGHSCORE) {
                 if(view.getHighScoreView().checkClickMenu(e)) {
-                    model.setGstate(State.LOSS);  // Quay lại
+                    model.setGstate(State.LOSS);
                 }
             }
         });
@@ -180,7 +197,21 @@ public class GameController implements GameEventListener {
             switch (e.getCode()) {
                 case A -> leftpressed = true; // Di chuyển sang trái
                 case D -> rightpressed = true; // Di chuyển sang phải
-                case SPACE -> model.getGameplayModel().launchBall(); // Phóng bóng
+                case SPACE -> {
+                    if(model.getGstate() == State.PLAYING) {
+                        model.getGameplayModel().launchBall(); // Phóng bóng
+                    }
+                }
+                // ESC cho Pause and Resume
+                case ESCAPE -> {
+                    if (model.getGstate() == State.PLAYING) {
+                        model.setGstate(State.PAUSED);
+                        System.out.println("GAME PAUSED!"); //nhấn esc thì pause
+                    } else if(model.getGstate() == State.PAUSED) {
+                        model.setGstate(State.PLAYING); //nhấn lần 2 thì resume
+                        System.out.println("GAME RESUMED!");
+                    }
+                }
             }
         });
 
