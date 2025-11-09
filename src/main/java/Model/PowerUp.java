@@ -10,4 +10,5 @@ public interface PowerUp {
     default boolean isInstant() { return getDurationMs() <= 0; }
     void update(GameplayModel ctx, double deltaTime);
     boolean isActive();
+    int getElapsedMs();
 }

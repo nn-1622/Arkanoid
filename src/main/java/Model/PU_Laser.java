@@ -6,7 +6,7 @@ import javafx.scene.canvas.GraphicsContext;
 
 public class PU_Laser extends MovableObject implements PowerUp {
 
-    private static final int DURATION_MS = 15_000;
+    private static final int DURATION_MS = 5_000;
     private static final int SHOOT_INTERVAL_MS = 150;
 
     private double radius;
@@ -43,13 +43,28 @@ public class PU_Laser extends MovableObject implements PowerUp {
         }
     }
 
+    public void extendDuration(int extraMs) {
+        elapsedMs -= extraMs;
+        if (elapsedMs < 0) elapsedMs = 0;
+    }
+
+
     @Override
     public void apply(GameplayModel game) {
+        for (PowerUp p : game.getActivePowerUps()) {
+            if (p instanceof PU_Laser && p.isActive()) {
+                ((PU_Laser)p).extendDuration(2500);
+                return;
+            }
+        }
+
+        // Nếu chưa có laser nào → kích hoạt laser mới
         this.active = false;
         this.effectActive = true;
         this.elapsedMs = 0;
         this.timeSinceLastShotMs = 0;
     }
+
 
     @Override
     public void update(GameplayModel game, double deltaTime) {
@@ -96,5 +111,10 @@ public class PU_Laser extends MovableObject implements PowerUp {
     @Override
     public double getHeight() {
         return radius * 2;
+    }
+
+    @Override
+    public int getElapsedMs() {
+        return elapsedMs;
     }
 }

@@ -39,7 +39,6 @@ public class GameplayView extends View {
         
         // Vẽ các đối tượng trong game
         model.getPaddle().draw(gc);
-        model.getBall().draw(gc);
         drawUI(gc, model);
         ArrayList<Brick> brickMap = model.getBricks();
 
@@ -56,6 +55,15 @@ public class GameplayView extends View {
         for (LaserShot x : laser) {
             x.draw(gc);
         }
+
+        ArrayList<Ball> balls = model.getBalls();
+        for (Ball x : balls) {
+            x.draw(gc);
+        }
+
+        model.drawActivePowerUps(gc);
+        model.drawEffects(gc);
+
 
     }
 

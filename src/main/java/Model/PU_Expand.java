@@ -5,7 +5,7 @@ import javafx.scene.image.Image;
 
 public class PU_Expand extends MovableObject implements PowerUp {
 
-    private static final int DURATION_MS = 30_000;
+    private static final int DURATION_MS = 5_000;
 
     private double radius;
     private Image expand_paddle;
@@ -21,7 +21,7 @@ public class PU_Expand extends MovableObject implements PowerUp {
 
     @Override
     public String getName() {
-        return "Expand Paddle";
+        return "Expand";
     }
 
     @Override
@@ -39,6 +39,7 @@ public class PU_Expand extends MovableObject implements PowerUp {
     public void apply(GameplayModel game) {
         if (effectActive) return;
         Paddle paddle = game.getPaddle();
+        if (paddle.getLength() > UltilityValues.paddleLength * Math.pow(1.5, 3)) return;
         if (paddle != null) {
             originalWidth = paddle.getLength();
             paddle.setLength(originalWidth * 1.5);
@@ -61,7 +62,7 @@ public class PU_Expand extends MovableObject implements PowerUp {
         if (!effectActive) return;
         Paddle paddle = game.getPaddle();
         if (paddle != null) {
-            paddle.setLength(originalWidth);
+            paddle.setLength(UltilityValues.paddleLength);
         }
         effectActive = false;
     }
@@ -80,4 +81,10 @@ public class PU_Expand extends MovableObject implements PowerUp {
     public double getHeight() {
         return radius * 2;
     }
+
+    @Override
+    public int getElapsedMs() {
+        return elapsedMs;
+    }
+
 }

@@ -1,8 +1,11 @@
 Controller\SoundManager.class
 Controller\GameEventListener.class
 View\VictoryView.class
+Model\PU_Shield.class
 Controller\ChangeStateCmd.class
+Model\PU_Icons.class
 Model\PU_Expand.class
+Model\PU_ScoreX2.class
 Controller\ExitCmd.class
 View\View.class
 Controller\GameCommand.class
@@ -10,6 +13,7 @@ Model\PU_ExtraLive.class
 Model\PU_MultiBall.class
 Controller\GameController$1.class
 Controller\GameEvent.class
+Model\PU_BombBall.class
 Model\LaserShot.class
 Controller\AdjustVolumeCmd.class
 Model\PowerUpType.class

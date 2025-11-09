@@ -13,6 +13,10 @@ public class Paddle extends MovableObject implements UltilityValues {
     private double length;
     private double height;
     private Image paddleImg;
+    private boolean shield = false;
+    private double shieldOpacity = 0.8;
+    private double shieldPulse = 0.0;      // để làm hiệu ứng gợn sóng
+    private boolean shieldIncreasing = true;
 
     /**
      * Khởi tạo một đối tượng Paddle mới.
@@ -32,7 +36,8 @@ public class Paddle extends MovableObject implements UltilityValues {
     public static Paddle getPaddle() {
         if (paddle == null) {
             paddle = new Paddle(canvasWidth / 2 - paddleLength / 2,
-                    canvasHeight - 100, paddleLength, paddleHeight);
+                    canvasHeight - 140, paddleLength, paddleHeight);
+
         }
         return paddle;
     }
@@ -65,13 +70,35 @@ public class Paddle extends MovableObject implements UltilityValues {
         this.paddleImg = paddleImg;
     }
 
+    public void setShield(boolean v) { shield = v; }
+    public boolean hasShield() { return shield; }
+
     /**
      * {@inheritDoc}
      * Vẽ hình ảnh của thanh trượt lên canvas tại vị trí hiện tại của nó.
      */
+    public void update(double deltaTime) {
+        if (shield) {
+            if (shieldIncreasing) {
+                shieldPulse += deltaTime * 2;
+                if (shieldPulse >= 1.0) {
+                    shieldPulse = 1.0;
+                    shieldIncreasing = false;
+                }
+            } else {
+                shieldPulse -= deltaTime * 2;
+                if (shieldPulse <= 0.2) {
+                    shieldPulse = 0.2;
+                    shieldIncreasing = true;
+                }
+            }
+        }
+    }
+
+
     @Override
-    public void draw(GraphicsContext render) {
-        render.drawImage(paddleImg, x, y, length, height);
+    public void draw(GraphicsContext g) {
+        g.drawImage(paddleImg, x, y, length, height);
     }
 
     /**
@@ -87,4 +114,13 @@ public class Paddle extends MovableObject implements UltilityValues {
             x += this.getVx();
         }
     }
+
+    public void checkBoundary(double canvasWidth) {
+        if (getX() < 0) {
+            setX(0);
+        } else if (getX() > canvasWidth - getLength()) {
+            setX(canvasWidth - getLength());
+        }
+    }
+
 }

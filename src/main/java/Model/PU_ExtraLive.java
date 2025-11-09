@@ -64,4 +64,8 @@ public class PU_ExtraLive extends MovableObject implements PowerUp{
         return radius * 2;
     }
 
+    @Override
+    public int getElapsedMs() {
+        return 0;
+    }
 }

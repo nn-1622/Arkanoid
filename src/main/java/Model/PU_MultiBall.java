@@ -35,31 +35,38 @@ public class PU_MultiBall extends MovableObject implements PowerUp {
 
     @Override
     public void apply(GameplayModel game) {
-        if (active) return;
-        active = true;
 
-        List<Ball> currentBalls = game.getBalls();
-        List<Ball> newBalls = new ArrayList<>();
+        ArrayList<Ball> currentBalls = game.getBalls();
+        ArrayList<Ball> newBalls = new ArrayList<>();
         int currentCount = game.getBalls().size();
 
         for (Ball b : currentBalls) {
-            // Nếu đủ 10 bóng thì dừng luôn
-            if (currentCount + newBalls.size() >= 10) break;
+            if (currentCount + newBalls.size() > 16) break;
 
-            Ball ball1 = new Ball(b.getX(), b.getY(), b.getVx(), -b.getVy(), radius);
-            if (currentCount + newBalls.size() < 10) newBalls.add(ball1);
+            double x = b.getX();
+            double y = b.getY();
+            double vx = b.getVx();
+            double vy = b.getVy();
+            double r = b.getRadius();
 
-            Ball ball2 = new Ball(b.getX(), b.getY(), -b.getVx(), b.getVy(), radius);
-            if (currentCount + newBalls.size() < 10) newBalls.add(ball2);
+            double speed = Math.sqrt(vx * vx + vy * vy);
+            double angle = Math.atan2(vy, vx);
+
+            double angle1 = angle + Math.toRadians(15);
+            double angle2 = angle - Math.toRadians(15);
+
+            Ball ball1 = new Ball(x, y, speed * Math.cos(angle1), speed * Math.sin(angle1), r);
+            Ball ball2 = new Ball(x, y, speed * Math.cos(angle2), speed * Math.sin(angle2), r);
+
+            newBalls.add(ball1);
+            newBalls.add(ball2);
+
         }
-
-        // Thêm bóng mới vào danh sách bóng trong GameplayModel
-        game.getBalls().addAll(newBalls);
+        game.setBalls(newBalls);
     }
 
     @Override
     public void remove(GameplayModel game) {
-        // MultiBall là hiệu ứng tức thời → không cần remove
         active = false;
     }
 
@@ -81,6 +88,11 @@ public class PU_MultiBall extends MovableObject implements PowerUp {
     @Override
     public double getHeight() {
         return radius * 2;
+    }
+
+    @Override
+    public int getElapsedMs() {
+        return 0;
     }
 
 }
