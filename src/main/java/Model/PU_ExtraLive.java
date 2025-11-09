@@ -45,6 +45,16 @@ public class PU_ExtraLive extends MovableObject implements PowerUp{
     }
 
     @Override
+    public void update(GameplayModel ctx, double deltaTime) {
+
+    }
+
+    @Override
+    public boolean isActive() {
+        return false;
+    }
+
+    @Override
     public double getWidth() {
         return radius * 2;
     }

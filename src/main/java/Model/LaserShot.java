@@ -4,13 +4,13 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class LaserShot extends MovableObject {
-    private static final double SPEED = 10;
+    private static final double SPEED = -10;
     private static final double WIDTH = 4;
     private static final double HEIGHT = 15;
     private boolean destroyed = false;
 
     public LaserShot(double x, double y) {
-        super(x, y, 0, -SPEED);
+        super(x, y, 0, SPEED);
     }
 
     @Override
@@ -28,13 +28,13 @@ public class LaserShot extends MovableObject {
     public boolean isDestroyed() { return destroyed; }
 
     public void update() {
-        y += 10;
+        y += this.getVy();
         if (y + HEIGHT < 0) destroyed = true;
     }
 
     public void checkLaser(GameplayModel game) {
         for (Brick brick : game.getBricks()) {
-            if (brick.isDestroyed()) continue;
+            if (brick.isBreaking()) continue;
 
             double laserLeft = x;
             double laserRight = x + WIDTH;

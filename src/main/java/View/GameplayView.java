@@ -52,6 +52,11 @@ public class GameplayView extends View {
             x.draw(gc);
         }
 
+        ArrayList<LaserShot> laser = model.getLasers();
+        for (LaserShot x : laser) {
+            x.draw(gc);
+        }
+
     }
 
     /**

@@ -26,6 +26,7 @@ public class GameplayModel implements UltilityValues {
     private ArrayList<Brick> brick;
     private ArrayList<Ball> balls = new ArrayList<>();
     private ArrayList<MovableObject> fallingPowerUps = new ArrayList<>();
+    private ArrayList<PowerUp> activePowerUps = new ArrayList<>();
     private ArrayList<LaserShot> lasers = new ArrayList<>();
     private int level;
     private int lives;
@@ -75,6 +76,10 @@ public class GameplayModel implements UltilityValues {
         Brick newBrick = new Brick(x, y);
         newBrick.setBrickType(type);
         brick.add(newBrick);
+    }
+
+    public void addLaserBullet(double x, double y) {
+        lasers.add(new LaserShot(x, y));
     }
 
     /**
@@ -320,6 +325,9 @@ public class GameplayModel implements UltilityValues {
                     break;
                 }
             }
+            for (LaserShot l : lasers) {
+                l.checkLaser(this);
+            }
         }
     }
 
@@ -336,6 +344,10 @@ public class GameplayModel implements UltilityValues {
             lives = 5;
             setCombo(0);
         }
+    }
+
+    public ArrayList<LaserShot> getLasers() {
+        return lasers;
     }
 
     /**
@@ -378,10 +390,10 @@ public class GameplayModel implements UltilityValues {
                     pu.getY() <= paddle.getY() + paddle.getHeight();
 
             if (overlapX && overlapY && pu instanceof PowerUp powerUp) {
-                powerUp.apply(this);        // kích hoạt hiệu ứng
+                powerUp.apply(this);                 // bật hiệu ứng
                 System.out.println(powerUp.getName());
-                fallingPowerUps.remove(i);  // xóa vật phẩm đã nhặt
-                if(deltaTime > powerUp.getDurationMs()) powerUp.remove(this);
+                activePowerUps.add(powerUp);         // đưa vào danh sách đang hoạt động
+                fallingPowerUps.remove(i);           // xóa icon rơi
                 i--;
                 continue;
             }
@@ -402,6 +414,16 @@ public class GameplayModel implements UltilityValues {
                     lasers.remove(i);
                     i--;
                 }
+            }
+        }
+
+        for (int i = 0; i < activePowerUps.size(); i++) {
+            PowerUp p = activePowerUps.get(i);
+            p.update(this, deltaTime);
+            if (!p.isActive()) {
+                p.remove(this);
+                activePowerUps.remove(i);
+                i--;
             }
         }
 
