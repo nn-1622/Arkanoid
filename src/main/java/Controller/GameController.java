@@ -24,6 +24,12 @@ public class GameController implements GameEventListener {
     private boolean left2pressed;
     private boolean right2pressed;
 
+    private static final double FADE_DURATION = 2.0;
+
+    private double leftFadeStart = -1;
+    private double rightFadeStart = -1;
+
+
     /**
      * Khởi tạo một GameController mới với GameModel và GameView được cung cấp.
      * @param gm Model của trò chơi, chứa dữ liệu và trạng thái game.
@@ -72,23 +78,54 @@ public class GameController implements GameEventListener {
         if (model.getGstate() == State.PLAYING) {
             this.model.getGameplayModel().update(leftpressed, rightpressed, deltaTime);
 
-        } else if (model.getGstate() == State.TWO_PLAYING) {
-            if (model.getLeftGame() != null) {
-                model.getLeftGame().update(leftpressed, rightpressed, deltaTime);
+        }  else if (model.getGstate() == State.TWO_PLAYING) {
+        GameplayModel leftGame = model.getLeftGame();
+        GameplayModel rightGame = model.getRightGame();
+
+        if (leftGame != null) {
+            leftGame.update(leftpressed, rightpressed, deltaTime);
+        }
+        if (rightGame != null) {
+            rightGame.update(left2pressed, right2pressed, deltaTime);
+        }
+        if (leftGame != null) {
+            if (leftGame.isLevelFinished() && !leftGame.isFading()) {
+                leftGame.startFade(now);
             }
-            if (model.getRightGame() != null) {
-                model.getRightGame().update(left2pressed, right2pressed, deltaTime);
+            if (leftGame.isFading()) {
+                double Elapsed = (now - leftGame.getFadeStartTime()) / 1_000_000_000.0;
+                if (Elapsed >= FADE_DURATION) {
+                    leftGame.Initialize();
+                    leftGame.setLevelFinished(false);
+                    leftGame.stopFade();
+                }
             }
-        } else if (model.getGstate() == State.FADE) {
+        }
+        if (rightGame != null) {
+            if (rightGame.isLevelFinished() && !rightGame.isFading()) {
+                rightGame.startFade(now);
+            }
+
+            if (rightGame.isFading()) {
+                double Elapsed = (now - rightGame.getFadeStartTime()) / 1_000_000_000.0;
+                if (Elapsed >= FADE_DURATION) {
+                    rightGame.Initialize();
+                    rightGame.setLevelFinished(false);
+                    rightGame.stopFade();
+                }
+            }
+        }
+        if (leftGame != null && rightGame != null
+                && leftGame.hasCompletedAllLevels()
+                && rightGame.hasCompletedAllLevels()) {
+                    model.setGstate(State.VICTORY);
+                }
+    } else if (model.getGstate() == State.FADE) {
             double timeElapsed = (now - model.getFadeStartTime()) / 1_000_000_000.0;
             final double FADE_DURATION = 2.0;
 
             if (timeElapsed >= FADE_DURATION) {
-                if (model.getLeftGame() != null && model.getRightGame() != null) {
-                    model.getLeftGame().Initialize();
-                    model.getRightGame().Initialize();
-                    model.setGstate(State.TWO_PLAYING);
-                } else if (model.getGameplayModel() != null) {
+                if (model.getGameplayModel() != null) {
                     model.getGameplayModel().Initialize();
                     model.setGstate(State.PLAYING);
                 }

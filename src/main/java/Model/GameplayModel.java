@@ -36,8 +36,26 @@ public class GameplayModel implements UltilityValues {
     private double areaLeft = 0;
     private double areaRight = canvasWidth;
     private double playWidth;
-    private boolean twoPlayerMode = false;
+    private final boolean twoPlayerMode;
+    private boolean completedAllLevels = false;
     private boolean levelFinished = false;
+    private boolean fading = false;
+    private long fadeStartTime;
+
+    public boolean hasCompletedAllLevels() {
+        return completedAllLevels;
+    }
+    public boolean isFading() { return fading; }
+    public long getFadeStartTime() { return fadeStartTime; }
+
+    public void startFade(long nowNano) {
+        this.fading = true;
+        this.fadeStartTime = nowNano;
+    }
+
+    public void stopFade() {
+        this.fading = false;
+    }
     public boolean isLevelFinished() { return levelFinished; }
     public void setLevelFinished(boolean finished) { this.levelFinished = finished; }
 
@@ -46,6 +64,7 @@ public class GameplayModel implements UltilityValues {
      */
     public GameplayModel(EventLoader eventLoader) {
         this.eventLoader = eventLoader;
+        this.twoPlayerMode = false;
 
         paddle = Paddle.getPaddle();
 
@@ -63,15 +82,17 @@ public class GameplayModel implements UltilityValues {
     }
 
     public GameplayModel(EventLoader eventLoader, double leftBound, double rightBound) {
-        this(eventLoader); // Gọi constructor mặc định
+        this.eventLoader = eventLoader; // Gọi constructor mặc định
+        this.twoPlayerMode = true;
         this.areaLeft = leftBound;
         this.areaRight = rightBound;
         paddle.setX((areaLeft + areaRight - paddle.getLength()) / 2); // căn giữa vùng chơi
     }
 
-    public GameplayModel(EventLoader eventLoader, Paddle customPaddle) {
+    public GameplayModel(EventLoader eventLoader, Paddle customPaddle, boolean twoPlayerMode) {
         this.eventLoader = eventLoader;
         this.paddle = customPaddle;
+        this.twoPlayerMode = twoPlayerMode;
         Ball ball = new Ball(
                 paddle.x + paddleLength / 2.0,
                 paddle.y - paddleHeight / 2.0,
@@ -97,7 +118,7 @@ public class GameplayModel implements UltilityValues {
             this.currentBallState = BallState.LAUNCHED;
             for (Ball ball: balls) {
                 ball.setVx(0);
-                ball.setVy(-2 - currentVx);
+                ball.setVy(-3 - currentVx);
             }
         }
     }
@@ -363,7 +384,8 @@ public class GameplayModel implements UltilityValues {
             currentVx++;
             lives = 5;
             setCombo(0);
-        }
+        } else {
+        completedAllLevels = true;}
     }
 
     public ArrayList<LaserShot> getLasers() {
@@ -394,7 +416,7 @@ public class GameplayModel implements UltilityValues {
         for (Brick b : brick) {
             b.update(deltaTime);
             if (b.isDestroyed()) {
-                if (Math.random() <= 1) {
+                if (Math.random() <= 0.3) {
                     double dropX = b.getX() + b.getWidth() / 2;
                     double dropY = b.getY() + b.getHeight() / 2;
                     spawnPowerUp(dropX, dropY);
@@ -459,11 +481,13 @@ public class GameplayModel implements UltilityValues {
                 eventLoader.loadEvent(GameEvent.LEVEL_COMPLETE);
             }
         }
-        if (level == 6) {
-            eventLoader.loadEvent(GameEvent.GAME_WIN);
-        }
-        if (lives <= 0) {
-            eventLoader.loadEvent(GameEvent.GAME_LOST);
+        if (!twoPlayerMode) {
+            if (level == 6) {
+                eventLoader.loadEvent(GameEvent.GAME_WIN);
+            }
+            if (lives <= 0) {
+                eventLoader.loadEvent(GameEvent.GAME_LOST);
+            }
         }
     }
 
@@ -546,4 +570,7 @@ public class GameplayModel implements UltilityValues {
     }
 
 
+    public int getLevel() {
+        return level;
+    }
 }

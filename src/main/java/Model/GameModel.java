@@ -70,8 +70,8 @@ public class GameModel implements UltilityValues {
                 UltilityValues.paddleLength,
                 UltilityValues.paddleHeight
         );
-        leftGame = new GameplayModel(eventLoader, p1);
-        rightGame = new GameplayModel(eventLoader, p2);
+        leftGame = new GameplayModel(eventLoader, p1, true);
+        rightGame = new GameplayModel(eventLoader, p2, true);
     }
 
     public GameplayModel getLeftGame() { return leftGame; }

@@ -1,44 +1,44 @@
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\AdjustVolumeCmd.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\ChangeStateCmd.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\EventLoader.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\ExitCmd.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\GameCommand.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\GameController.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\GameEvent.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\GameEventListener.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Controller\SoundManager.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Game.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\Ball.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\BallState.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\Brick.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\Button.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\GameModel.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\GameObject.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\GameplayModel.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\LaserShot.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\MovableObject.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\Paddle.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PowerUp.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PowerUpType.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_BombBall.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_Expand.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_ExtraLive.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_Icons.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_Laser.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_MultiBall.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_ScoreX2.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_Shield.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\State.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\TwoPlayerMatch.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\UltilityValues.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\Utility.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\GameplayView.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\GameView.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\LoseView.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\MenuScene.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\PlayModeScene.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\SceneActions.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\SettingScene.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\TwoPlayerView.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\VictoryView.java
-C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\View.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\AdjustVolumeCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ChangeStateCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\EventLoader.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ExitCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\GameCommand.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\GameController.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\GameEvent.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\GameEventListener.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\SoundManager.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Game.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\Ball.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\BallState.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\Brick.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\Button.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\GameModel.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\GameObject.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\GameplayModel.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\LaserShot.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\MovableObject.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\Paddle.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PowerUp.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PowerUpType.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PU_BombBall.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PU_Expand.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PU_ExtraLive.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PU_Icons.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PU_Laser.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PU_MultiBall.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PU_ScoreX2.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\PU_Shield.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\State.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\TwoPlayerMatch.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\UltilityValues.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\Utility.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\GameplayView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\GameView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\LoseView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\MenuScene.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\PlayModeScene.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\SceneActions.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\SettingScene.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\TwoPlayerView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\VictoryView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\View.java

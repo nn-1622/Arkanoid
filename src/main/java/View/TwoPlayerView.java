@@ -17,30 +17,59 @@ public class TwoPlayerView extends View {
 
     @Override
     public void draw(GraphicsContext gc, GameplayModel ignore) {
-        // Lấy 2 phiên chơi
         GameplayModel left = model.getLeftGame();
         GameplayModel right = model.getRightGame();
 
-        // Vẽ nền chung (nếu muốn)
+        // nền chung
         gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, UltilityValues.canvasWidth * 2, UltilityValues.canvasHeight);
+        gc.fillRect(0, 0,
+                UltilityValues.canvasWidth * 2,
+                UltilityValues.canvasHeight);
 
-        // ====== Vẽ nửa bên trái ======
+        // ====== LEFT HALF ======
         if (left != null) {
+            gc.save();
+            // không translate, vẽ từ (0,0)
             subView.draw(gc, left);
+
+            if (left.isFading()) {
+                double fadeTime = 2.0;
+                double elapsed = (System.nanoTime() - left.getFadeStartTime()) / 1_000_000_000.0;
+                double opacity = Math.min(1.0, elapsed / fadeTime);
+
+                gc.setFill(new Color(0, 0, 0, opacity));
+                gc.fillRect(0, 0,
+                        UltilityValues.canvasWidth,
+                        UltilityValues.canvasHeight);
+            }
+
+            gc.restore();
         }
 
-        // ====== Vẽ đường chia đôi ======
+        // ====== DIVIDER ======
         gc.setStroke(Color.GRAY);
         gc.setLineWidth(2);
         gc.strokeLine(UltilityValues.canvasWidth, 0,
                 UltilityValues.canvasWidth, UltilityValues.canvasHeight);
 
-        // ====== Vẽ nửa bên phải ======
+        // ====== RIGHT HALF ======
         if (right != null) {
             gc.save();
             gc.translate(UltilityValues.canvasWidth, 0);
+
             subView.draw(gc, right);
+
+            if (right.isFading()) {
+                double fadeTime = 2.0;
+                double elapsed = (System.nanoTime() - right.getFadeStartTime()) / 1_000_000_000.0;
+                double opacity = Math.min(1.0, elapsed / fadeTime);
+
+                gc.setFill(new Color(0, 0, 0, opacity));
+                gc.fillRect(0, 0,
+                        UltilityValues.canvasWidth,
+                        UltilityValues.canvasHeight);
+            }
+
             gc.restore();
         }
     }
