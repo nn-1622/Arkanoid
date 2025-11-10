@@ -26,7 +26,7 @@ public class PlayModeScene extends View implements SceneActions {
         One_Player.setImgButton("/1Player.png");
         One_Player.setImgHoverButton("/1PlayerHover.png");
 
-        Two_Player = new Button(153.3, 288.3, 293.5, 73.4, new ChangeStateCmd(model, State.PLAYING));
+        Two_Player = new Button(153.3, 288.3, 293.5, 73.4, new ChangeStateCmd(model, State.TWO_PLAYING));
         Two_Player.setImgButton("/2Player.png");
         Two_Player.setImgHoverButton("/2PlayerHover.png");
 

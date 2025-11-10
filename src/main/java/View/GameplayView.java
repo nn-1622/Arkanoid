@@ -74,19 +74,22 @@ public class GameplayView extends View {
      * @param model Đối tượng GameplayModel để lấy dữ liệu UI như điểm, mạng sống, và combo.
      */
     public void drawUI(GraphicsContext gc, GameplayModel model) {
-        double scoreX = gc.getCanvas().getWidth() - 170;
-        double scoreY = gc.getCanvas().getHeight() - 30;
+        double w = UltilityValues.canvasWidth;
+        double h = UltilityValues.canvasHeight;
 
-        // Vẽ điểm số
+        // Ghi điểm & combo ở góc phải mỗi nửa
+        double scoreX = w - 170;
+        double scoreY = h - 30;
+
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
         gc.setFill(Color.WHITE);
         gc.fillText("Score: " + model.getScore(), scoreX, scoreY);
-        
-        // Vẽ thanh máu bằng cách cắt (crop) ảnh healthbar dựa trên số mạng còn lại
+
+        // Thanh máu
         gc.drawImage(healthbar, 0, 0, 40 * model.getLives(), 40,
                 23.7, 600, 40 * model.getLives(), 40);
 
-        // Chỉ vẽ combo khi nó lớn hơn 1
+        // Combo
         if (model.getCombo() > 1) {
             double comboX = scoreX;
             double comboY = scoreY - 30;
@@ -95,4 +98,5 @@ public class GameplayView extends View {
             gc.fillText("Streak: x" + model.getCombo(), comboX, comboY);
         }
     }
+
 }

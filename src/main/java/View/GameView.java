@@ -38,6 +38,21 @@ public class GameView {
         return scene;
     }
 
+    public void ensureSizeForState(State s) {
+        double targetW = (s == State.TWO_PLAYING) ? 1200 : 600;
+        double targetH = 650;
+
+        if (canvas.getWidth() != targetW || canvas.getHeight() != targetH) {
+            canvas.setWidth(targetW);
+            canvas.setHeight(targetH);
+
+            if (scene.getWindow() != null) {
+                scene.getWindow().setWidth(targetW + 16);  // cộng viền, tránh cắt
+                scene.getWindow().setHeight(targetH + 39); // thanh tiêu đề
+            }
+        }
+    }
+
     /**
      * Phương thức kết xuất (render) chính, được gọi liên tục trong vòng lặp game.
      * Dựa vào trạng thái (State) từ GameModel, phương thức này gọi phương thức vẽ
@@ -45,16 +60,22 @@ public class GameView {
      * @param model Đối tượng GameModel chứa trạng thái hiện tại của game.
      */
     public void render(GameModel model) {
-        if(model.getGstate() == State.FADE){
-            // Xử lý hiệu ứng chuyển cảnh mờ dần
+        // --- Tự động đổi kích thước khi vào 2 người chơi ---
+        ensureSizeForState(model.getGstate());
+
+        if (model.getGstate() == State.FADE) {
+            // Hiệu ứng chuyển cảnh mờ dần
             final double fadeTime = 2.0;
             double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;
             double opacity = Math.min(1.0, (timeElapsed / fadeTime));
-            gc.setFill(new Color(0,0,0,opacity));
-            gc.fillRect(0,0, canvas.getWidth(), canvas.getHeight());
+
+            gc.setFill(new Color(0, 0, 0, opacity));
+            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         } else {
+            // Vẽ khung hình hiện tại (1P hoặc 2P đều được)
             model.getCurrentView().draw(gc, model.getGameplayModel());
         }
     }
+
 
 }

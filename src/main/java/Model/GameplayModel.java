@@ -19,6 +19,7 @@ import javafx.scene.image.Image;
 public class GameplayModel implements UltilityValues {
     private Image background;
     private Paddle paddle;
+    private Paddle paddle2;
     private BallState currentBallState;
     private double currentVx;
     private ArrayList<Brick> brick;
@@ -32,6 +33,13 @@ public class GameplayModel implements UltilityValues {
     private int combo;
     private int scoreMultiplier = 1;
     private EventLoader eventLoader;
+    private double areaLeft = 0;
+    private double areaRight = canvasWidth;
+    private double playWidth;
+    private boolean twoPlayerMode = false;
+    private boolean levelFinished = false;
+    public boolean isLevelFinished() { return levelFinished; }
+    public void setLevelFinished(boolean finished) { this.levelFinished = finished; }
 
     /**
      * Xây dựng một GameplayModel mới và khởi tạo trạng thái trò chơi.
@@ -50,7 +58,35 @@ public class GameplayModel implements UltilityValues {
         combo = 0;
         currentVx = 0;
         renderMap();
+
+        this.playWidth = UltilityValues.canvasWidth;
     }
+
+    public GameplayModel(EventLoader eventLoader, double leftBound, double rightBound) {
+        this(eventLoader); // Gọi constructor mặc định
+        this.areaLeft = leftBound;
+        this.areaRight = rightBound;
+        paddle.setX((areaLeft + areaRight - paddle.getLength()) / 2); // căn giữa vùng chơi
+    }
+
+    public GameplayModel(EventLoader eventLoader, Paddle customPaddle) {
+        this.eventLoader = eventLoader;
+        this.paddle = customPaddle;
+        Ball ball = new Ball(
+                paddle.x + paddleLength / 2.0,
+                paddle.y - paddleHeight / 2.0,
+                0, 0, 10
+        );
+        this.currentBallState = BallState.ATTACHED;
+        this.balls.add(ball);
+        this.lives = 5;
+        this.level = 1;
+        this.score = 0;
+        this.combo = 0;
+        this.currentVx = 0;
+        renderMap();
+    }
+
 
     /**
      * Phóng quả bóng từ thanh trượt nếu nó hiện đang ở trạng thái ATTACHED (gắn liền).
@@ -257,6 +293,10 @@ public class GameplayModel implements UltilityValues {
         combo++;
     }
 
+    public double getPlayWidth() {
+        return playWidth;
+    }
+
     public void spawnPowerUp(double x, double y) {
         Random rand = new Random();
         int type = rand.nextInt(7);
@@ -413,7 +453,11 @@ public class GameplayModel implements UltilityValues {
         }
 
         if (brick.isEmpty()) {
-            eventLoader.loadEvent(GameEvent.LEVEL_COMPLETE);
+            if (twoPlayerMode) {
+                levelFinished = true;
+            } else {
+                eventLoader.loadEvent(GameEvent.LEVEL_COMPLETE);
+            }
         }
         if (level == 6) {
             eventLoader.loadEvent(GameEvent.GAME_WIN);

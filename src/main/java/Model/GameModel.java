@@ -22,7 +22,8 @@ public class GameModel implements UltilityValues {
     private GameplayModel gameModel;
     private final Map<State, View> viewMap = new EnumMap<State, View>(State.class);
     private long fadeStartTime = 0;
-
+    private GameplayModel leftGame;
+    private GameplayModel rightGame;
     /**
      * Khởi tạo một đối tượng GameModel mới.
      * Trạng thái ban đầu của trò chơi được đặt là MENU.
@@ -33,10 +34,10 @@ public class GameModel implements UltilityValues {
         viewMap.put(State.MENU, new MenuScene(this));
         viewMap.put(State.LOSS, new LoseView(this));
         viewMap.put(State.PLAYING, new GameplayView(this));
+        viewMap.put(State.TWO_PLAYING, new TwoPlayerView(this));
         viewMap.put(State.SETTING, new SettingScene(this));
         viewMap.put(State.VICTORY, new VictoryView(this));
         viewMap.put(State.PLAY_MODE, new PlayModeScene(this));
-
         setGstate(State.MENU);
     }
 
@@ -54,6 +55,27 @@ public class GameModel implements UltilityValues {
     public void CreateGameplay() {
         gameModel = new GameplayModel(eventLoader);
     }
+
+    public void CreateTwoGameplay() {
+        // Mỗi phiên vẫn chạy tư duy khung 600×650; View hai người sẽ dịch trục vẽ
+        Paddle p1 = Paddle.newInstance(
+                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
+                UltilityValues.canvasHeight - 140,
+                UltilityValues.paddleLength,
+                UltilityValues.paddleHeight
+        );
+        Paddle p2 = Paddle.newInstance(
+                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
+                UltilityValues.canvasHeight - 140,
+                UltilityValues.paddleLength,
+                UltilityValues.paddleHeight
+        );
+        leftGame = new GameplayModel(eventLoader, p1);
+        rightGame = new GameplayModel(eventLoader, p2);
+    }
+
+    public GameplayModel getLeftGame() { return leftGame; }
+    public GameplayModel getRightGame() { return rightGame; }
 
     /**
      * Thiết lập trạng thái hiện tại của trò chơi.

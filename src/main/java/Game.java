@@ -15,6 +15,7 @@ import javafx.animation.AnimationTimer;
  */
 public class Game extends Application {
     private GameController controller;
+
     private SoundManager soundManager;
     private GameModel model;
     private GameView view;

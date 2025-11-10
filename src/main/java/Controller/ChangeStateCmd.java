@@ -16,5 +16,8 @@ public class ChangeStateCmd implements GameCommand {
         if (stateToChange == State.PLAYING) {
             model.CreateGameplay();
         }
+        else if (stateToChange == State.TWO_PLAYING) {
+            model.CreateTwoGameplay();
+        }
     }
 }

@@ -8,12 +8,14 @@ Model\PU_Expand.class
 Model\PU_ScoreX2.class
 Controller\ExitCmd.class
 View\View.class
+View\TwoPlayerView.class
 Controller\GameCommand.class
 Model\PU_ExtraLive.class
 Model\PU_MultiBall.class
 Controller\GameController$1.class
 Controller\GameEvent.class
 Model\PU_BombBall.class
+Model\TwoPlayerMatch.class
 Model\LaserShot.class
 Controller\AdjustVolumeCmd.class
 Model\PowerUpType.class

@@ -42,6 +42,11 @@ public class Paddle extends MovableObject implements UltilityValues {
         return paddle;
     }
 
+    public static Paddle newInstance(double x, double y, double length, double height) {
+        return new Paddle(x, y, length, height);
+    }
+
+
     /**
      * Lấy chiều dài của thanh trượt.
      * @return Chiều dài của thanh trượt.

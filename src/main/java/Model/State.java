@@ -9,6 +9,7 @@ package Model;
 public enum State {
     MENU,
     PLAYING,
+    TWO_PLAYING,
     PAUSED,
     SETTING,
     LOSS,

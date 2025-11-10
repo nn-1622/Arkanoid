@@ -29,6 +29,7 @@ C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_MultiBall.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_ScoreX2.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\PU_Shield.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\State.java
+C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\TwoPlayerMatch.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\UltilityValues.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\Model\Utility.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\GameplayView.java
@@ -38,5 +39,6 @@ C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\MenuScene.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\PlayModeScene.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\SceneActions.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\SettingScene.java
+C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\TwoPlayerView.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\VictoryView.java
 C:\Users\FPT SHOP\IdeaProjects\Arkanoid\src\main\java\View\View.java

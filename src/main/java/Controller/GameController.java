@@ -20,6 +20,9 @@ public class GameController implements GameEventListener {
     private boolean leftpressed;
     private boolean rightpressed;
     private long lastUpdateTime = 0;
+    // Bổ sung cho chế độ 2 người chơi
+    private boolean left2pressed;
+    private boolean right2pressed;
 
     /**
      * Khởi tạo một GameController mới với GameModel và GameView được cung cấp.
@@ -67,14 +70,28 @@ public class GameController implements GameEventListener {
 
         view.render(model);
         if (model.getGstate() == State.PLAYING) {
-            this.model.getGameplayModel().update(leftpressed,rightpressed,deltaTime);
+            this.model.getGameplayModel().update(leftpressed, rightpressed, deltaTime);
+
+        } else if (model.getGstate() == State.TWO_PLAYING) {
+            if (model.getLeftGame() != null) {
+                model.getLeftGame().update(leftpressed, rightpressed, deltaTime);
+            }
+            if (model.getRightGame() != null) {
+                model.getRightGame().update(left2pressed, right2pressed, deltaTime);
+            }
         } else if (model.getGstate() == State.FADE) {
             double timeElapsed = (now - model.getFadeStartTime()) / 1_000_000_000.0;
             final double FADE_DURATION = 2.0;
 
             if (timeElapsed >= FADE_DURATION) {
-                model.getGameplayModel().Initialize();
-                model.setGstate(State.PLAYING);
+                if (model.getLeftGame() != null && model.getRightGame() != null) {
+                    model.getLeftGame().Initialize();
+                    model.getRightGame().Initialize();
+                    model.setGstate(State.TWO_PLAYING);
+                } else if (model.getGameplayModel() != null) {
+                    model.getGameplayModel().Initialize();
+                    model.setGstate(State.PLAYING);
+                }
             }
         }
     }
@@ -104,7 +121,20 @@ public class GameController implements GameEventListener {
             switch (e.getCode()) {
                 case A -> leftpressed = true; // Di chuyển sang trái
                 case D -> rightpressed = true; // Di chuyển sang phải
-                case SPACE -> model.getGameplayModel().launchBall(); // Phóng bóng
+                case LEFT -> left2pressed = true;   // Player 2 sang trái
+                case RIGHT -> right2pressed = true; // Player 2 sang phải
+                case SPACE -> {
+                    if (model.getGstate() == State.TWO_PLAYING) {
+                        if (model.getLeftGame() != null)
+                            model.getLeftGame().launchBall(); // P1 bắn bóng
+                    } else {
+                        model.getGameplayModel().launchBall();
+                    }
+                }
+                case ENTER -> {
+                    if (model.getGstate() == State.TWO_PLAYING && model.getRightGame() != null)
+                        model.getRightGame().launchBall(); // P2 bắn bóng
+                }
             }
         });
 
@@ -113,6 +143,8 @@ public class GameController implements GameEventListener {
             switch (e.getCode()) {
                 case A -> leftpressed = false; // Dừng di chuyển sang trái
                 case D -> rightpressed = false; // Dừng di chuyển sang phải
+                case LEFT -> left2pressed = false;
+                case RIGHT -> right2pressed = false;
             }
         });
     }
