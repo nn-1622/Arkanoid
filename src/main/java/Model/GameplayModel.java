@@ -636,7 +636,7 @@ public class GameplayModel implements UltilityValues {
             }
         }
         if (!twoPlayerMode) {
-            if (level == 6) {
+            if (hasCompletedAllLevels()) {
                 eventLoader.loadEvent(GameEvent.GAME_WIN);
             }
             if (lives <= 0) {

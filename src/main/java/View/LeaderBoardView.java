@@ -65,7 +65,7 @@ public class LeaderBoardView extends View {
         render.setFill(Color.WHITE);
         render.setFont(Font.font("Consolas", FontWeight.BOLD, 28));
 
-        double startX = 100;
+        double startX = 120;
         double startY = 250;
         double lineSpacing = 60;
 

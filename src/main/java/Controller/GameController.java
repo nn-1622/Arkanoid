@@ -13,6 +13,8 @@ import View.View;
 import View.VictoryView;
 import javafx.scene.input.KeyCode;
 
+import java.sql.SQLOutput;
+
 /**
  * Bộ điều khiển chính cho game Arkanoid (1P & 2P).
  * Xử lý input, điều phối state, cập nhật logic và View.
@@ -40,6 +42,7 @@ public class GameController implements GameEventListener {
         switch (event) {
             case GAME_WIN -> {
                 model.recordFinalScore();
+                System.out.println("đã lưu điểm khi thắng"); //debug
                 model.setGstate(State.VICTORY);
             }
             case GAME_LOST -> {
