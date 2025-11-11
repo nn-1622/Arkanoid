@@ -21,7 +21,7 @@ public class LoadGameView extends View {
 
     public LoadGameView(GameModel model) {
         super(model);
-        background = new Image(getClass().getResource("/bg.png").toExternalForm());
+        background = new Image(getClass().getResource("/bg2.png").toExternalForm());
 
         Button backButton = new Button(20, 580, 150, 50, new ChangeStateCmd(model, State.PLAY_MODE));
         backButton.setImgButton("/Exit.png");
@@ -29,7 +29,7 @@ public class LoadGameView extends View {
         buttons.add(backButton);
 
         Button createSlotButton = new Button(175, 150, 250, 60,
-                new GameCommand() { // Lệnh mới
+                new GameCommand() {
                     @Override
                     public void execute() {
                         model.setStateBeforeAccount(State.LOAD_GAME);
@@ -39,7 +39,6 @@ public class LoadGameView extends View {
         createSlotButton.setImgButton("/Start.png");
         createSlotButton.setImgHoverButton("/StartHover.png");
         buttons.add(createSlotButton);
-
     }
 
     @Override
@@ -74,7 +73,7 @@ public class LoadGameView extends View {
                 String fileName = saveFiles[i].getName();
                 String slotName = fileName.substring(0, fileName.lastIndexOf('.'));
 
-                Button loadSlotBtn = new Button(175, startY + (i * spacing), 250, 50,
+                Button loadSlotBtn = new Button(175, startY + (i * spacing), 262.6, 65.7,
                         new LoadGameCmd(model, fileName));
                 loadSlotBtn.setImgButton("/Slot.png");
                 loadSlotBtn.setImgHoverButton("/SlotHover.png");
@@ -98,7 +97,7 @@ public class LoadGameView extends View {
 
             if (b.getCommand() instanceof LoadGameCmd cmd) {
                 String slotName = cmd.getFileName().substring(0, cmd.getFileName().lastIndexOf('.'));
-                gc.fillText(slotName, b.getX() + 20, b.getY() + 35);
+                gc.fillText(slotName, b.getX() + 130, b.getY() + 35);
             }
         }
     }

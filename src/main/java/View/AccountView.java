@@ -27,13 +27,12 @@ public class AccountView extends View {
         // Nút Save
         // TODO: Bạn cần tạo ảnh /Save.png và /SaveHover.png
         // Đặt nút Save (Tọa độ X, Y, Rộng, Cao)
-        saveButton = new Button(390, 400, 110, 50, new SavePlayerCmd(this));
+        saveButton = new Button(202, 356.6, 196.1, 49, new SavePlayerCmd(this));
         saveButton.setImgButton("/Save.png");
         saveButton.setImgHoverButton("/SaveHover.png");
 
-        // Nút Exit
-        exitButton = new Button( 200.1, 523.8, 199.8, 41.9,
-                new GameCommand() { // Lệnh mới
+        exitButton = new Button( 5.4, 590, 153.6, 59.1,
+                new GameCommand() {
                     @Override
                     public void execute() {
                         model.setGstate(model.getStateBeforeAccount());
@@ -145,4 +144,16 @@ public class AccountView extends View {
         saveButton.draw(render);
         exitButton.draw(render);
     }
+
+    /**
+     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
+     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
+     */
+    @Override
+    public void checkHover(MouseEvent e) {
+        for (Button b : buttons) {
+            b.setHovering(e);
+        }
+    }
+
 }
