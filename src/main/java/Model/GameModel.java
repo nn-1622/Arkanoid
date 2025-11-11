@@ -62,21 +62,8 @@ public class GameModel implements UltilityValues {
     }
 
     public void CreateTwoGameplay() {
-        // Mỗi phiên vẫn chạy tư duy khung 600×650; View hai người sẽ dịch trục vẽ
-        Paddle p1 = Paddle.newInstance(
-                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
-                UltilityValues.canvasHeight - 140,
-                UltilityValues.paddleLength,
-                UltilityValues.paddleHeight, gameModel.getPaddlePath()
-        );
-        Paddle p2 = Paddle.newInstance(
-                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
-                UltilityValues.canvasHeight - 140,
-                UltilityValues.paddleLength,
-                UltilityValues.paddleHeight, gameModel.getPaddlePath()
-        );
-        leftGame = new GameplayModel(eventLoader, p1, true);
-        rightGame = new GameplayModel(eventLoader, p2, true);
+        leftGame = new GameplayModel(eventLoader,true);
+        rightGame = new GameplayModel(eventLoader, true);
     }
 
     public GameplayModel getLeftGame() { return leftGame; }

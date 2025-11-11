@@ -103,12 +103,22 @@ public class GameplayModel implements UltilityValues {
         paddle.setX((areaLeft + areaRight - paddle.getLength()) / 2); // căn giữa vùng chơi
     }
 
-    public GameplayModel(EventLoader eventLoader, Paddle customPaddle, boolean twoPlayerMode) {
+    public GameplayModel(EventLoader eventLoader, boolean twoPlayerMode) {
         this.eventLoader = eventLoader;
-        this.paddle = customPaddle;
+        this.paddlePath = loadPaddlePathFromFile();
         this.twoPlayerMode = twoPlayerMode;
         this.ballPath = loadBallPathFromFile();
         this.background = loadBackgroundFromFile();
+        this.paddle = Paddle.getPaddle(loadPaddlePathFromFile());
+
+        this.paddle = Paddle.newInstance(
+                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
+                UltilityValues.canvasHeight - 140,
+                UltilityValues.paddleLength,
+                UltilityValues.paddleHeight,
+                paddlePath
+        );
+
         Ball ball = new Ball(
                 paddle.x + paddleLength / 2.0,
                 paddle.y - paddleHeight / 2.0,
