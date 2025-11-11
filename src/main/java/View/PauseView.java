@@ -18,7 +18,6 @@ public class PauseView extends View {
     Button saveButton;
     Button exitButton;
 
-    // === THÊM BIẾN NÀY ===
     private String saveMessage = "";
 
     public PauseView(GameModel model) {
@@ -33,8 +32,7 @@ public class PauseView extends View {
         resumeButton.setImgButton("/Replay.png");
         resumeButton.setImgHoverButton("/ReplayHover.png");
 
-        // === CẬP NHẬT DÒNG NÀY ===
-        // Truyền "this" (chính là PauseView) vào
+
         saveButton = new Button(centerX - btnWidth/2, 320, btnWidth, btnHeight,
                 new CheckSaveNameCmd(model, this)); // <-- THÊM ", this"
         saveButton.setImgButton("/Save.png");
