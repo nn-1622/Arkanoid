@@ -5,6 +5,7 @@ import Model.GameplayModel;
 import Model.State;
 import View.GameView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyEvent;
 
 
 /**
@@ -56,6 +57,9 @@ public class GameController implements GameEventListener {
                 model.setFadeStartTime(System.nanoTime());
                 model.setGstate(State.FADE);
                 break;
+            case AUTO_SAVE_TRIGGER:
+                model.autoSave();
+                break;
         }
     }
 
@@ -74,7 +78,17 @@ public class GameController implements GameEventListener {
         double deltaTime = elapsed / 1_000_000_000.0;
         lastUpdateTime = now;
 
+        if (model.getGstate() == State.PAUSED) {
+            view.render(model);
+            return;
+        }
+
         view.render(model);
+
+        State currentState = model.getGstate();
+        if (currentState == State.PAUSED || currentState == State.READY_TO_PLAY) {
+            return;
+        }
         if (model.getGstate() == State.PLAYING) {
             this.model.getGameplayModel().update(leftpressed, rightpressed, deltaTime);
 
@@ -155,22 +169,45 @@ public class GameController implements GameEventListener {
 
         // Xử lý sự kiện nhấn phím
         view.getScene().setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case A -> leftpressed = true; // Di chuyển sang trái
-                case D -> rightpressed = true; // Di chuyển sang phải
-                case LEFT -> left2pressed = true;   // Player 2 sang trái
-                case RIGHT -> right2pressed = true; // Player 2 sang phải
-                case SPACE -> {
-                    if (model.getGstate() == State.TWO_PLAYING) {
-                        if (model.getLeftGame() != null)
-                            model.getLeftGame().launchBall(); // P1 bắn bóng
-                    } else {
-                        model.getGameplayModel().launchBall();
+            State currentState = model.getGstate();
+
+            if (e.getCode() == e.getCode().ESCAPE) {
+                if (currentState == State.PLAYING) {
+                    model.setGstate(State.PAUSED);
+                    return;
+                } else if (currentState == State.PAUSED) {
+                    model.setGstate(State.PLAYING);
+                    return;
+                }
+            }
+            if (currentState == State.READY_TO_PLAY) {
+                if (e.getCode() == e.getCode().A || e.getCode() == e.getCode().D) {
+                    model.setGstate(State.PLAYING);
+                }
+            }
+
+            if (currentState == State.PLAYING || currentState == State.TWO_PLAYING) {
+                switch (e.getCode()) {
+                    case A -> leftpressed = true; // Di chuyển sang trái
+                    case D -> rightpressed = true; // Di chuyển sang phải
+                    case LEFT -> left2pressed = true;   // Player 2 sang trái
+                    case RIGHT -> right2pressed = true; // Player 2 sang phải
+                    case SPACE -> {
+                        if (model.getGstate() == State.TWO_PLAYING) {
+                            if (model.getLeftGame() != null)
+                                model.getLeftGame().launchBall(); // P1 bắn bóng
+                        } else {
+                            model.getGameplayModel().launchBall();
+                        }
+                    }
+                    case ENTER -> {
+                        if (model.getGstate() == State.TWO_PLAYING && model.getRightGame() != null)
+                            model.getRightGame().launchBall(); // P2 bắn bóng
                     }
                 }
-                case ENTER -> {
-                    if (model.getGstate() == State.TWO_PLAYING && model.getRightGame() != null)
-                        model.getRightGame().launchBall(); // P2 bắn bóng
+            } else if (currentState == State.SETTING_ACCOUNT) {
+                if (model.getCurrentView() != null) {
+                    model.getCurrentView().handleKeyInput(e);
                 }
             }
         });

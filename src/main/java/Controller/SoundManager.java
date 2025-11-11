@@ -16,8 +16,9 @@ public class SoundManager implements GameEventListener {
     private static AudioClip loseSound;
     private static AudioClip testSound;
     private static double masterVolume = 0.5;
-    private static final double volStep = 0.2;
+    private static final double volStep = 0.1;
 
+    public static final int TOTAL_VOLUME_STEPS = 10;
     /**
      * Khởi tạo SoundManager.
      * Tải tất cả các tệp âm thanh cần thiết từ thư mục tài nguyên (resources)
@@ -57,6 +58,15 @@ public class SoundManager implements GameEventListener {
         winSound.setVolume(masterVolume);
         loseSound.setVolume(masterVolume);
         testSound.setVolume(masterVolume);
+    }
+
+    /**
+     * Lấy số nấc âm lượng hiện tại (một số từ 0 đến 5).
+     * @return Số nấc âm lượng đang hoạt động.
+     */
+    public static int getCurrentVolumeSteps() {
+        // Dùng Math.round để tránh lỗi dấu phẩy động (ví dụ 0.6 / 0.2 = 2.999...)
+        return (int) Math.round(masterVolume / volStep);
     }
 
     /**

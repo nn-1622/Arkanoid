@@ -22,7 +22,7 @@ public class PlayModeScene extends View implements SceneActions {
 
         background = new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResource("/bg2.png")).toExternalForm());
 
-        One_Player = new Button(149.2, 169.8, 301.6, 75.4, new ChangeStateCmd(model, State.PLAYING));
+        One_Player = new Button(149.2, 169.8, 301.6, 75.4, new ChangeStateCmd(model, State.LOAD_GAME));
         One_Player.setImgButton("/1Player.png");
         One_Player.setImgHoverButton("/1PlayerHover.png");
 

@@ -62,8 +62,18 @@ public class GameView {
     public void render(GameModel model) {
         // --- Tự động đổi kích thước khi vào 2 người chơi ---
         ensureSizeForState(model.getGstate());
+        if (model.getGstate() == State.PAUSED || model.getGstate() == State.READY_TO_PLAY) {
+            View gameplayView = model.getView(State.PLAYING);
+            if (gameplayView != null) {
+                gameplayView.draw(gc, model.getGameplayModel());
+            }
 
-        if (model.getGstate() == State.FADE) {
+            View overlayView = model.getCurrentView();
+            if (overlayView != null) {
+                overlayView.draw(gc, model.getGameplayModel());
+            }
+        }
+        else if (model.getGstate() == State.FADE) {
             // Hiệu ứng chuyển cảnh mờ dần
             final double fadeTime = 2.0;
             double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;

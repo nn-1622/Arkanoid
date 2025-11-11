@@ -63,4 +63,9 @@ public class PU_Shield extends MovableObject implements PowerUp {
         return elapsedMs;
     }
 
+    @Override
+    public void setElapsedMs(int ms) {
+        this.elapsedMs = ms;
+    }
+
 }

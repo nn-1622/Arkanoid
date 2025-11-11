@@ -14,10 +14,17 @@ public class ChangeStateCmd implements GameCommand {
     public void execute() {
         model.setGstate(stateToChange);
         if (stateToChange == State.PLAYING) {
-            model.CreateGameplay();
+            model.CreateNewGame();
         }
         else if (stateToChange == State.TWO_PLAYING) {
             model.CreateTwoGameplay();
         }
+    }
+    /**
+     * Lấy State mà lệnh này sẽ chuyển đến.
+     * @return Trạng thái (State) đích.
+     */
+    public State getState() {
+        return this.stateToChange;
     }
 }

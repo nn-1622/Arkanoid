@@ -11,4 +11,5 @@ public interface PowerUp {
     void update(GameplayModel ctx, double deltaTime);
     boolean isActive();
     int getElapsedMs();
+    void setElapsedMs(int ms);
 }

@@ -95,4 +95,8 @@ public class PU_MultiBall extends MovableObject implements PowerUp {
         return 0;
     }
 
+    @Override
+    public void setElapsedMs(int ms) {
+    }
+
 }

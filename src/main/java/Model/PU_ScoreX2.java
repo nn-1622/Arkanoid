@@ -83,4 +83,9 @@ public class PU_ScoreX2 extends MovableObject implements PowerUp {
         return elapsedMs;
     }
 
+    @Override
+    public void setElapsedMs(int ms) {
+        this.elapsedMs = ms;
+    }
+
 }

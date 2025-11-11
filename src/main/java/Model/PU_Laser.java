@@ -117,4 +117,9 @@ public class PU_Laser extends MovableObject implements PowerUp {
     public int getElapsedMs() {
         return elapsedMs;
     }
+
+    @Override
+    public void setElapsedMs(int ms) {
+        this.elapsedMs = ms;
+    }
 }

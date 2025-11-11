@@ -15,5 +15,12 @@ public enum State {
     LOSS,
     VICTORY,
     FADE,
-    PLAY_MODE
+    PLAY_MODE,
+
+    SETTING_ACCOUNT,
+    SETTING_THEME,
+    SETTING_VOLUME,
+    SETTING_HOWTOPLAY,
+    READY_TO_PLAY,
+    LOAD_GAME
 }

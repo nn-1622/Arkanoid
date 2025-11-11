@@ -6,6 +6,8 @@ import Model.GameplayModel;
 import Model.UltilityValues;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyEvent;
 
 import java.util.ArrayList;
 
@@ -32,4 +34,15 @@ public class View implements UltilityValues, SceneActions {
             }
         }
     }
+
+    /**
+     * Xử lý đầu vào bàn phím.
+     * Các View con (như AccountView) sẽ override
+     * phương thức này để xử lý việc gõ chữ.
+     * @param e Sự kiện phím
+     */
+    public void handleKeyInput(KeyEvent e) {
+    }
+
+    public GameModel getModel() { return model; }
 }

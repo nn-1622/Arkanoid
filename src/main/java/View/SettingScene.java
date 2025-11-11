@@ -1,6 +1,6 @@
 package View;
 
-import Controller.AdjustVolumeCmd;
+
 import Controller.ChangeStateCmd;
 import Model.Button;
 import Model.GameModel;
@@ -8,7 +8,7 @@ import Model.GameplayModel;
 import Model.State;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-
+import Controller.GameCommand;
 import javafx.scene.input.MouseEvent;
 
 /**
@@ -18,10 +18,12 @@ import javafx.scene.input.MouseEvent;
  */
 public class SettingScene extends View {
     private Image settingBg;
-    private Image settings;
     private Button exit;
-    private Button lowVolume;
-    private Button highVolume;
+
+    private Button accountButton;
+    private Button themeButton;
+    private Button volumeButton;
+    private Button howToPlayButton;
 
     /**
      * Khởi tạo một đối tượng SettingScene mới.
@@ -36,17 +38,42 @@ public class SettingScene extends View {
         exit.setImgButton("/Exit.png");
         exit.setImgHoverButton("/ExitHover.png");
 
-        lowVolume = new Button( 132.4, 347.3 , 60, 60, new AdjustVolumeCmd(false));
-        lowVolume.setImgButton("/left.png");
-        lowVolume.setImgHoverButton("/leftHover.png");
+        double btnWidth = 250;
+        double btnHeight = 60;
+        double startY = 200;
+        double spacing = 70;
+        double centerX = (600 - btnWidth) / 2;
 
-        highVolume = new Button(407.1, 347.3, 60, 60, new AdjustVolumeCmd(true));
-        highVolume.setImgButton("/right.png");
-        highVolume.setImgHoverButton("/rightHover.png");
+        accountButton = new Button( centerX, startY, btnWidth, btnHeight,
+                new GameCommand() { // Lệnh mới
+                    @Override
+                    public void execute() {
+                        model.setStateBeforeAccount(State.SETTING);
+                        model.setGstate(State.SETTING_ACCOUNT);
+                    }
+                });
+        accountButton.setImgButton("/Continue.png");
+        accountButton.setImgHoverButton("/ContinueHover.png");
 
-        buttons.add(lowVolume);
-        buttons.add(highVolume);
+        themeButton = new Button( centerX, startY + spacing, btnWidth, btnHeight,
+                new ChangeStateCmd(model, State.SETTING_THEME));
+        themeButton.setImgButton("/Continue.png");
+        themeButton.setImgHoverButton("/ContinueHover.png");
+        volumeButton = new Button( centerX, startY + (spacing * 2), btnWidth, btnHeight,
+                new ChangeStateCmd(model, State.SETTING_VOLUME));
+        volumeButton.setImgButton("/Continue.png");
+        volumeButton.setImgHoverButton("/ContinueHover.png");
+
+        howToPlayButton = new Button( centerX, startY + (spacing * 3), btnWidth, btnHeight,
+                new ChangeStateCmd(model, State.SETTING_HOWTOPLAY));
+        howToPlayButton.setImgButton("/Continue.png");
+        howToPlayButton.setImgHoverButton("/ContinueHover.png");
+
         buttons.add(exit);
+        buttons.add(accountButton);
+        buttons.add(themeButton);
+        buttons.add(volumeButton);
+        buttons.add(howToPlayButton);
     }
 
     /**
@@ -58,9 +85,11 @@ public class SettingScene extends View {
     @Override
     public void draw(GraphicsContext render, GameplayModel gameplayModel) {
         render.drawImage(settingBg,0, 0, 600, 650);
+        accountButton.draw(render);
+        themeButton.draw(render);
+        volumeButton.draw(render);
+        howToPlayButton.draw(render);
         exit.draw(render);
-        lowVolume.draw(render);
-        highVolume.draw(render);
     }
 
     /**
@@ -69,8 +98,8 @@ public class SettingScene extends View {
      */
     @Override
     public void checkHover(MouseEvent e) {
-        exit.setHovering(e);
-        lowVolume.setHovering(e);
-        highVolume.setHovering(e);
+        for (Button b : buttons) {
+            b.setHovering(e);
+        }
     }
 }
