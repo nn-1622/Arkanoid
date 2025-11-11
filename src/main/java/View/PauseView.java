@@ -9,100 +9,57 @@ import Model.GameModel;
 import Model.GameplayModel;
 import Model.State;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 public class PauseView extends View {
-    Button resumeButton;
-    Button saveButton;
-    Button exitButton;
-
-    private String saveMessage = "";
+    Button resume;
+    Button save;
+    Button menu;
+    Image background;
 
     public PauseView(GameModel model) {
         super(model);
 
-        double centerX = 300;
-        double btnWidth = 200;
-        double btnHeight = 50;
+        background = new Image(getClass().getResource("/Pause.png").toExternalForm());
 
-        // --- Sửa logic nút Resume ---
-        final GameCommand resumeCmd = new ResumeGameCmd(model); // Lệnh gốc
-        resumeButton = new Button(centerX - btnWidth/2, 250, btnWidth, btnHeight,
-                new GameCommand() { // Lệnh mới (ẩn danh)
-                    @Override
-                    public void execute() {
-                        resetSaveMessage(); // <-- Xóa thông báo
-                        resumeCmd.execute(); // <-- Chạy lệnh gốc
-                    }
-                });
-        resumeButton.setImgButton("/Replay.png");
-        resumeButton.setImgHoverButton("/ReplayHover.png");
+        resume = new Button(152.2, 351.6, 295.6, 73.9, new ResumeGameCmd(model));
+        resume.setImgButton("/Continue.png");
+        resume.setImgHoverButton("/ContinueHover.png");
 
 
-        saveButton = new Button(centerX - btnWidth/2, 320, btnWidth, btnHeight,
-                new CheckSaveNameCmd(model, this)); // <-- THÊM ", this"
-        saveButton.setImgButton("/Save.png");
-        saveButton.setImgHoverButton("/SaveHover.png");
+        save = new Button(153.3, 445.9, 293.5, 73.4, new CheckSaveNameCmd(model, this));
+        save.setImgButton("/Save.png");
+        save.setImgHoverButton("/SaveHover.png");
 
-        final GameCommand exitCmd = new ChangeStateCmd(model, State.MENU); // Lệnh gốc
-        exitButton = new Button(centerX - btnWidth/2, 390, btnWidth, btnHeight,
-                new GameCommand() { // Lệnh mới (ẩn danh)
-                    @Override
-                    public void execute() {
-                        resetSaveMessage(); // <-- Xóa thông báo
-                        exitCmd.execute(); // <-- Chạy lệnh gốc
-                    }
-                });
-        exitButton.setImgButton("/Exit.png");
-        exitButton.setImgHoverButton("/ExitHover.png");
+        menu = new Button(146.2, 539.3, 300.5, 75.1, new ChangeStateCmd(model, State.MENU));
+        menu.setImgButton("/Menu.png");
+        menu.setImgHoverButton("/MenuHover.png");
 
-        buttons.add(resumeButton);
-        buttons.add(saveButton);
-        buttons.add(exitButton);
-    }
-
-    /**
-     * Được gọi bởi các Lệnh (Commands) để báo cho View này hiển thị xác nhận
-     */
-    public void showSaveConfirmation() {
-        this.saveMessage = "Đã lưu!";
-    }
-    /**
-     * Xóa thông báo "Đã lưu" để lần tạm dừng sau không hiển thị nữa
-     */
-    public void resetSaveMessage() {
-        this.saveMessage = "";
+        buttons.add(resume);
+        buttons.add(save);
+        buttons.add(menu);
     }
 
     @Override
-    public void handleClick(MouseEvent e) {
-        if (!saveMessage.isEmpty()) {
-            saveMessage = "";
-        }
-
-        super.handleClick(e);
+    public void draw(GraphicsContext render, GameplayModel gameplayModel) {
+        render.drawImage(background, 0, 0, 600, 650);
+        resume.draw(render);
+        save.draw(render);
+        menu.draw(render);
     }
 
+    /**
+     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
+     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
+     */
     @Override
-    public void draw(GraphicsContext gc, GameplayModel gameplayModel) {
-        gc.setFill(Color.rgb(0, 0, 0, 0.7));
-        gc.fillRect(0, 0, 600, 650);
-
-        gc.setFill(Color.WHITE);
-        gc.setFont(Font.font("Consolas", FontWeight.BOLD, 50));
-        gc.fillText("PAUSED", 210, 180);
-
-        resumeButton.draw(gc);
-        saveButton.draw(gc);
-        exitButton.draw(gc);
-
-        if (!saveMessage.isEmpty()) {
-            gc.setFill(Color.GREEN);
-            gc.setFont(Font.font("Consolas", FontWeight.BOLD, 20));
-            gc.fillText(saveMessage, 265, 380); // (Vị trí Y ở ngay dưới nút Save)
+    public void checkHover(MouseEvent e) {
+        for (Button b : buttons) {
+            b.setHovering(e);
         }
     }
 }

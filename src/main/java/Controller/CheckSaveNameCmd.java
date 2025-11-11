@@ -20,10 +20,6 @@ public class CheckSaveNameCmd implements GameCommand {
             model.setGstate(State.SETTING_ACCOUNT);
         } else {
             model.saveGame(model.getCurrentSaveName());
-            System.out.println("Đã lưu game vào slot: " + model.getCurrentSaveName());
-            if (view != null) {
-                view.showSaveConfirmation();
-            }
         }
     }
 }

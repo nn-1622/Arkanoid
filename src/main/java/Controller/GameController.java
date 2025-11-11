@@ -223,15 +223,9 @@ public class GameController implements GameEventListener {
                 // Nếu đang Pause
                 if (e.getCode() == KeyCode.ESCAPE) {
                     View pauseView = model.getView(State.PAUSED);
-                    if (pauseView instanceof PauseView) {
-                        // Gọi hàm reset của PauseView
-                        ((PauseView) pauseView).resetSaveMessage();
-                    }
-                    // Nhấn ESC lần nữa sẽ Resume
                     new ResumeGameCmd(model).execute(); // Lệnh này sẽ set state về PLAYING
-                    return; // Đã xử lý xong
+                    return;
                 }
-                // Đã return; không cho phép di chuyển khi đang pause
                 return;
 
             case SETTING_ACCOUNT:

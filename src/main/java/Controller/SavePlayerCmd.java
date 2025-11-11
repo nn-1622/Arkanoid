@@ -57,14 +57,7 @@ public class SavePlayerCmd implements GameCommand {
         if (previousState == State.PAUSED) {
 
             model.setCurrentSaveName(fileName);
-            System.out.println("Lưu game vao slot " + fileName);
             model.saveGame(fileName);
-
-            View pauseViewInstance = model.getView(State.PAUSED);
-            if (pauseViewInstance instanceof PauseView) {
-                ((PauseView) pauseViewInstance).showSaveConfirmation();
-            }
-
             model.setGstate(State.PAUSED);
 
         } else {
