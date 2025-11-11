@@ -1,1 +1,1 @@
-/Sword.png
+/DefaultPaddle.png

@@ -120,6 +120,7 @@ public class Ball extends MovableObject {
             if (game.getPaddle().hasShield()) {
                 reverseVy();
             } else {
+                game.getEventLoader().loadEvent(GameEvent.BALL_LOST);
                 if (game.getBalls().size() == 1) {
                     game.resetPosition();
                     game.resetPowerUp();
@@ -159,7 +160,7 @@ public class Ball extends MovableObject {
                 double dist = Math.sqrt(dx*dx + dy*dy);
 
                 if (dist <= blastRadius) {
-                    b.hit(); // phá gạch
+                    b.hit();
                     game.getEventLoader().loadEvent(GameEvent.BALL_HIT);
                 }
             }

@@ -5,5 +5,7 @@ public enum GameEvent {
     GAME_WIN,
     GAME_LOST,
     LEVEL_COMPLETE,
-    AUTO_SAVE_TRIGGER
+    AUTO_SAVE_TRIGGER,
+    BALL_LOST,
+    POWER_UP
 }

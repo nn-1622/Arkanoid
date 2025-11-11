@@ -36,8 +36,8 @@ public class LoadGameView extends View {
                         model.setGstate(State.SETTING_ACCOUNT);
                     }
                 });
-        createSlotButton.setImgButton("/Start.png");
-        createSlotButton.setImgHoverButton("/StartHover.png");
+        createSlotButton.setImgButton("/NewGame.png");
+        createSlotButton.setImgHoverButton("/NewGameHover.png");
         buttons.add(createSlotButton);
     }
 

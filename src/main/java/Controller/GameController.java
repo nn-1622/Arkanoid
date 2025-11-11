@@ -23,6 +23,8 @@ public class GameController implements GameEventListener {
     private final GameModel model;
     private final GameView view;
     private long lastUpdateTime = 0;
+    private State lastState;
+    SoundManager soundManager;
 
     private boolean leftPressed, rightPressed;     // Player 1
     private boolean left2Pressed, right2Pressed;   // Player 2
@@ -33,8 +35,39 @@ public class GameController implements GameEventListener {
         this.model = gm;
         this.view = gv;
         setInput();
+        this.soundManager = soundManager;
         gm.getEventLoader().register(this);
         gm.getEventLoader().register(soundManager);
+
+        this.lastState = model.getGstate();
+        handleStateChange(null, lastState);
+    }
+
+    private void handleStateChange(State oldState, State newState) {
+        if (newState == null) return;
+
+        // Vào gameplay (1P hoặc 2P) -> bật nhạc gameplay
+        if (newState == State.PLAYING || newState == State.TWO_PLAYING) {
+            soundManager.playGameplayBgm();
+            return;
+        }
+
+        if (newState == State.PAUSED || newState == State.TWO_PLAYER_PAUSED) {
+            soundManager.pauseGameplayBgm();
+            return;
+        }
+
+        if ((oldState == State.PAUSED && newState == State.PLAYING)
+                || (oldState == State.TWO_PLAYING && newState == State.TWO_PLAYER_PAUSED)) {
+            soundManager.resumeGameplayBgm();
+            return;
+        }
+        if (newState == State.MENU
+                || newState == State.SETTING
+                || newState == State.VICTORY
+                || newState == State.LOSS) {
+            soundManager.playMenuBgm();
+        }
     }
 
     @Override
@@ -62,6 +95,12 @@ public class GameController implements GameEventListener {
         double deltaTime = (now - lastUpdateTime) / 1_000_000_000.0;
         lastUpdateTime = now;
 
+        State current = model.getGstate();
+        if (current != lastState) {
+            handleStateChange(lastState, current);
+            lastState = current;
+        }
+
         if (model.getGstate() == State.PAUSED) {
             view.render(model);
             return;
@@ -76,8 +115,8 @@ public class GameController implements GameEventListener {
             case PLAYING -> handleSinglePlayer(deltaTime);
             case TWO_PLAYING -> handleTwoPlayer(now, deltaTime);
             case FADE -> handleFade(now);
-            case VICTORY, LOSS -> { /* giữ nguyên kết quả */ }
-            default -> { /* menu hoặc setting không update logic */ }
+            case VICTORY, LOSS -> { }
+            default -> { }
         }
 
         view.render(model);

@@ -435,7 +435,6 @@ public class GameplayModel implements UltilityValues {
             case 6 -> pu = new PU_ScoreX2(x, y, 0, 2, 15);
             default -> pu = new PU_Expand(x, y, 0, 2, 15);
         }
-
         fallingPowerUps.add(pu);
     }
 
@@ -588,10 +587,10 @@ public class GameplayModel implements UltilityValues {
                     pu.getY() <= paddle.getY() + paddle.getHeight();
 
             if (overlapX && overlapY && pu instanceof PowerUp powerUp) {
-                powerUp.apply(this);// bật hiệu ứng
-                System.out.println(powerUp.getName());
-                activePowerUps.add(powerUp);         // đưa vào danh sách đang hoạt động
-                fallingPowerUps.remove(i);           // xóa icon rơi
+                powerUp.apply(this);
+                getEventLoader().loadEvent(GameEvent.POWER_UP);
+                activePowerUps.add(powerUp);
+                fallingPowerUps.remove(i);
                 i--;
                 continue;
             }

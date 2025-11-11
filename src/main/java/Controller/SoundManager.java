@@ -15,6 +15,11 @@ public class SoundManager implements GameEventListener {
     private static AudioClip winSound;
     private static AudioClip loseSound;
     private static AudioClip testSound;
+    private static AudioClip lostBall;
+    private static AudioClip powerUp;
+    private static AudioClip finishLevel;
+    private static MediaPlayer menuBgm;
+    private static MediaPlayer gameplayBgm;
     private static double masterVolume = 0.5;
     private static final double volStep = 0.2;
 
@@ -28,6 +33,28 @@ public class SoundManager implements GameEventListener {
         winSound = new AudioClip(getClass().getResource("/sound/win.wav").toExternalForm());
         loseSound = new AudioClip(getClass().getResource("/sound/lose.wav").toExternalForm());
         testSound = new AudioClip(getClass().getResource("/sound/test.wav").toExternalForm());
+        finishLevel = new AudioClip(getClass().getResource("/sound/FinishALevel.wav").toExternalForm());
+        powerUp = new AudioClip(getClass().getResource("/sound/PowerUp.wav").toExternalForm());
+        lostBall = new AudioClip(getClass().getResource("/sound/BallLost.wav").toExternalForm());
+        this.menuBgm = createLoopPlayer("/sound/MainTheme.mp3");
+        this.gameplayBgm = createLoopPlayer("/sound/GameTheme.mp3");
+    }
+
+    private MediaPlayer createLoopPlayer(String path) {
+        try {
+            var url = getClass().getResource(path);
+            if (url == null) {
+                System.err.println("BGM not found: " + path);
+                return null;
+            }
+            Media media = new Media(url.toExternalForm());
+            MediaPlayer player = new MediaPlayer(media);
+            player.setCycleCount(MediaPlayer.INDEFINITE);
+            return player;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Override
@@ -42,6 +69,59 @@ public class SoundManager implements GameEventListener {
             case BALL_HIT:
                 hitSound.play();
                 break;
+            case BALL_LOST:
+                lostBall.play();
+                break;
+            case POWER_UP:
+                powerUp.play();
+                break;
+            case LEVEL_COMPLETE:
+                finishLevel.play();
+                break;
+        }
+    }
+
+    public void playMenuBgm() {
+        stopGameplayBgm();
+        if (menuBgm != null) {
+            menuBgm.play();
+        }
+    }
+
+    public void stopMenuBgm() {
+        if (menuBgm != null) {
+            menuBgm.stop();
+        }
+    }
+
+    public void stopGameplayBgm() {
+        if (gameplayBgm != null) {
+            gameplayBgm.stop();
+        }
+    }
+
+    public void stopAll() {
+        stopMenuBgm();
+        stopGameplayBgm();
+    }
+    public void playGameplayBgm() {
+        stopMenuBgm();
+        if (gameplayBgm != null) {
+            gameplayBgm.play();
+        }
+    }
+
+    public void pauseGameplayBgm() {
+        if (gameplayBgm != null
+                && gameplayBgm.getStatus() == MediaPlayer.Status.PLAYING) {
+            gameplayBgm.pause();
+        }
+    }
+
+    public void resumeGameplayBgm() {
+        if (gameplayBgm != null
+                && gameplayBgm.getStatus() == MediaPlayer.Status.PAUSED) {
+            gameplayBgm.play();
         }
     }
 
@@ -52,29 +132,35 @@ public class SoundManager implements GameEventListener {
      */
     public static void setMasterVolume(double volume) {
         masterVolume = Math.max(0.0, Math.min(1.0, volume));
-
-        hitSound.setVolume(masterVolume);
-        winSound.setVolume(masterVolume);
-        loseSound.setVolume(masterVolume);
-        testSound.setVolume(masterVolume);
+        applyMasterVolume();
     }
 
-    /**
-     * Tăng âm lượng chính lên một bậc.
-     * Lượng tăng được xác định bởi biến {@code volStep}.
-     */
     public static void increaseVolume() {
         setMasterVolume(masterVolume + volStep);
-        testSound.play();
+        playTest();
     }
 
-    /**
-     * Giảm âm lượng chính xuống một bậc.
-     * Lượng giảm được xác định bởi biến {@code volStep}.
-     */
     public static void decreaseVolume() {
         setMasterVolume(masterVolume - volStep);
-        testSound.play();
+        playTest();
     }
 
+    private static void playTest() {
+        if (testSound != null) {
+            testSound.play();
+        }
+    }
+
+    private static void applyMasterVolume() {
+        if (hitSound != null) hitSound.setVolume(masterVolume);
+        if (winSound != null) winSound.setVolume(masterVolume);
+        if (loseSound != null) loseSound.setVolume(masterVolume);
+        if (testSound != null) testSound.setVolume(masterVolume);
+        if (powerUp != null) powerUp.setVolume(masterVolume);
+        if (lostBall != null) lostBall.setVolume(masterVolume);
+        if (finishLevel != null) finishLevel.setVolume(masterVolume);
+
+        if (menuBgm != null) menuBgm.setVolume(masterVolume);
+        if (gameplayBgm != null) gameplayBgm.setVolume(masterVolume);
+    }
 }
