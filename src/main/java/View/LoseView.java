@@ -8,6 +8,10 @@ import Model.State;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 
 /**
  * Lớp chịu trách nhiệm hiển thị màn hình thua cuộc (Game Over).
@@ -50,6 +54,15 @@ public class LoseView extends View {
         gc.drawImage(lose, 0, 0,600,650);
         replay.draw(gc);
         menu.draw(gc);
+
+        if (gameplayModel != null) {
+            int score = gameplayModel.getScore();
+            gc.setFill(Color.web("#E7A3E7"));
+            gc.setFont(Font.font("Consolas", FontWeight.BOLD, 100));
+            double centerX = 300;
+            double posY = 380;
+            gc.fillText("" + score, 350, 370);
+        }
     }
 
     /**

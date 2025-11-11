@@ -8,6 +8,10 @@ import Model.State;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextAlignment;
 
 /**
  * Lớp chịu trách nhiệm hiển thị màn hình chiến thắng khi người chơi hoàn thành trò chơi.
@@ -26,6 +30,8 @@ public class VictoryView extends View {
      */
     public VictoryView(GameModel model) {
         super(model);
+
+
         replay = new Button(54.7, 559.3,245.3, 61.3, new ChangeStateCmd(model, State.PLAYING));
         menu = new Button(349.7,553.4, 190.3, 73.2, new ChangeStateCmd(model, State.MENU));
 
@@ -49,6 +55,14 @@ public class VictoryView extends View {
         gc.drawImage(win, 0, 0,600,650);
         replay.draw(gc);
         menu.draw(gc);
+        if (gameplayModel != null) {
+            int score = gameplayModel.getScore();
+            gc.setFill(Color.web("#D19C00"));
+            gc.setFont(Font.font("Consolas", FontWeight.BOLD, 100));
+            double centerX = 300;
+            double posY = 380;
+            gc.fillText("" + score, 350, 370);
+        }
     }
 
     /**
