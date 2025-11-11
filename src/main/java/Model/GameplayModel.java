@@ -117,7 +117,7 @@ public class GameplayModel implements UltilityValues {
         Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
         balls.add(ball);
-        lives = 5;
+        lives = 1;
         level = 5;
         score = 0;
         combo = 0;
