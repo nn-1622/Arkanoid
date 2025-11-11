@@ -57,8 +57,6 @@ public class LaserShot extends MovableObject {
                 destroyed = true;
 
                 game.scorePoint(1);
-                game.comboHit();
-
                 break;
             }
         }
