@@ -1,4 +1,5 @@
 import Controller.GameController;
+import Controller.GameExecutor;
 import Controller.SoundManager;
 import Model.GameModel;
 import Model.State;
@@ -33,7 +34,7 @@ public class Game extends Application {
     public void start(Stage stage) {
         // Khởi tạo các thành phần Model, View, và Controller
         model = GameModel.getGameModel();
-        soundManager = new SoundManager();
+        soundManager = SoundManager.getInstance();
         view = new GameView(model);
         controller = new GameController(model, view, soundManager);
 
@@ -55,6 +56,20 @@ public class Game extends Application {
                 controller.update(now);
             }
         } .start();
+    }
+
+    /**
+     * Phương thức được gọi khi ứng dụng kết thúc.
+     * Phương thức này chịu trách nhiệm dọn dẹp tài nguyên,
+     * chẳng hạn như tắt các luồng worker để tránh rò rỉ tài nguyên.
+     *
+     * @throws Exception Nếu có lỗi xảy ra trong quá trình tắt ứng dụng.
+     */
+    @Override
+    public void stop() throws Exception {
+        // Tắt các luồng worker khi ứng dụng đóng
+        GameExecutor.getInstance().shutdown();
+        super.stop();
     }
 
     /**

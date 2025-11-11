@@ -1,5 +1,6 @@
 package View;
 
+import Controller.SoundManager;
 import Controller.AdjustVolumeCmd;
 import Controller.ChangeStateCmd;
 import Model.Button;

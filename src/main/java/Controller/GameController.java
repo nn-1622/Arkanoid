@@ -12,6 +12,10 @@ import View.TwoPlayerView;
 import View.View;
 import View.VictoryView;
 import javafx.scene.input.KeyCode;
+import javafx.application.Platform;
+import java.util.concurrent.Future;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 
 import java.sql.SQLOutput;
 
@@ -31,9 +35,13 @@ public class GameController implements GameEventListener {
 
     private static final double FADE_DURATION = 1.1;
 
+    private final ExecutorService logicExecutor;
+    private Future<Void> gameLogicUpdateTask;
+
     public GameController(GameModel gm, GameView gv, SoundManager soundManager) {
         this.model = gm;
         this.view = gv;
+        this.logicExecutor = GameExecutor.getInstance().getLogicExecutor();
         setInput();
         this.soundManager = soundManager;
         gm.getEventLoader().register(this);
@@ -86,7 +94,9 @@ public class GameController implements GameEventListener {
                 model.setFadeStartTime(System.nanoTime());
                 model.setGstate(State.FADE);
             }
-            case AUTO_SAVE_TRIGGER -> model.autoSave();
+            case AUTO_SAVE_TRIGGER -> {
+                model.autoSave();
+            }
         }
     }
 
@@ -105,27 +115,46 @@ public class GameController implements GameEventListener {
             view.render(model);
             return;
         }
-        view.render(model);
+
+        System.out.println(Thread.currentThread().getName());
+        // Render tren luong JavaFX
+        Platform.runLater(() -> view.render(model));
+
         State currentState = model.getGstate();
+
         if (currentState == State.PAUSED || currentState == State.READY_TO_PLAY) {
             return;
         }
 
-        switch (model.getGstate()) {
-            case PLAYING -> handleSinglePlayer(deltaTime);
-            case TWO_PLAYING -> handleTwoPlayer(now, deltaTime);
-            case FADE -> handleFade(now);
-            case VICTORY, LOSS -> { }
-            default -> { }
+        // Xử lý cập nhật logic dựa trên trạng thái hiện tại
+        if (gameLogicUpdateTask == null || gameLogicUpdateTask.isDone()) {
+            Callable<Void> logicTask = () -> {
+                System.out.println(Thread.currentThread().getName() + currentState);
+                synchronized (this) {
+                    switch (currentState) {
+                        case PLAYING:
+                            handleSinglePlayer(deltaTime);
+                            break;
+                        case TWO_PLAYING:
+                            handleTwoPlayer(now, deltaTime);
+                            break;
+                        case FADE:
+                            handleFade(now);
+                            break;
+                        case VICTORY, LOSS: {/* giữ nguyên kết quả */}
+                        default: { /* menu hoặc setting không update logic */ }
+                    }
+                }
+                return null;
+            };
+            gameLogicUpdateTask = logicExecutor.submit(logicTask);
         }
-
-        view.render(model);
     }
 
     // ---------------- SINGLE PLAYER ----------------
     private void handleSinglePlayer(double deltaTime) {
         if (!(model.getCurrentView() instanceof GameplayView))
-            model.setCurrentView(new GameplayView(model));
+            Platform.runLater(() -> model.setCurrentView(new GameplayView(model)));
 
         GameplayModel g = model.getGameplayModel();
         if (g == null) return;
@@ -135,20 +164,20 @@ public class GameController implements GameEventListener {
         // ✅ Khi người chơi thắng (hoàn tất tất cả level)
         if (g.hasCompletedAllLevels()) {
             model.setGstate(State.VICTORY);
-            model.setCurrentView(new VictoryView(model));
+            Platform.runLater(() -> model.setCurrentView(new VictoryView(model))); // Luồng JavaFX
         }
 
         // ✅ Khi người chơi hết mạng
         else if (g.getLives() <= 0) {
             model.setGstate(State.LOSS);
-            model.setCurrentView(new LoseView(model));
+            Platform.runLater(() -> model.setCurrentView(new LoseView(model))); // Luồng JavaFX
         }
     }
 
     // ---------------- TWO PLAYER ----------------
     private void handleTwoPlayer(long now, double deltaTime) {
         if (!(model.getCurrentView() instanceof TwoPlayerView))
-            model.setCurrentView(new TwoPlayerView(model));
+            Platform.runLater(() -> model.setCurrentView(new TwoPlayerView(model)));
 
         GameplayModel left = model.getLeftGame(), right = model.getRightGame();
         if (left == null || right == null) return;
@@ -201,7 +230,8 @@ public class GameController implements GameEventListener {
             double rightFade = (now - right.getFadeStartTime()) / 1_000_000_000.0;
 
             if (leftFade >= FADE_DURATION && rightFade >= FADE_DURATION) {
-                left.stopFade(); right.stopFade();
+                left.stopFade(); 
+                right.stopFade();
                 if (!leftDone) left.Initialize();
                 if (!rightDone) right.Initialize();
                 lastUpdateTime = now;
@@ -236,8 +266,8 @@ public class GameController implements GameEventListener {
     // Tệp: Controller/GameController.java
 
     private void handleKeyPressed(javafx.scene.input.KeyEvent e) {
+        System.out.println(e.getCode() + Thread.currentThread().getName());
         State state = model.getGstate();
-
         // Xử lý input DỰA TRÊN TRẠNG THÁI (STATE)
         switch (state) {
             case READY_TO_PLAY:

@@ -423,7 +423,6 @@ public class GameplayModel implements UltilityValues {
     public void spawnPowerUp(double x, double y) {
         Random rand = new Random();
         int type = rand.nextInt(7);
-        System.out.println(type);
         MovableObject pu;
         switch (type) {
             case 0 -> pu = new PU_Expand(x, y, 0, 2, 15);
@@ -448,7 +447,6 @@ public class GameplayModel implements UltilityValues {
     public void checkCollisions() {
         paddle.checkBoundary(canvasWidth);
         int check = 0;
-        System.out.println(balls.size());
         for (Ball ball: new ArrayList<>(balls)) {
             if (currentBallState == BallState.ATTACHED) {
                 ball.attachToPaddle(paddle);

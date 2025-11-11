@@ -3,18 +3,19 @@ package Controller;
 import java.sql.SQLOutput;
 
 public class AdjustVolumeCmd implements GameCommand {
-    private boolean increase;
+    private final boolean increase;
 
     public AdjustVolumeCmd(boolean inc) {
-        increase = inc;
+        this.increase = inc;
     }
 
     @Override
     public void execute() {
+        SoundManager soundManager = SoundManager.getInstance();
         if (increase) {
-            SoundManager.increaseVolume();
+            soundManager.increaseVolume();
         } else {
-            SoundManager.decreaseVolume();
+            soundManager.decreaseVolume();
         }
     }
 }
