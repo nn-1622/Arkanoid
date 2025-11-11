@@ -24,6 +24,15 @@ public class GameModel implements UltilityValues {
     private long fadeStartTime = 0;
     private GameplayModel leftGame;
     private GameplayModel rightGame;
+    private long resultStartTime = 0;
+
+    public void startResultTimer() {
+        resultStartTime = System.currentTimeMillis();
+    }
+
+    public boolean hasResultTimeElapsed(long durationMillis) {
+        return System.currentTimeMillis() - resultStartTime >= durationMillis;
+    }
     /**
      * Khởi tạo một đối tượng GameModel mới.
      * Trạng thái ban đầu của trò chơi được đặt là MENU.

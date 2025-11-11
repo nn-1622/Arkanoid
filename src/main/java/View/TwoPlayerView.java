@@ -5,6 +5,9 @@ import Model.GameplayModel;
 import Model.UltilityValues;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
+
 
 public class TwoPlayerView extends View {
     private final GameplayView subView;
@@ -14,6 +17,59 @@ public class TwoPlayerView extends View {
         // Dùng lại GameplayView để vẽ từng nửa
         this.subView = new GameplayView(model);
     }
+
+    private void drawWaitingOverlay(GraphicsContext gc, String text) {
+        gc.save();
+        gc.setGlobalAlpha(0.6);
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0,
+                UltilityValues.canvasWidth,
+                UltilityValues.canvasHeight);
+        gc.setGlobalAlpha(1.0);
+
+        gc.setFill(Color.WHITE);
+        gc.setFont(new Font("Arial", 36));
+        gc.setTextAlign(TextAlignment.CENTER);
+        double time = (System.currentTimeMillis() / 500) % 2;
+        if (time < 0.2) {
+            gc.fillText(text,
+                    UltilityValues.canvasWidth / 2,
+                    UltilityValues.canvasHeight / 2);
+        }
+        gc.restore();
+    }
+
+    private void drawResultOverlay(GraphicsContext gc, String text, Color color, int score) {
+        gc.save();
+        gc.setGlobalAlpha(0.7);
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0, 0,
+                UltilityValues.canvasWidth,
+                UltilityValues.canvasHeight);
+        gc.setGlobalAlpha(1.0);
+
+        gc.setFill(color);
+        gc.setFont(new Font("Arial", 48));
+        gc.setTextAlign(TextAlignment.CENTER);
+        gc.fillText(text,
+                UltilityValues.canvasWidth / 2,
+                UltilityValues.canvasHeight / 2 - 30);
+
+        gc.setFont(new Font("Arial", 24));
+        gc.setFill(Color.WHITE);
+        gc.fillText("Final Score: " + score,
+                UltilityValues.canvasWidth / 2,
+                UltilityValues.canvasHeight / 2 + 20);
+
+        gc.setFont(new Font("Arial", 22));
+        gc.setFill(Color.LIGHTGRAY);
+        gc.fillText("Press ENTER or CLICK to return to Menu",
+                UltilityValues.canvasWidth / 2,
+                UltilityValues.canvasHeight / 2 + 60);
+
+        gc.restore();
+    }
+
 
     @Override
     public void draw(GraphicsContext gc, GameplayModel ignore) {
@@ -43,6 +99,18 @@ public class TwoPlayerView extends View {
                         UltilityValues.canvasHeight);
             }
 
+            if (left.isWaitingForOtherPlayer()) {
+                drawWaitingOverlay(gc, "WAITING FOR PLAYER 2...");
+            }
+
+            if (left.isWinner()) {
+                drawResultOverlay(gc, "PLAYER 1 WINS!", Color.LIMEGREEN, left.getScore());
+            } else if (left.isLoser()) {
+                drawResultOverlay(gc, "PLAYER 1 LOSES!", Color.RED, left.getScore());
+            } else if (left.isDraw()) {
+                drawResultOverlay(gc, "DRAW!", Color.GOLD, left.getScore());
+            }
+
             gc.restore();
         }
 
@@ -68,6 +136,18 @@ public class TwoPlayerView extends View {
                 gc.fillRect(0, 0,
                         UltilityValues.canvasWidth,
                         UltilityValues.canvasHeight);
+            }
+
+            if (right.isWaitingForOtherPlayer()) {
+                drawWaitingOverlay(gc, "WAITING FOR PLAYER 1...");
+            }
+
+            if (right.isWinner()) {
+                drawResultOverlay(gc, "PLAYER 2 WINS!", Color.LIMEGREEN, right.getScore());
+            } else if (right.isLoser()) {
+                drawResultOverlay(gc, "PLAYER 2 LOSES!", Color.RED, right.getScore());
+            } else if (right.isDraw()) {
+                drawResultOverlay(gc, "DRAW!", Color.GOLD, right.getScore());
             }
 
             gc.restore();

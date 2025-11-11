@@ -39,6 +39,10 @@ public class GameplayView extends View {
         
         // Vẽ các đối tượng trong game
         model.getPaddle().draw(gc);
+        if (model.getLives() <= 0) {
+            gc.setGlobalAlpha(0.5);
+        }
+
         drawUI(gc, model);
         ArrayList<Brick> brickMap = model.getBricks();
 

@@ -41,7 +41,53 @@ public class GameplayModel implements UltilityValues {
     private boolean levelFinished = false;
     private boolean fading = false;
     private long fadeStartTime;
+    private boolean waitingForOtherPlayer = false;
+    private boolean isWinner = false;
+    private boolean isLoser = false;
+    private boolean isDraw = false;
 
+    public boolean isWinner() {
+        return isWinner;
+    }
+
+    public void setWinner(boolean winner) {
+        this.isWinner = winner;
+        if (winner) { // đảm bảo chỉ 1 trạng thái tại 1 thời điểm
+            this.isLoser = false;
+            this.isDraw = false;
+        }
+    }
+
+    public boolean isLoser() {
+        return isLoser;
+    }
+
+    public void setLoser(boolean loser) {
+        this.isLoser = loser;
+        if (loser) {
+            this.isWinner = false;
+            this.isDraw = false;
+        }
+    }
+
+    public boolean isDraw() {
+        return isDraw;
+    }
+
+    public void setDraw(boolean draw) {
+        this.isDraw = draw;
+        if (draw) {
+            this.isWinner = false;
+            this.isLoser = false;
+        }
+    }
+
+    public boolean isWaitingForOtherPlayer() {
+        return waitingForOtherPlayer;
+    }
+    public void setWaitingForOtherPlayer(boolean waiting) {
+        this.waitingForOtherPlayer = waiting;
+    }
     public boolean hasCompletedAllLevels() {
         return completedAllLevels;
     }
@@ -72,7 +118,7 @@ public class GameplayModel implements UltilityValues {
         currentBallState = BallState.ATTACHED;
         balls.add(ball);
         lives = 5;
-        level = 1;
+        level = 5;
         score = 0;
         combo = 0;
         currentVx = 0;
@@ -100,7 +146,7 @@ public class GameplayModel implements UltilityValues {
         );
         this.currentBallState = BallState.ATTACHED;
         this.balls.add(ball);
-        this.lives = 5;
+        this.lives = 1;
         this.level = 1;
         this.score = 0;
         this.combo = 0;
@@ -384,8 +430,12 @@ public class GameplayModel implements UltilityValues {
             currentVx++;
             lives = 5;
             setCombo(0);
+            isWinner = false;
+            isLoser = false;
+            isDraw = false;
         } else {
-        completedAllLevels = true;}
+            completedAllLevels = true;
+        }
     }
 
     public ArrayList<LaserShot> getLasers() {
