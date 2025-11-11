@@ -20,7 +20,6 @@ public class Game extends Application {
     private GameModel model;
     private GameView view;
     public static State gstate;
-    //addtext bruhbruh
 
     /**
      * Phương thức khởi đầu chính cho tất cả các ứng dụng JavaFX.
