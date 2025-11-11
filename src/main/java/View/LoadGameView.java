@@ -8,6 +8,7 @@ import Model.GameplayModel;
 import Model.State;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import Controller.GameCommand;
@@ -39,6 +40,13 @@ public class LoadGameView extends View {
         createSlotButton.setImgHoverButton("/StartHover.png");
         buttons.add(createSlotButton);
 
+    }
+
+    @Override
+    public void checkHover(MouseEvent e) {
+        for (Button b : buttons) {
+            b.setHovering(e);
+        }
     }
 
     /**
