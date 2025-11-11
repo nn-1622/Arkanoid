@@ -52,6 +52,7 @@ public class LaserShot extends MovableObject {
             if (overlapX && overlapY) {
                 brick.hit();
                 destroyed = true;
+                game.scorePoint(1);
                 break;
             }
         }

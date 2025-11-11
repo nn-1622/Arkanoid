@@ -416,7 +416,7 @@ public class GameplayModel implements UltilityValues {
         for (Brick b : brick) {
             b.update(deltaTime);
             if (b.isDestroyed()) {
-                if (Math.random() <= 0.3) {
+                if (Math.random() <= 1) {
                     double dropX = b.getX() + b.getWidth() / 2;
                     double dropY = b.getY() + b.getHeight() / 2;
                     spawnPowerUp(dropX, dropY);
