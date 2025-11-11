@@ -25,25 +25,25 @@ public class Paddle extends MovableObject implements UltilityValues {
      * @param length Chiều dài (chiều rộng) của thanh trượt.
      * @param height Chiều cao của thanh trượt.
      */
-    private Paddle(double x, double y, double length, double height) {
+    private Paddle(double x, double y, double length, double height, String path) {
         super(x, y);
         this.length = length;
         this.height = height;
-        this.paddleImg = new Image("/DefaultPaddle.png");
+        this.paddleImg = new Image(path);
         setVx(5); // Đặt tốc độ di chuyển mặc định
     }
 
-    public static Paddle getPaddle() {
+    public static Paddle getPaddle(String path) {
         if (paddle == null) {
             paddle = new Paddle(canvasWidth / 2 - paddleLength / 2,
-                    canvasHeight - 140, paddleLength, paddleHeight);
+                    canvasHeight - 140, paddleLength, paddleHeight,  path);
 
         }
         return paddle;
     }
 
-    public static Paddle newInstance(double x, double y, double length, double height) {
-        return new Paddle(x, y, length, height);
+    public static Paddle newInstance(double x, double y, double length, double height, String path) {
+        return new Paddle(x, y, length, height, path);
     }
 
 
@@ -65,14 +65,12 @@ public class Paddle extends MovableObject implements UltilityValues {
         return height;
     }
 
-    //public void setLength;
-
     /**
      * Thiết lập một hình ảnh mới cho thanh trượt.
      * @param paddleImg Đối tượng Image mới để hiển thị cho thanh trượt.
      */
-    public void setPaddleImg(Image paddleImg) {
-        this.paddleImg = paddleImg;
+    public void setPaddleImg(String paddleImg) {
+        this.paddleImg = new Image(paddleImg);
     }
 
     public void setShield(boolean v) { shield = v; }

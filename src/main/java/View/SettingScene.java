@@ -22,6 +22,8 @@ public class SettingScene extends View {
     private Button exit;
     private Button lowVolume;
     private Button highVolume;
+    private Button theme;
+    private Button how2play;
 
     /**
      * Khởi tạo một đối tượng SettingScene mới.
@@ -32,21 +34,31 @@ public class SettingScene extends View {
         super(model);
         settingBg = new Image(getClass().getResource("/settingBg.png").toExternalForm());
 
-        exit = new Button( 200.1, 523.8, 199.8, 41.9, new ChangeStateCmd(model, State.MENU));
+        exit = new Button( 412.4, 26.4, 175, 67.3, new ChangeStateCmd(model, State.MENU));
         exit.setImgButton("/Exit.png");
         exit.setImgHoverButton("/ExitHover.png");
 
-        lowVolume = new Button( 132.4, 347.3 , 60, 60, new AdjustVolumeCmd(false));
+        lowVolume = new Button( 160, 68.7, 70, 70, new AdjustVolumeCmd(false));
         lowVolume.setImgButton("/left.png");
         lowVolume.setImgHoverButton("/leftHover.png");
 
-        highVolume = new Button(407.1, 347.3, 60, 60, new AdjustVolumeCmd(true));
+        highVolume = new Button(230, 68.7, 70, 70, new AdjustVolumeCmd(true));
         highVolume.setImgButton("/right.png");
         highVolume.setImgHoverButton("/rightHover.png");
+
+        theme = new Button(103.9, 247, 262.6, 65.7, new ChangeStateCmd(model, State.THEME));
+        theme.setImgHoverButton("/Theme.png");
+        theme.setImgButton("/ThemeHover.png");
+
+        how2play = new Button(103.9, 337.6, 262.6, 65.7, new ChangeStateCmd(model, State.HOW_TO_PLAY));
+        how2play.setImgButton("/Howtoplay.png");
+        how2play.setImgHoverButton("/HowtoplayHover.png");
 
         buttons.add(lowVolume);
         buttons.add(highVolume);
         buttons.add(exit);
+        buttons.add(theme);
+        buttons.add(how2play);
     }
 
     /**
@@ -61,6 +73,8 @@ public class SettingScene extends View {
         exit.draw(render);
         lowVolume.draw(render);
         highVolume.draw(render);
+        theme.draw(render);
+        how2play.draw(render);
     }
 
     /**
@@ -72,5 +86,7 @@ public class SettingScene extends View {
         exit.setHovering(e);
         lowVolume.setHovering(e);
         highVolume.setHovering(e);
+        theme.setHovering(e);
+        how2play.setHovering(e);
     }
 }

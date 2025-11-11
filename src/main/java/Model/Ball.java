@@ -25,10 +25,10 @@ public class Ball extends MovableObject {
      * @param vy Vận tốc ban đầu theo trục y.
      * @param radius Bán kính của quả bóng.
      */
-    public Ball(double x, double y, double vx, double vy, double radius) {
+    public Ball(double x, double y, double vx, double vy, double radius, String path) {
         super(x,y,vx,vy);
         this.radius = radius;
-        ballImg = new Image("/DefaultBall.png");
+        ballImg = new Image(path);
     }
 
     /**
@@ -79,12 +79,8 @@ public class Ball extends MovableObject {
         return x;
     }
 
-    /**
-     * Đặt một hình ảnh mới cho quả bóng.
-     * @param ballImg Đối tượng Image mới để hiển thị cho quả bóng.
-     */
-    public void setBallImg(Image ballImg) {
-        this.ballImg = ballImg;
+    public void setballImg(String ballImg) {
+        this.ballImg = new Image(ballImg);
     }
 
     public void setBomb(boolean val) { isBomb = val; }

@@ -1,4 +1,7 @@
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\AdjustVolumeCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ChangeBackgroundCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ChangeBallCmd.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ChangePaddleCmd.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ChangeStateCmd.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\EventLoader.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Controller\ExitCmd.java
@@ -32,13 +35,18 @@ C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\State.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\TwoPlayerMatch.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\UltilityValues.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\Model\Utility.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\ChooseBackgroundView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\ChooseBallView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\ChoosePaddleView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\GameplayView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\GameView.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\LeaderBoardView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\LoseView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\MenuScene.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\PlayModeScene.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\SceneActions.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\SettingScene.java
+C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\ThemeView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\TwoPlayerView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\VictoryView.java
 C:\Users\PC\IdeaProjects\Arkanoid4\src\main\java\View\View.java

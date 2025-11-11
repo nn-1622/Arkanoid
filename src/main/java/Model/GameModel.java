@@ -38,6 +38,11 @@ public class GameModel implements UltilityValues {
         viewMap.put(State.SETTING, new SettingScene(this));
         viewMap.put(State.VICTORY, new VictoryView(this));
         viewMap.put(State.PLAY_MODE, new PlayModeScene(this));
+        viewMap.put(State.LEADERBOARD, new LeaderBoardView(this));
+        viewMap.put(State.THEME, new ThemeView(this));
+        viewMap.put(State.CHOOSE_BALL, new ChooseBallView(this));
+        viewMap.put(State.CHOOSE_BACKGROUND, new ChooseBackgroundView(this));
+        viewMap.put(State.CHOOSE_PADDLE, new ChoosePaddleView(this));
         setGstate(State.MENU);
     }
 
@@ -62,13 +67,13 @@ public class GameModel implements UltilityValues {
                 UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
                 UltilityValues.canvasHeight - 140,
                 UltilityValues.paddleLength,
-                UltilityValues.paddleHeight
+                UltilityValues.paddleHeight, gameModel.getPaddlePath()
         );
         Paddle p2 = Paddle.newInstance(
                 UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
                 UltilityValues.canvasHeight - 140,
                 UltilityValues.paddleLength,
-                UltilityValues.paddleHeight
+                UltilityValues.paddleHeight, gameModel.getPaddlePath()
         );
         leftGame = new GameplayModel(eventLoader, p1, true);
         rightGame = new GameplayModel(eventLoader, p2, true);

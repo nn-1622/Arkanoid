@@ -25,7 +25,6 @@ public class GameplayView extends View {
      * Hình ảnh được sử dụng để hiển thị thanh máu/mạng sống của người chơi.
      */
     public Image healthbar = new Image(getClass().getResource("/healthbar.png").toExternalForm());
-    public Image background = new Image(getClass().getResource("/GameBG.png").toExternalForm());
 
     /**
      * Vẽ toàn bộ màn hình chơi game.
@@ -34,7 +33,7 @@ public class GameplayView extends View {
      * @param model Đối tượng GameplayModel chứa tất cả dữ liệu và trạng thái của màn chơi cần vẽ.
      */
     public void draw(GraphicsContext gc, GameplayModel model) {
-
+        Image background = model.getBackground();
         gc.drawImage(background, 0, 0, 600, 650);
         
         // Vẽ các đối tượng trong game

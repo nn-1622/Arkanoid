@@ -6,6 +6,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
+import java.util.Objects;
+
 /**
  * Lớp đại diện cho một nút bấm (button) có thể tương tác trong giao diện người dùng.
  * Lớp này quản lý vị trí, kích thước, hình ảnh mặc định và hình ảnh khi di chuột qua.
@@ -37,7 +39,7 @@ public class Button extends Utility {
      * @param link Đường dẫn đến tệp hình ảnh trong thư mục tài nguyên (resources).
      */
     public void setImgButton(String link) {
-        this.imgButton = new Image(getClass().getResource(link).toExternalForm());
+        this.imgButton = new Image(Objects.requireNonNull(getClass().getResource(link)).toExternalForm());
     }
 
     /**

@@ -15,5 +15,11 @@ public enum State {
     LOSS,
     VICTORY,
     FADE,
-    PLAY_MODE
+    PLAY_MODE,
+    LEADERBOARD,
+    THEME,
+    HOW_TO_PLAY,
+    CHOOSE_PADDLE,
+    CHOOSE_BALL,
+    CHOOSE_BACKGROUND
 }

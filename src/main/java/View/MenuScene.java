@@ -19,6 +19,7 @@ public class MenuScene extends View implements SceneActions {
     Button start;
     Button settings;
     Button exit;
+    Button lead;
 
     /**
      * Khởi tạo một đối tượng MenuScene mới.
@@ -43,9 +44,14 @@ public class MenuScene extends View implements SceneActions {
         exit.setImgButton("/Exit.png");
         exit.setImgHoverButton("/ExitHover.png");
 
+        lead = new Button(422.1, 259.6, 90.8, 90.8, new  ChangeStateCmd(model, State.LEADERBOARD));
+        lead.setImgButton("/Lead.png");
+        lead.setImgHoverButton("/LeadHover.png");
+
         buttons.add(start);
         buttons.add(settings);
         buttons.add(exit);
+        buttons.add(lead);
     }
 
     /**
@@ -61,6 +67,7 @@ public class MenuScene extends View implements SceneActions {
         start.draw(render);
         settings.draw(render);
         exit.draw(render);
+        lead.draw(render);
     }
 
     /**

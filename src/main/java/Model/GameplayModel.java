@@ -1,6 +1,9 @@
 package Model;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 import Controller.EventLoader;
@@ -22,6 +25,8 @@ public class GameplayModel implements UltilityValues {
     private Paddle paddle2;
     private BallState currentBallState;
     private double currentVx;
+    private String ballPath = "DefaultBall.png";
+    private String paddlePath = "DefaultPaddle.png";
     private ArrayList<Brick> brick;
     private ArrayList<Ball> balls = new ArrayList<>();
     private ArrayList<MovableObject> fallingPowerUps = new ArrayList<>();
@@ -41,6 +46,12 @@ public class GameplayModel implements UltilityValues {
     private boolean levelFinished = false;
     private boolean fading = false;
     private long fadeStartTime;
+    private static final String CONFIG_FILE = "ball_config.txt";
+    private static final String DEFAULT_BALL = "DefaultBall.png";
+    private static final String BG_CONFIG_FILE   = "background_config.txt";
+    private static final String DEFAULT_BG   = "/GameBG.png";
+    private static final String PADDLE_CONFIG_FILE = "paddle_config.txt";
+    private static final String DEFAULT_PADDLE    = "/DefaultPaddle.png";
 
     public boolean hasCompletedAllLevels() {
         return completedAllLevels;
@@ -66,9 +77,12 @@ public class GameplayModel implements UltilityValues {
         this.eventLoader = eventLoader;
         this.twoPlayerMode = false;
 
-        paddle = Paddle.getPaddle();
+        this.ballPath = loadBallPathFromFile();
+        this.background = loadBackgroundFromFile();
 
-        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
+        paddle = Paddle.getPaddle(loadPaddlePathFromFile());
+
+        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10, ballPath);
         currentBallState = BallState.ATTACHED;
         balls.add(ball);
         lives = 5;
@@ -93,10 +107,12 @@ public class GameplayModel implements UltilityValues {
         this.eventLoader = eventLoader;
         this.paddle = customPaddle;
         this.twoPlayerMode = twoPlayerMode;
+        this.ballPath = loadBallPathFromFile();
+        this.background = loadBackgroundFromFile();
         Ball ball = new Ball(
                 paddle.x + paddleLength / 2.0,
                 paddle.y - paddleHeight / 2.0,
-                0, 0, 10
+                0, 0, 10, ballPath
         );
         this.currentBallState = BallState.ATTACHED;
         this.balls.add(ball);
@@ -106,6 +122,53 @@ public class GameplayModel implements UltilityValues {
         this.combo = 0;
         this.currentVx = 0;
         renderMap();
+    }
+
+    private String loadPaddlePathFromFile() {
+        try {
+            Path p = Path.of(PADDLE_CONFIG_FILE);
+            if (Files.exists(p)) {
+                String s = Files.readString(p, StandardCharsets.UTF_8).trim();
+                if (!s.isEmpty()) {
+                    System.out.println("Set paddle from config: " + s);
+                    return s;
+                }
+            } else {
+                System.out.println("Paddle config not found, use default");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DEFAULT_PADDLE;
+    }
+
+    private Image loadBackgroundFromFile() {
+        String path = DEFAULT_BG;
+        try {
+            Path p = Path.of(BG_CONFIG_FILE);
+            if (Files.exists(p)) {
+                String s = Files.readString(p, StandardCharsets.UTF_8).trim();
+                if (!s.isEmpty()) {
+                    path = s;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Image(getClass().getResource(path).toExternalForm());
+    }
+
+    private String loadBallPathFromFile() {
+            try {
+                Path path = Path.of(CONFIG_FILE);
+                if (Files.exists(path)) {
+                    String data = Files.readString(path, StandardCharsets.UTF_8).trim();
+                    if (!data.isEmpty()) return data;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return DEFAULT_BALL;
     }
 
 
@@ -199,7 +262,7 @@ public class GameplayModel implements UltilityValues {
         paddle.setX(canvasWidth / 2 - paddle.getLength() / 2);
         paddle.setY(canvasHeight - 140);
         balls.clear();
-        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
+        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10, ballPath);
         balls.add(ball);
         currentBallState = BallState.ATTACHED;
     }
@@ -212,12 +275,26 @@ public class GameplayModel implements UltilityValues {
         return background;
     }
 
+
+
     /**
      * Lấy đối tượng thanh trượt.
      * @return Thanh trượt của trò chơi.
      */
     public Paddle getPaddle() {
         return paddle;
+    }
+
+    public void setBallPath(String path) {
+        this.ballPath = path;
+    }
+
+    public String getBallPath() {
+        return ballPath;
+    }
+
+    public String getPaddlePath() {
+        return paddlePath;
     }
 
     public ArrayList<MovableObject> getFallingPowerUps() {
@@ -321,7 +398,6 @@ public class GameplayModel implements UltilityValues {
     public void spawnPowerUp(double x, double y) {
         Random rand = new Random();
         int type = rand.nextInt(7);
-        System.out.println(type);
         MovableObject pu;
         switch (type) {
             case 0 -> pu = new PU_Expand(x, y, 0, 2, 15);
@@ -347,7 +423,6 @@ public class GameplayModel implements UltilityValues {
     public void checkCollisions() {
         paddle.checkBoundary(canvasWidth);
         int check = 0;
-        System.out.println(balls.size());
         for (Ball ball: new ArrayList<>(balls)) {
             if (currentBallState == BallState.ATTACHED) {
                 ball.attachToPaddle(paddle);

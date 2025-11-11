@@ -55,8 +55,8 @@ public class PU_MultiBall extends MovableObject implements PowerUp {
             double angle1 = angle + Math.toRadians(15);
             double angle2 = angle - Math.toRadians(15);
 
-            Ball ball1 = new Ball(x, y, speed * Math.cos(angle1), speed * Math.sin(angle1), r);
-            Ball ball2 = new Ball(x, y, speed * Math.cos(angle2), speed * Math.sin(angle2), r);
+            Ball ball1 = new Ball(x, y, speed * Math.cos(angle1), speed * Math.sin(angle1), r, game.getBallPath());
+            Ball ball2 = new Ball(x, y, speed * Math.cos(angle2), speed * Math.sin(angle2), r,  game.getBallPath());
 
             newBalls.add(ball1);
             newBalls.add(ball2);
