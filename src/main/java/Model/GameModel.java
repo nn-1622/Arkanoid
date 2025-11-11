@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import View.LoadGameView;
 import View.View;
+import View.TwoPlayerPauseView;
 
 /**
  * Lớp model chính của toàn bộ ứng dụng trò chơi.
@@ -101,6 +102,7 @@ public class GameModel implements UltilityValues {
         viewMap.put(State.PAUSED, new PauseView(this));
         viewMap.put(State.LOAD_GAME, new LoadGameView(this));
         viewMap.put(State.READY_TO_PLAY, new ReadyView(this));
+        viewMap.put(State.TWO_PLAYER_PAUSED, new TwoPlayerPauseView(this));
 
         setGstate(State.MENU);
     }

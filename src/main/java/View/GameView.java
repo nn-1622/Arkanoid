@@ -39,7 +39,7 @@ public class GameView {
     }
 
     public void ensureSizeForState(State s) {
-        double targetW = (s == State.TWO_PLAYING) ? 1200 : 600;
+        double targetW = (s == State.TWO_PLAYING || s == State.TWO_PLAYER_PAUSED) ? 1200 : 600;
         double targetH = 650;
 
         if (canvas.getWidth() != targetW || canvas.getHeight() != targetH) {
@@ -62,20 +62,10 @@ public class GameView {
     public void render(GameModel model) {
         // --- Tự động đổi kích thước khi vào 2 người chơi ---
         ensureSizeForState(model.getGstate());
-        if (model.getGstate() == State.PAUSED || model.getGstate() == State.READY_TO_PLAY) {
-            View gameplayView = model.getView(State.PLAYING);
-            if (gameplayView != null) {
-                gameplayView.draw(gc, model.getGameplayModel());
-            }
-
-            View overlayView = model.getCurrentView();
-            if (overlayView != null) {
-                overlayView.draw(gc, model.getGameplayModel());
-            }
-        }
+        State currentState = model.getGstate();
 
         // --- Nếu đang hiệu ứng FADE ---
-        else if (model.getGstate() == State.FADE) {
+        if (model.getGstate() == State.FADE) {
             final double fadeTime = 15.0;
             double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;
             double opacity = Math.min(1.0, (timeElapsed / fadeTime));
@@ -84,13 +74,45 @@ public class GameView {
             gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
             return;
         }
+        if (model.getGstate() == State.PAUSED || model.getGstate() == State.READY_TO_PLAY || model.getGstate() == State.TWO_PLAYER_PAUSED) {
+            View backgroundView = model.getView(State.TWO_PLAYING);
+            if (backgroundView != null && model.getGameplayModel() != null) {
+                backgroundView.draw(gc, model.getGameplayModel());
+            }
+            View overlayView = model.getCurrentView();
+            if (overlayView != null) {
+                overlayView.draw(gc, model.getGameplayModel()); // Dùng model 1P
+            }
+            return;
+        }
+        // --- Xử lý 2P PAUSE ---
+        if (currentState == State.TWO_PLAYER_PAUSED) {
+            // 1. Vẽ nền (TwoPlayerView của 2P)
+            View backgroundView = model.getView(State.TWO_PLAYING);
+            if (backgroundView != null) {
+                // TwoPlayerView.draw không cần model, nó tự lấy left/right
+                backgroundView.draw(gc, null);
+            }
 
-        // --- Kiểm tra view hợp lệ trước khi vẽ ---
+            // 2. Vẽ lớp phủ (TwoPlayerPauseView)
+            View overlayView = model.getCurrentView();
+            if (overlayView != null) {
+                // TwoPlayerPauseView.draw cũng không cần model
+                overlayView.draw(gc, null);
+            }
+            return; // Đã vẽ xong
+        }
+
+        // --- Các trạng thái bình thường khác (MENU, PLAYING, TWO_PLAYING, v.v.) ---
         try {
             if (model.getCurrentView() != null) {
+                // Tự động gọi hàm draw chính xác:
+                // - PLAYING -> GameplayView.draw(gc, model.getGameplayModel())
+                // - TWO_PLAYING -> TwoPlayerView.draw(gc, null) (nó sẽ bỏ qua tham số null)
+                // - MENU -> MenuScene.draw(gc, null) (nó cũng bỏ qua)
                 model.getCurrentView().draw(gc, model.getGameplayModel());
             } else if (model.getGameplayModel() != null) {
-                // Nếu chưa có currentView, fallback vẽ gameplay
+                // Fallback nếu state là PLAYING nhưng currentView bị null
                 new GameplayView(model).draw(gc, model.getGameplayModel());
             } else {
                 // Fallback cuối cùng: màn hình đen an toàn
@@ -99,6 +121,7 @@ public class GameView {
             }
         } catch (Exception e) {
             System.err.println("[Render Warning] " + e.getMessage());
+            e.printStackTrace(); // In ra stack trace để debug
             gc.setFill(Color.BLACK);
             gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         }

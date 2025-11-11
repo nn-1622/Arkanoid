@@ -209,12 +209,18 @@ public class GameController implements GameEventListener {
                 }
                 break; // Thoát khỏi switch(state)
 
-            case PLAYING:
+            case PLAYING: // Chế độ 1 người chơi
+                if (e.getCode() == KeyCode.ESCAPE) {
+                    // Nhấn ESC sẽ Pause game (của 1P)
+                    model.setGstate(State.PAUSED); // <-- Sửa ở đây
+                    return; // Đã xử lý xong, thoát
+                }
+                break;
             case TWO_PLAYING:
                 // Nếu đang chơi (1P hoặc 2P)
                 if (e.getCode() == KeyCode.ESCAPE) {
                     // Nhấn ESC sẽ Pause game
-                    model.setGstate(State.PAUSED);
+                    model.setGstate(State.TWO_PLAYER_PAUSED);
                     return; // Đã xử lý xong, thoát
                 }
                 break; // Thoát khỏi switch(state), chạy logic di chuyển bên dưới
@@ -224,6 +230,14 @@ public class GameController implements GameEventListener {
                 if (e.getCode() == KeyCode.ESCAPE) {
                     View pauseView = model.getView(State.PAUSED);
                     new ResumeGameCmd(model).execute(); // Lệnh này sẽ set state về PLAYING
+                    return;
+                }
+                return;
+
+            case TWO_PLAYER_PAUSED: // <-- Đang Pause 2P
+                if (e.getCode() == KeyCode.ESCAPE) {
+                    // Chỉ cần quay lại trạng thái 2P
+                    model.setGstate(State.TWO_PLAYING);
                     return;
                 }
                 return;

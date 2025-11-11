@@ -28,5 +28,6 @@ public enum State {
     SETTING_VOLUME,
     SETTING_HOWTOPLAY,
     READY_TO_PLAY,
-    LOAD_GAME
+    LOAD_GAME,
+    TWO_PLAYER_PAUSED
 }
