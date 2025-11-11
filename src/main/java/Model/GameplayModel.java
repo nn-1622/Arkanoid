@@ -1,9 +1,6 @@
 package Model;
 
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 import Controller.EventLoader;
@@ -25,8 +22,6 @@ public class GameplayModel implements UltilityValues {
     private Paddle paddle2;
     private BallState currentBallState;
     private double currentVx;
-    private String ballPath = "DefaultBall.png";
-    private String paddlePath = "DefaultPaddle.png";
     private ArrayList<Brick> brick;
     private ArrayList<Ball> balls = new ArrayList<>();
     private ArrayList<MovableObject> fallingPowerUps = new ArrayList<>();
@@ -46,13 +41,40 @@ public class GameplayModel implements UltilityValues {
     private boolean levelFinished = false;
     private boolean fading = false;
     private long fadeStartTime;
-    private static final String CONFIG_FILE = "ball_config.txt";
-    private static final String DEFAULT_BALL = "DefaultBall.png";
-    private static final String BG_CONFIG_FILE   = "background_config.txt";
-    private static final String DEFAULT_BG   = "/GameBG.png";
-    private static final String PADDLE_CONFIG_FILE = "paddle_config.txt";
-    private static final String DEFAULT_PADDLE    = "/DefaultPaddle.png";
+    private boolean waitingForOtherPlayer = false;
+    private boolean isWinner = false;
+    private boolean isLoser = false;
+    private boolean isDraw = false;
+    private boolean twoPlayerEnded = false;
 
+    public boolean isTwoPlayerEnded() { return twoPlayerEnded; }
+    public void setTwoPlayerEnded(boolean value) { this.twoPlayerEnded = value; }
+
+
+    public boolean isWaitingForOtherPlayer() {
+        return waitingForOtherPlayer;
+    }
+    public void setWaitingForOtherPlayer(boolean waiting) {
+        this.waitingForOtherPlayer = waiting;
+    }
+
+    public boolean isWinner() { return isWinner; }
+    public void setWinner(boolean winner) {
+        this.isWinner = winner;
+        if (winner) { this.isLoser = false; this.isDraw = false; }
+    }
+
+    public boolean isLoser() { return isLoser; }
+    public void setLoser(boolean loser) {
+        this.isLoser = loser;
+        if (loser) { this.isWinner = false; this.isDraw = false; }
+    }
+
+    public boolean isDraw() { return isDraw; }
+    public void setDraw(boolean draw) {
+        this.isDraw = draw;
+        if (draw) { this.isWinner = false; this.isLoser = false; }
+    }
     public boolean hasCompletedAllLevels() {
         return completedAllLevels;
     }
@@ -77,12 +99,9 @@ public class GameplayModel implements UltilityValues {
         this.eventLoader = eventLoader;
         this.twoPlayerMode = false;
 
-        this.ballPath = loadBallPathFromFile();
-        this.background = loadBackgroundFromFile();
+        paddle = Paddle.getPaddle();
 
-        paddle = Paddle.getPaddle(loadPaddlePathFromFile());
-
-        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10, ballPath);
+        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         currentBallState = BallState.ATTACHED;
         balls.add(ball);
         lives = 5;
@@ -103,26 +122,14 @@ public class GameplayModel implements UltilityValues {
         paddle.setX((areaLeft + areaRight - paddle.getLength()) / 2); // căn giữa vùng chơi
     }
 
-    public GameplayModel(EventLoader eventLoader, boolean twoPlayerMode) {
+    public GameplayModel(EventLoader eventLoader, Paddle customPaddle, boolean twoPlayerMode) {
         this.eventLoader = eventLoader;
-        this.paddlePath = loadPaddlePathFromFile();
+        this.paddle = customPaddle;
         this.twoPlayerMode = twoPlayerMode;
-        this.ballPath = loadBallPathFromFile();
-        this.background = loadBackgroundFromFile();
-        this.paddle = Paddle.getPaddle(loadPaddlePathFromFile());
-
-        this.paddle = Paddle.newInstance(
-                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
-                UltilityValues.canvasHeight - 140,
-                UltilityValues.paddleLength,
-                UltilityValues.paddleHeight,
-                paddlePath
-        );
-
         Ball ball = new Ball(
                 paddle.x + paddleLength / 2.0,
                 paddle.y - paddleHeight / 2.0,
-                0, 0, 10, ballPath
+                0, 0, 10
         );
         this.currentBallState = BallState.ATTACHED;
         this.balls.add(ball);
@@ -132,53 +139,6 @@ public class GameplayModel implements UltilityValues {
         this.combo = 0;
         this.currentVx = 0;
         renderMap();
-    }
-
-    private String loadPaddlePathFromFile() {
-        try {
-            Path p = Path.of(PADDLE_CONFIG_FILE);
-            if (Files.exists(p)) {
-                String s = Files.readString(p, StandardCharsets.UTF_8).trim();
-                if (!s.isEmpty()) {
-                    System.out.println("Set paddle from config: " + s);
-                    return s;
-                }
-            } else {
-                System.out.println("Paddle config not found, use default");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return DEFAULT_PADDLE;
-    }
-
-    private Image loadBackgroundFromFile() {
-        String path = DEFAULT_BG;
-        try {
-            Path p = Path.of(BG_CONFIG_FILE);
-            if (Files.exists(p)) {
-                String s = Files.readString(p, StandardCharsets.UTF_8).trim();
-                if (!s.isEmpty()) {
-                    path = s;
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new Image(getClass().getResource(path).toExternalForm());
-    }
-
-    private String loadBallPathFromFile() {
-            try {
-                Path path = Path.of(CONFIG_FILE);
-                if (Files.exists(path)) {
-                    String data = Files.readString(path, StandardCharsets.UTF_8).trim();
-                    if (!data.isEmpty()) return data;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return DEFAULT_BALL;
     }
 
 
@@ -272,7 +232,7 @@ public class GameplayModel implements UltilityValues {
         paddle.setX(canvasWidth / 2 - paddle.getLength() / 2);
         paddle.setY(canvasHeight - 140);
         balls.clear();
-        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10, ballPath);
+        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
         balls.add(ball);
         currentBallState = BallState.ATTACHED;
     }
@@ -285,26 +245,12 @@ public class GameplayModel implements UltilityValues {
         return background;
     }
 
-
-
     /**
      * Lấy đối tượng thanh trượt.
      * @return Thanh trượt của trò chơi.
      */
     public Paddle getPaddle() {
         return paddle;
-    }
-
-    public void setBallPath(String path) {
-        this.ballPath = path;
-    }
-
-    public String getBallPath() {
-        return ballPath;
-    }
-
-    public String getPaddlePath() {
-        return paddlePath;
     }
 
     public ArrayList<MovableObject> getFallingPowerUps() {
@@ -408,6 +354,7 @@ public class GameplayModel implements UltilityValues {
     public void spawnPowerUp(double x, double y) {
         Random rand = new Random();
         int type = rand.nextInt(7);
+        System.out.println(type);
         MovableObject pu;
         switch (type) {
             case 0 -> pu = new PU_Expand(x, y, 0, 2, 15);
@@ -433,6 +380,7 @@ public class GameplayModel implements UltilityValues {
     public void checkCollisions() {
         paddle.checkBoundary(canvasWidth);
         int check = 0;
+        System.out.println(balls.size());
         for (Ball ball: new ArrayList<>(balls)) {
             if (currentBallState == BallState.ATTACHED) {
                 ball.attachToPaddle(paddle);
@@ -460,18 +408,66 @@ public class GameplayModel implements UltilityValues {
      * Khởi tạo cấp độ tiếp theo của trò chơi. Phương thức này tăng biến đếm cấp độ,
      * kết xuất bản đồ mới, đặt lại vị trí các đối tượng, và đặt lại số mạng và combo.
      */
+    /**
+     * Khởi tạo lại trạng thái khi qua màn mới.
+     * Reset các chỉ số tạm thời nhưng giữ nguyên điểm, mạng và tiến trình.
+     */
     public void Initialize() {
+        // Nếu đã hoàn tất tất cả level, đánh dấu game đã hoàn thành
+        if (level >= 5) {
+            completedAllLevels = true;
+            return;
+        }
+
+        // Tăng level (chỉ nếu chưa hết)
         level++;
-        if (level <= 5) {
-            renderMap();
-            resetPosition();
-            resetPowerUp();
-            currentVx++;
-            lives = 5;
-            setCombo(0);
-        } else {
-        completedAllLevels = true;}
+
+        // Tải lại bản đồ gạch mới cho level hiện tại
+        renderMap();
+
+        // Đặt lại paddle về giữa và kích thước mặc định
+        paddle.setX(canvasWidth / 2.0 - paddleLength / 2.0);
+        paddle.setY(canvasHeight - 140);
+        paddle.setLength(paddleLength);
+
+        // Đặt lại bóng (xóa toàn bộ và tạo lại)
+        balls.clear();
+        Ball newBall = new Ball(
+                paddle.getX() + paddle.getLength() / 2,
+                paddle.getY() - paddle.getHeight() / 2,
+                0, 0, 10
+        );
+        balls.add(newBall);
+        currentBallState = BallState.ATTACHED;
+
+        // Reset các danh sách tạm
+        fallingPowerUps.clear();
+        activePowerUps.clear();
+        lasers.clear();
+
+        // Reset chỉ số phụ
+        combo = 0;
+        scoreMultiplier = 1;
+        currentVx = 0;
+
+        // Reset trạng thái logic
+        levelFinished = false;
+        waitingForOtherPlayer = false;
+        fading = false;
+        fadeStartTime = -1;
+        twoPlayerEnded = false;
+        isWinner = false;
+        isLoser = false;
+        isDraw = false;
+
+        // Không reset điểm hoặc mạng — giữ nguyên
+        // lives = lives;
+        // score = score;
+
+        // Nếu cần hiệu ứng khi qua màn (âm thanh, sự kiện, ...), có thể gọi thêm:
+        // eventLoader.loadEvent(GameEvent.LEVEL_START);
     }
+
 
     public ArrayList<LaserShot> getLasers() {
         return lasers;

@@ -49,9 +49,14 @@ public class LaserShot extends MovableObject {
             boolean overlapX = laserRight >= brickLeft && laserLeft <= brickRight;
             boolean overlapY = laserBottom >= brickTop && laserTop <= brickBottom;
 
+            //game.scorePoint(1);
+            //game.comboHit();
+
             if (overlapX && overlapY) {
                 brick.hit();
                 destroyed = true;
+
+                game.scorePoint(1);
                 break;
             }
         }

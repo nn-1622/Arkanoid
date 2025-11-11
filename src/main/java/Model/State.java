@@ -10,6 +10,7 @@ public enum State {
     MENU,
     PLAYING,
     TWO_PLAYING,
+    TWO_PLAYER_ENDGAME,
     PAUSED,
     SETTING,
     LOSS,

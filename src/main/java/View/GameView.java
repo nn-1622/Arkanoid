@@ -63,19 +63,36 @@ public class GameView {
         // --- Tự động đổi kích thước khi vào 2 người chơi ---
         ensureSizeForState(model.getGstate());
 
+        // --- Nếu đang hiệu ứng FADE ---
         if (model.getGstate() == State.FADE) {
-            // Hiệu ứng chuyển cảnh mờ dần
-            final double fadeTime = 2.0;
+            final double fadeTime = 15.0;
             double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;
             double opacity = Math.min(1.0, (timeElapsed / fadeTime));
 
             gc.setFill(new Color(0, 0, 0, opacity));
             gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        } else {
-            // Vẽ khung hình hiện tại (1P hoặc 2P đều được)
-            model.getCurrentView().draw(gc, model.getGameplayModel());
+            return;
+        }
+
+        // --- Kiểm tra view hợp lệ trước khi vẽ ---
+        try {
+            if (model.getCurrentView() != null) {
+                model.getCurrentView().draw(gc, model.getGameplayModel());
+            } else if (model.getGameplayModel() != null) {
+                // Nếu chưa có currentView, fallback vẽ gameplay
+                new GameplayView(model).draw(gc, model.getGameplayModel());
+            } else {
+                // Fallback cuối cùng: màn hình đen an toàn
+                gc.setFill(Color.BLACK);
+                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            }
+        } catch (Exception e) {
+            System.err.println("[Render Warning] " + e.getMessage());
+            gc.setFill(Color.BLACK);
+            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         }
     }
+
 
 
 }
