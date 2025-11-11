@@ -115,9 +115,6 @@ public class GameController implements GameEventListener {
             view.render(model);
             return;
         }
-
-        System.out.println(Thread.currentThread().getName());
-        // Render tren luong JavaFX
         Platform.runLater(() -> view.render(model));
 
         State currentState = model.getGstate();
@@ -126,7 +123,6 @@ public class GameController implements GameEventListener {
             return;
         }
 
-        // Xử lý cập nhật logic dựa trên trạng thái hiện tại
         if (gameLogicUpdateTask == null || gameLogicUpdateTask.isDone()) {
             Callable<Void> logicTask = () -> {
                 System.out.println(Thread.currentThread().getName() + currentState);
@@ -141,8 +137,8 @@ public class GameController implements GameEventListener {
                         case FADE:
                             handleFade(now);
                             break;
-                        case VICTORY, LOSS: {/* giữ nguyên kết quả */}
-                        default: { /* menu hoặc setting không update logic */ }
+                        case VICTORY, LOSS: {}
+                        default: {}
                     }
                 }
                 return null;
@@ -160,24 +156,27 @@ public class GameController implements GameEventListener {
         if (g == null) return;
 
         g.update(leftPressed, rightPressed, deltaTime);
-
-        // ✅ Khi người chơi thắng (hoàn tất tất cả level)
         if (g.hasCompletedAllLevels()) {
             model.setGstate(State.VICTORY);
-            Platform.runLater(() -> model.setCurrentView(new VictoryView(model))); // Luồng JavaFX
+            Platform.runLater(() -> model.setCurrentView(new VictoryView(model)));
         }
-
-        // ✅ Khi người chơi hết mạng
         else if (g.getLives() <= 0) {
             model.setGstate(State.LOSS);
-            Platform.runLater(() -> model.setCurrentView(new LoseView(model))); // Luồng JavaFX
+            Platform.runLater(() -> model.setCurrentView(new LoseView(model)));
         }
     }
 
     // ---------------- TWO PLAYER ----------------
     private void handleTwoPlayer(long now, double deltaTime) {
-        if (!(model.getCurrentView() instanceof TwoPlayerView))
-            Platform.runLater(() -> model.setCurrentView(new TwoPlayerView(model)));
+        if (!(model.getCurrentView() instanceof TwoPlayerView)) {
+            Platform.runLater(() -> {
+                model.setCurrentView(new TwoPlayerView(model));
+                javafx.stage.Stage stage = (javafx.stage.Stage) view.getScene().getWindow();
+                stage.sizeToScene();
+                stage.centerOnScreen();
+            });
+        }
+
 
         GameplayModel left = model.getLeftGame(), right = model.getRightGame();
         if (left == null || right == null) return;
@@ -230,7 +229,7 @@ public class GameController implements GameEventListener {
             double rightFade = (now - right.getFadeStartTime()) / 1_000_000_000.0;
 
             if (leftFade >= FADE_DURATION && rightFade >= FADE_DURATION) {
-                left.stopFade(); 
+                left.stopFade();
                 right.stopFade();
                 if (!leftDone) left.Initialize();
                 if (!rightDone) right.Initialize();
@@ -366,22 +365,22 @@ public class GameController implements GameEventListener {
             break;
 
             // Player 2
-            case LEFT: 
-            if (state == State.PLAYING) {
-                leftPressed = true;
-                break;
-            } else if (state == State.TWO_PLAYING) {
-                left2Pressed = true; 
-                break;
-            }
+            case LEFT:
+                if (state == State.PLAYING) {
+                    leftPressed = true;
+                    break;
+                } else if (state == State.TWO_PLAYING) {
+                    left2Pressed = true;
+                    break;
+                }
             case RIGHT:
-            if (state == State.PLAYING) {
-                rightPressed = true;
-                break;
-            } else if (state == State.TWO_PLAYING) {
-                right2Pressed = true; 
-                break;
-            }
+                if (state == State.PLAYING) {
+                    rightPressed = true;
+                    break;
+                } else if (state == State.TWO_PLAYING) {
+                    right2Pressed = true;
+                    break;
+                }
             case ENTER: {
                 if (state == State.TWO_PLAYING && model.getRightGame() != null)
                     model.getRightGame().launchBall();
@@ -394,20 +393,20 @@ public class GameController implements GameEventListener {
         switch (e.getCode()) {
             case A: leftPressed = false; break;
             case D: rightPressed = false; break;
-            case LEFT: 
-            if (model.getGstate() == State.PLAYING) {
-                leftPressed = false;
-            } else if (model.getGstate() == State.TWO_PLAYING) {
-                left2Pressed = false;
-            }
-            break;
-            case RIGHT: 
-            if (model.getGstate() == State.PLAYING) {
-                rightPressed = false;
-            } else if (model.getGstate() == State.TWO_PLAYING) {
-                right2Pressed = false;
-            }
-            break;
+            case LEFT:
+                if (model.getGstate() == State.PLAYING) {
+                    leftPressed = false;
+                } else if (model.getGstate() == State.TWO_PLAYING) {
+                    left2Pressed = false;
+                }
+                break;
+            case RIGHT:
+                if (model.getGstate() == State.PLAYING) {
+                    rightPressed = false;
+                } else if (model.getGstate() == State.TWO_PLAYING) {
+                    right2Pressed = false;
+                }
+                break;
         }
     }
 }

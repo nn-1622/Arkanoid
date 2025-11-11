@@ -35,7 +35,7 @@ public class GameplayView extends View {
     public void draw(GraphicsContext gc, GameplayModel model) {
         Image background = model.getBackground();
         gc.drawImage(background, 0, 0, 600, 650);
-        
+
         // Vẽ các đối tượng trong game
         model.getPaddle().draw(gc);
         drawUI(gc, model);
@@ -62,9 +62,8 @@ public class GameplayView extends View {
 
         model.drawActivePowerUps(gc);
         model.drawEffects(gc);
-
-
     }
+
 
     /**
      * Vẽ các thành phần của giao diện người dùng (UI) lên màn hình.

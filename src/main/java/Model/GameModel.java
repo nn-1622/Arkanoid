@@ -20,7 +20,7 @@ import View.TwoPlayerPauseView;
 public class GameModel implements UltilityValues {
     private final EventLoader eventLoader;
     private static GameModel model;
-    private State gstate;
+    private volatile State gstate;
     private View currentView;
     private GameplayModel gameModel;
     private final Map<State, View> viewMap = new EnumMap<>(State.class);
@@ -37,7 +37,7 @@ public class GameModel implements UltilityValues {
     private long resultStartTime = -1;
     private boolean resultTimerStarted = false;
 
-    private boolean twoPlayerEnded = false;
+    private volatile boolean twoPlayerEnded = false;
 
     public boolean isTwoPlayerEnded() {
         return twoPlayerEnded;

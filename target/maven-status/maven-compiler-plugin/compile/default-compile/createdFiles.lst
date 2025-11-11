@@ -10,6 +10,7 @@ View\ChooseBallView.class
 Model\PU_Expand.class
 Model\PU_ScoreX2.class
 Controller\ExitCmd.class
+Controller\GameExecutor$Holder.class
 View\View.class
 View\TwoPlayerView.class
 View\ChoosePaddleView.class

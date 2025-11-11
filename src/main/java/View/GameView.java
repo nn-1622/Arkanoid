@@ -38,6 +38,11 @@ public class GameView {
         return scene;
     }
 
+    public javafx.scene.Scene getScene_center() {
+        return scene;
+    }
+
+
     public void ensureSizeForState(State s) {
         double targetW = (s == State.TWO_PLAYING || s == State.TWO_PLAYER_PAUSED) ? 1200 : 600;
         double targetH = 650;
@@ -51,6 +56,13 @@ public class GameView {
                 scene.getWindow().setHeight(targetH + 39); // thanh tiêu đề
             }
         }
+
+        if (scene.getWindow() != null) {
+            scene.getWindow().setWidth(targetW + 16);
+            scene.getWindow().setHeight(targetH + 39);
+            ((javafx.stage.Stage) scene.getWindow()).centerOnScreen();
+        }
+
     }
 
     /**

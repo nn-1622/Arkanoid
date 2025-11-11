@@ -58,7 +58,7 @@ public class VictoryView extends View {
             gc.setFont(Font.font("Consolas", FontWeight.BOLD, 100));
             double centerX = 300;
             double posY = 380;
-            gc.fillText("" + score, 400, 500);
+            gc.fillText("" + score, 385, 500);
         }
     }
 

@@ -29,6 +29,7 @@ public class View implements UltilityValues, SceneActions {
             if(button.isClicked(e)) {
                 System.out.println("clicked");
                 button.activate();
+                Controller.SoundManager.getInstance().onGameEvent(Controller.GameEvent.CLICK);
                 return;
             }
         }

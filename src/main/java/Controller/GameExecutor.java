@@ -4,53 +4,44 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class GameExecutor {
-    private static GameExecutor instance;
-    private ExecutorService logicExecutor; // Luồng dành cho các tác vụ logic trò chơi
-    private ExecutorService audioExecutor; // Luồng dành cho các tác vụ âm thanh
-
+public final class GameExecutor {
     private GameExecutor() {
-        logicExecutor = Executors.newSingleThreadExecutor();
-        audioExecutor = Executors.newSingleThreadExecutor();
+        logicExecutor = newSingle("game-logic", true);
+        audioExecutor = newSingle("game-audio", true);
     }
 
-    public static synchronized GameExecutor getInstance() {
-        if (instance == null) {
-            instance = new GameExecutor();
-        }
-        return instance;
+    private static ExecutorService newSingle(String name, boolean daemon) {
+        return java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, name);
+            t.setDaemon(daemon);
+            return t;
+        });
     }
 
-    public ExecutorService getLogicExecutor() {
-        return logicExecutor;
-    }
+    // Holder idiom: thread-safe, không cần synchronized
+    private static class Holder { static final GameExecutor I = new GameExecutor(); }
+    public static GameExecutor getInstance() { return Holder.I; }
 
-    public void setLogicExecutor(ExecutorService logicExecutor) {
-        this.logicExecutor = logicExecutor;
-    }
+    private final ExecutorService logicExecutor;
+    private final ExecutorService audioExecutor;
 
-    public ExecutorService getAudioExecutor() {
-        return audioExecutor;
-    }
-
-    public void setAudioExecutor(ExecutorService audioExecutor) {
-        this.audioExecutor = audioExecutor;
-    }
+    public ExecutorService getLogicExecutor() { return logicExecutor; }
+    public ExecutorService getAudioExecutor() { return audioExecutor; }
 
     public void shutdown() {
         shutdownExecutor(audioExecutor);
         shutdownExecutor(logicExecutor);
     }
-    
-    private void shutdownExecutor(ExecutorService executor) {
-        if (executor != null && !executor.isShutdown()) {
-            executor.shutdown();
+
+    private static void shutdownExecutor(ExecutorService ex) {
+        if (ex != null && !ex.isShutdown()) {
+            ex.shutdown();
             try {
-                if (!executor.awaitTermination(5, TimeUnit.SECONDS)) {
-                    executor.shutdownNow();
+                if (!ex.awaitTermination(5, java.util.concurrent.TimeUnit.SECONDS)) {
+                    ex.shutdownNow();
                 }
             } catch (InterruptedException e) {
-                executor.shutdownNow();
+                ex.shutdownNow();
                 Thread.currentThread().interrupt();
             }
         }

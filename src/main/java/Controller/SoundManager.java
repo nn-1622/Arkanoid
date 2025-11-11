@@ -29,12 +29,12 @@ public class SoundManager implements GameEventListener {
     private static AudioClip lostBall;
     private static AudioClip powerUp;
     private static AudioClip finishLevel;
+    private static AudioClip button;
     private static MediaPlayer menuBgm;
     private static MediaPlayer gameplayBgm;
     private static double masterVolume = 0.5;
     private static final double volStep = 0.2;
     private final ExecutorService audioExecutor;
-
     /**
      * Khởi tạo SoundManager.
      * Tải tất cả các tệp âm thanh cần thiết từ thư mục tài nguyên (resources)
@@ -50,6 +50,7 @@ public class SoundManager implements GameEventListener {
         finishLevel = new AudioClip(getClass().getResource("/sound/FinishALevel.wav").toExternalForm());
         powerUp = new AudioClip(getClass().getResource("/sound/PowerUp.wav").toExternalForm());
         lostBall = new AudioClip(getClass().getResource("/sound/BallLost.wav").toExternalForm());
+        button = new AudioClip(getClass().getResource("/sound/button.wav").toExternalForm());
         this.menuBgm = createLoopPlayer("/sound/MainTheme.mp3");
         this.gameplayBgm = createLoopPlayer("/sound/GameTheme.mp3");
         setMasterVolume(masterVolume);
@@ -83,6 +84,7 @@ public class SoundManager implements GameEventListener {
                 case BALL_LOST:      if (lostBall != null) lostBall.play(); break;
                 case POWER_UP:       if (powerUp != null) powerUp.play(); break;
                 case LEVEL_COMPLETE: if (finishLevel != null) finishLevel.play(); break;
+                case CLICK:          if(button != null) button.play();break;
             }
         });
     }
