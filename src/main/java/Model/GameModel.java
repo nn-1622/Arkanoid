@@ -81,7 +81,12 @@ public class GameModel implements UltilityValues {
         viewMap.put(State.SETTING, new SettingScene(this));
         viewMap.put(State.VICTORY, new VictoryView(this));
         viewMap.put(State.PLAY_MODE, new PlayModeScene(this));
-
+        viewMap.put(State.CHOOSE_PADDLE, new ChoosePaddleView(this));
+        viewMap.put(State.CHOOSE_BALL, new ChooseBallView(this));
+        viewMap.put(State.CHOOSE_BACKGROUND, new ChooseBackgroundView(this));
+        viewMap.put(State.LEADERBOARD, new LeaderBoardView(this));
+        viewMap.put(State.THEME, new ThemeView(this));
+        viewMap.put(State.HOW_TO_PLAY, new HowToPlayView(this));
         setGstate(State.MENU);
     }
 
@@ -106,25 +111,8 @@ public class GameModel implements UltilityValues {
      * Tạo và khởi tạo hai phiên chơi riêng biệt cho chế độ 2 người.
      */
     public void CreateTwoGameplay() {
-        // Tạo paddle riêng cho từng bên
-        Paddle p1 = Paddle.newInstance(
-                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
-                UltilityValues.canvasHeight - 140,
-                UltilityValues.paddleLength,
-                UltilityValues.paddleHeight
-        );
-        Paddle p2 = Paddle.newInstance(
-                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
-                UltilityValues.canvasHeight - 140,
-                UltilityValues.paddleLength,
-                UltilityValues.paddleHeight
-        );
-
-        // Mỗi GameplayModel có logic độc lập, cùng chia sẻ EventLoader
-        leftGame = new GameplayModel(eventLoader, p1, true);
-        rightGame = new GameplayModel(eventLoader, p2, true);
-
-        // Reset timer kết quả mỗi khi bắt đầu 2P
+        leftGame = new GameplayModel(eventLoader, true);
+        rightGame = new GameplayModel(eventLoader, true);
         resetResultTimer();
     }
 

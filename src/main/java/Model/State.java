@@ -22,5 +22,5 @@ public enum State {
     HOW_TO_PLAY,
     CHOOSE_PADDLE,
     CHOOSE_BALL,
-    CHOOSE_BACKGROUND
+    CHOOSE_BACKGROUND,
 }

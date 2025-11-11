@@ -19,6 +19,7 @@ View\ChooseBackgroundView.class
 Model\PU_MultiBall.class
 Controller\GameController$1.class
 Controller\GameEvent.class
+View\HowToPlayView.class
 Model\PU_BombBall.class
 Controller\ChangeBallCmd.class
 Model\TwoPlayerMatch.class
