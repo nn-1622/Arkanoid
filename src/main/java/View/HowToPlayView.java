@@ -16,7 +16,7 @@ public class HowToPlayView extends View {
         super(model);
 
         background = new Image(getClass().getResource("/HowtoplayBg.png").toExternalForm());
-        exit = new Button( 412.4, 26.4, 175, 67.3, new ChangeStateCmd(model, State.MENU));
+        exit = new Button( 412.4, 26.4, 175, 67.3, new ChangeStateCmd(model, State.SETTING));
         exit.setImgButton("/Exit.png");
         exit.setImgHoverButton("/ExitHover.png");
 

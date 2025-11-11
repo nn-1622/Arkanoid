@@ -5,6 +5,7 @@ import Model.GameModel;
 import Model.GameplayModel;
 import Model.UltilityValues;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
@@ -32,4 +33,9 @@ public class View implements UltilityValues, SceneActions {
             }
         }
     }
+
+    public void handleKeyInput(KeyEvent e) {
+    }
+    public GameModel getModel() { return model; }
+
 }

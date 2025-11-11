@@ -11,7 +11,7 @@ import Controller.GameEvent;
 import Controller.GameEventListener;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-
+import java.io.InputStream;
 
 /**
  * Quản lý trạng thái và logic của trò chơi.
@@ -538,6 +538,7 @@ public class GameplayModel implements UltilityValues {
 
         // Nếu cần hiệu ứng khi qua màn (âm thanh, sự kiện, ...), có thể gọi thêm:
         // eventLoader.loadEvent(GameEvent.LEVEL_START);
+        eventLoader.loadEvent(GameEvent.AUTO_SAVE_TRIGGER);
     }
 
 
@@ -643,6 +644,135 @@ public class GameplayModel implements UltilityValues {
             }
         }
     }
+
+
+    /**
+     * Cấu hình lại toàn bộ GameplayModel dựa trên 1 file save.
+     * @param save Đối tượng SaveState đã đọc từ file
+     */
+    public void configureFromSave(SaveState save) {
+        // 1. Tải dữ liệu Gameplay
+        this.level = save.level;
+        this.lives = save.lives;
+        this.score = save.score;
+        this.combo = save.combo;
+
+        // Tải lại map của level đó
+        renderMap(); // Hàm này sẽ tạo lại danh sách gạch (brick)
+
+        // 2. Tải dữ liệu Paddle
+        Paddle p = getPaddle();
+        p.setX(save.paddleX);
+        p.setLength(save.paddleLength);
+        p.setShield(save.paddleShield);
+
+        // 3. Tải dữ liệu Balls
+        balls.clear(); // Xóa bóng cũ
+        for (SaveState.BallData ballData : save.balls) {
+            Ball b = new Ball(ballData.x, ballData.y, ballData.vx, ballData.vy, 10, "/DefaultBall.png");
+            b.setBomb(ballData.isBomb);
+            balls.add(b);
+        }
+        // Nếu bóng đã được phóng, set state
+        if (!balls.isEmpty() && balls.get(0).getVy() != 0) {
+            currentBallState = BallState.LAUNCHED;
+        } else {
+            currentBallState = BallState.ATTACHED;
+        }
+
+        // 4. Tải dữ liệu Bricks (Phần phức tạp nhất)
+        // Chúng ta so sánh danh sách gạch mới render (this.brick)
+        // với danh sách gạch đã lưu (save.bricks)
+        ArrayList<Brick> loadedBricks = new ArrayList<>();
+
+        for (Brick templateBrick : this.brick) {
+            boolean foundInSave = false;
+            for (SaveState.BrickData savedBrick : save.bricks) {
+                // So sánh bằng tọa độ
+                if (templateBrick.getX() == savedBrick.x && templateBrick.getY() == savedBrick.y) {
+
+                    templateBrick.setBrickType(savedBrick.brickType);
+                    templateBrick.frameTimer = savedBrick.frameTimer;
+                    if (savedBrick.isBreaking) {
+                        templateBrick.hit(); // Kích hoạt lại trạng thái vỡ
+                    }
+
+                    if (templateBrick.getBrickType() > 0) {
+                        loadedBricks.add(templateBrick);
+                    }
+                    // Nếu brickType <= 0 (đã bị phá),
+                    // chúng ta không add nó vào loadedBricks
+
+                    foundInSave = true;
+                    break;
+                }
+            }
+            // Nếu gạch từ map không có trong file save
+            // (ví dụ: phiên bản cũ), cứ thêm vào
+            if (!foundInSave && templateBrick.getBrickType() > 0) {
+                loadedBricks.add(templateBrick);
+            }
+        }
+        this.brick = loadedBricks; // Thay thế danh sách gạch
+
+        activePowerUps.clear();
+        fallingPowerUps.clear();
+        lasers.clear();
+
+        // 5a. Tải các Power-up đang RƠI
+        if (save.fallingPowerUps != null) { // Kiểm tra null phòng file save cũ
+            for (SaveState.FallingPowerUpData puData : save.fallingPowerUps) {
+                MovableObject puObj = createPowerUpByName(puData.name, puData.x, puData.y, puData.vx, puData.vy);
+                if (puObj != null) {
+                    fallingPowerUps.add(puObj);
+                }
+            }
+        }
+        // 5b. Tải các Power-up đang KÍCH HOẠT
+        if (save.activePowerUps != null) {
+            for (SaveState.ActivePowerUpData puData : save.activePowerUps) {
+                // Tọa độ (0,0) không quan trọng vì nó không rơi
+                MovableObject puObj = createPowerUpByName(puData.name, 0, 0, 0, 0);
+                if (puObj instanceof PowerUp) {
+                    PowerUp pu = (PowerUp) puObj;
+
+                    pu.apply(this); // Kích hoạt lại hiệu ứng (ví dụ: setShield(true))
+                    pu.setElapsedMs(puData.elapsedMs); // Rất quan trọng: đặt lại thời gian
+
+                    activePowerUps.add(pu); // Thêm vào danh sách kích hoạt
+                }
+            }
+        }
+
+    }
+
+    /**
+     * Tái tạo một đối tượng Power-up từ tên và vị trí
+     * Dùng để tải game
+     */
+    private MovableObject createPowerUpByName(String name, double x, double y, double vx, double vy) {
+        double radius = 15; // Bán kính tiêu chuẩn của Power-up
+        switch (name) {
+            case "Expand":
+                return new PU_Expand(x, y, vx, vy, radius);
+            case "Multi Ball":
+                return new PU_MultiBall(x, y, vx, vy, radius);
+            case "Laser":
+                return new PU_Laser(x, y, vx, vy, radius);
+            case "Extra Live":
+                return new PU_ExtraLive(x, y, vx, vy, radius);
+            case "Shield":
+                return new PU_Shield(x, y, vx, vy, radius);
+            case "BombBall":
+                return new PU_BombBall(x, y, vx, vy, radius);
+            case "Score x2":
+                return new PU_ScoreX2(x, y, vx, vy, radius);
+            default:
+                System.err.println("CẢNH BÁO: Không nhận diện được tên Power-up khi tải: " + name);
+                return null;
+        }
+    }
+
 
     public void decreaseLives() {
         lives--;

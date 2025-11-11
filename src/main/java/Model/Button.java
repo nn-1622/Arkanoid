@@ -100,4 +100,13 @@ public class Button extends Utility {
     public void activate() {
         command.execute();
     }
+
+    /**
+     * Lấy GameCommand mà nút này đang giữ.
+     * @return Lệnh (command) của nút.
+     */
+    public GameCommand getCommand() {
+        return this.command;
+    }
+
 }

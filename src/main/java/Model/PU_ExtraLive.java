@@ -68,4 +68,8 @@ public class PU_ExtraLive extends MovableObject implements PowerUp{
     public int getElapsedMs() {
         return 0;
     }
+
+    @Override
+    public void setElapsedMs(int ms) {
+    }
 }

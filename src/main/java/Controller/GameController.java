@@ -4,6 +4,13 @@ import Model.GameModel;
 import Model.GameplayModel;
 import Model.State;
 import View.GameView;
+import View.GameplayView;
+import View.LoseView;
+import View.MenuScene;
+import View.PauseView;
+import View.TwoPlayerView;
+import View.View;
+import View.VictoryView;
 import javafx.scene.input.KeyCode;
 
 /**
@@ -31,12 +38,19 @@ public class GameController implements GameEventListener {
     @Override
     public void onGameEvent(GameEvent event) {
         switch (event) {
-            case GAME_WIN -> model.setGstate(State.VICTORY);
-            case GAME_LOST -> model.setGstate(State.LOSS);
+            case GAME_WIN -> {
+                model.recordFinalScore();
+                model.setGstate(State.VICTORY);
+            }
+            case GAME_LOST -> {
+                model.recordFinalScore();
+                model.setGstate(State.LOSS);
+            }
             case LEVEL_COMPLETE -> {
                 model.setFadeStartTime(System.nanoTime());
                 model.setGstate(State.FADE);
             }
+            case AUTO_SAVE_TRIGGER -> model.autoSave();
         }
     }
 
@@ -44,6 +58,16 @@ public class GameController implements GameEventListener {
         if (lastUpdateTime == 0) lastUpdateTime = now;
         double deltaTime = (now - lastUpdateTime) / 1_000_000_000.0;
         lastUpdateTime = now;
+
+        if (model.getGstate() == State.PAUSED) {
+            view.render(model);
+            return;
+        }
+        view.render(model);
+        State currentState = model.getGstate();
+        if (currentState == State.PAUSED || currentState == State.READY_TO_PLAY) {
+            return;
+        }
 
         switch (model.getGstate()) {
             case PLAYING -> handleSinglePlayer(deltaTime);
@@ -58,8 +82,8 @@ public class GameController implements GameEventListener {
 
     // ---------------- SINGLE PLAYER ----------------
     private void handleSinglePlayer(double deltaTime) {
-        if (!(model.getCurrentView() instanceof View.GameplayView))
-            model.setCurrentView(new View.GameplayView(model));
+        if (!(model.getCurrentView() instanceof GameplayView))
+            model.setCurrentView(new GameplayView(model));
 
         GameplayModel g = model.getGameplayModel();
         if (g == null) return;
@@ -69,20 +93,20 @@ public class GameController implements GameEventListener {
         // ✅ Khi người chơi thắng (hoàn tất tất cả level)
         if (g.hasCompletedAllLevels()) {
             model.setGstate(State.VICTORY);
-            model.setCurrentView(new View.VictoryView(model));
+            model.setCurrentView(new VictoryView(model));
         }
 
         // ✅ Khi người chơi hết mạng
         else if (g.getLives() <= 0) {
             model.setGstate(State.LOSS);
-            model.setCurrentView(new View.LoseView(model));
+            model.setCurrentView(new LoseView(model));
         }
     }
 
     // ---------------- TWO PLAYER ----------------
     private void handleTwoPlayer(long now, double deltaTime) {
-        if (!(model.getCurrentView() instanceof View.TwoPlayerView))
-            model.setCurrentView(new View.TwoPlayerView(model));
+        if (!(model.getCurrentView() instanceof TwoPlayerView))
+            model.setCurrentView(new TwoPlayerView(model));
 
         GameplayModel left = model.getLeftGame(), right = model.getRightGame();
         if (left == null || right == null) return;
@@ -114,7 +138,7 @@ public class GameController implements GameEventListener {
             right.setWaitingForOtherPlayer(false);
 
             model.setTwoPlayerEnded(true);
-            model.setCurrentView(new View.TwoPlayerView(model));
+            model.setCurrentView(new TwoPlayerView(model));
             return;
         }
 
@@ -167,44 +191,108 @@ public class GameController implements GameEventListener {
             model.getCurrentView().handleClick(e);
     }
 
+    // Tệp: Controller/GameController.java
+
     private void handleKeyPressed(javafx.scene.input.KeyEvent e) {
         State state = model.getGstate();
 
+        // Xử lý input DỰA TRÊN TRẠNG THÁI (STATE)
+        switch (state) {
+            case READY_TO_PLAY:
+                // Nếu đang ở màn hình "Ready" (vừa load game)
+                if (e.getCode() == KeyCode.A || e.getCode() == KeyCode.D) {
+                    // Nhấn A hoặc D sẽ bắt đầu game
+                    model.setGstate(State.PLAYING);
+                    // Không 'return', để cho phím A/D chạy xuống logic di chuyển bên dưới
+                } else {
+                    return; // Các phím khác thì bỏ qua
+                }
+                break; // Thoát khỏi switch(state)
+
+            case PLAYING:
+            case TWO_PLAYING:
+                // Nếu đang chơi (1P hoặc 2P)
+                if (e.getCode() == KeyCode.ESCAPE) {
+                    // Nhấn ESC sẽ Pause game
+                    model.setGstate(State.PAUSED);
+                    return; // Đã xử lý xong, thoát
+                }
+                break; // Thoát khỏi switch(state), chạy logic di chuyển bên dưới
+
+            case PAUSED:
+                // Nếu đang Pause
+                if (e.getCode() == KeyCode.ESCAPE) {
+                    View pauseView = model.getView(State.PAUSED);
+                    if (pauseView instanceof PauseView) {
+                        // Gọi hàm reset của PauseView
+                        ((PauseView) pauseView).resetSaveMessage();
+                    }
+                    // Nhấn ESC lần nữa sẽ Resume
+                    new ResumeGameCmd(model).execute(); // Lệnh này sẽ set state về PLAYING
+                    return; // Đã xử lý xong
+                }
+                // Đã return; không cho phép di chuyển khi đang pause
+                return;
+
+            case SETTING_ACCOUNT:
+                // Nếu đang ở màn hình nhập tên
+                // Chuyển sự kiện phím cho AccountView xử lý (fix từ lần trước)
+                if (model.getCurrentView() != null) {
+                    model.getCurrentView().handleKeyInput(e);
+                }
+                return; // Đã xử lý xong, không chạy logic di chuyển
+
+            // Các state khác (MENU, VICTORY,...) không cần xử lý phím bấm ở đây
+            default:
+                break;
+        }
+
+        // --- LOGIC DI CHUYỂN & HÀNH ĐỘNG (CHỈ CHẠY KHI ĐANG CHƠI) ---
+
         // Xử lý 2 người chơi khi game kết thúc
+        // (State vẫn là TWO_PLAYING, nhưng cờ isTwoPlayerEnded = true)
         if (model.isTwoPlayerEnded()) {
             if (e.getCode() == KeyCode.ENTER) {
                 model.CreateTwoGameplay();
                 model.setTwoPlayerEnded(false);
                 model.setGstate(State.TWO_PLAYING);
-                model.setCurrentView(new View.TwoPlayerView(model));
+                model.setCurrentView(new TwoPlayerView(model));
                 return;
             } else if (e.getCode() == KeyCode.ESCAPE) {
                 model.setTwoPlayerEnded(false);
                 model.setGstate(State.MENU);
-                model.setCurrentView(new View.MenuScene(model));
+                model.setCurrentView(new MenuScene(model));
                 return;
             }
         }
 
         // Input di chuyển và phóng bóng
+        // (Logic này giờ chỉ chạy khi state là PLAYING, TWO_PLAYING, hoặc READY_TO_PLAY)
         switch (e.getCode()) {
             // Player 1
-            case A -> leftPressed = true;
-            case D -> rightPressed = true;
-            case SPACE -> {
+            case A: leftPressed = true; break;
+            case D: rightPressed = true; break;
+            case SPACE: {
                 if (state == State.TWO_PLAYING && model.getLeftGame() != null)
                     model.getLeftGame().launchBall();
                 else if (state == State.PLAYING && model.getGameplayModel() != null)
                     model.getGameplayModel().launchBall();
+                else if (state == State.READY_TO_PLAY && model.getGameplayModel() != null) {
+                    // Bonus: Cho phép nhấn SPACE để bắt đầu ở màn hình Ready
+                    model.setGstate(State.PLAYING);
+                    model.getGameplayModel().launchBall();
+                }
             }
+            break;
 
             // Player 2
-            case LEFT -> left2Pressed = true;
-            case RIGHT -> right2Pressed = true;
-            case ENTER -> {
+            case LEFT: left2Pressed = true; break;
+            case RIGHT: right2Pressed = true; break;
+            case ENTER: {
                 if (state == State.TWO_PLAYING && model.getRightGame() != null)
                     model.getRightGame().launchBall();
             }
+            break;
         }
     }
 

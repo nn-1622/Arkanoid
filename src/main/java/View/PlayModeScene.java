@@ -16,13 +16,17 @@ public class PlayModeScene extends View implements SceneActions {
     private Image background;
     Button One_Player;
     Button Two_Player;
+    private Button exitButton;
 
     public PlayModeScene(GameModel model) {
         super(model);
+        exitButton = new Button( 200.1, 523.8, 199.8, 41.9, new ChangeStateCmd(model, State.MENU));
+        exitButton.setImgButton("/Exit.png");
+        exitButton.setImgHoverButton("/ExitHover.png");
 
         background = new javafx.scene.image.Image(Objects.requireNonNull(getClass().getResource("/bg2.png")).toExternalForm());
 
-        One_Player = new Button(149.2, 169.8, 301.6, 75.4, new ChangeStateCmd(model, State.PLAYING));
+        One_Player = new Button(149.2, 169.8, 301.6, 75.4, new ChangeStateCmd(model, State.LOAD_GAME));
         One_Player.setImgButton("/1Player.png");
         One_Player.setImgHoverButton("/1PlayerHover.png");
 
@@ -32,6 +36,7 @@ public class PlayModeScene extends View implements SceneActions {
 
         buttons.add(One_Player);
         buttons.add(Two_Player);
+        buttons.add(exitButton);
     }
 
     @Override
@@ -39,6 +44,7 @@ public class PlayModeScene extends View implements SceneActions {
         render.drawImage(background, 0, 0, 600, 650);
         One_Player.draw(render);
         Two_Player.draw(render);
+        exitButton.draw(render);
     }
 
     /**
