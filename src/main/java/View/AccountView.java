@@ -20,6 +20,11 @@ public class AccountView extends View {
     private boolean isTyping = false;
     private boolean showCursor = false;
     private String saveMessage = "";
+    private boolean isFirstTyping = false;
+
+    public void setPlayerName(String playerName) {
+        this.playerName = playerName;
+    }
 
     public AccountView(GameModel model) {
         super(model);
@@ -43,15 +48,12 @@ public class AccountView extends View {
 
         buttons.add(saveButton);
         buttons.add(exitButton);
+
+        this.playerName = "";
     }
 
     public String getPlayerName() {
         return playerName;
-    }
-
-    // Phương thức để SavePlayerCmd báo đã lưu
-    public void showSaveConfirmation() {
-        saveMessage = "Đã lưu!";
     }
 
     @Override
@@ -62,7 +64,6 @@ public class AccountView extends View {
         if (e.getX() >= boxX && e.getX() <= boxX + boxW &&
                 e.getY() >= boxY && e.getY() <= boxY + boxH) {
             isTyping = true;
-            saveMessage = "";
         } else {
             isTyping = false;
         }
@@ -74,8 +75,6 @@ public class AccountView extends View {
     @Override
     public void handleKeyInput(KeyEvent e) {
         if (!isTyping) return;
-
-        saveMessage = "";
 
         if (e.getCode() == KeyCode.BACK_SPACE) {
             if (!playerName.isEmpty()) {
@@ -133,12 +132,6 @@ public class AccountView extends View {
                 render.setLineWidth(2);
                 render.strokeLine(cursorX, 290, cursorX, 325);
             }
-        }
-
-        if (!saveMessage.isEmpty()) {
-            render.setFill(Color.GREEN);
-            render.setFont(Font.font("Arial", 20));
-            render.fillText(saveMessage, 110, 360);
         }
 
         saveButton.draw(render);

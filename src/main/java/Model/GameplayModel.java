@@ -8,10 +8,8 @@ import java.util.*;
 
 import Controller.EventLoader;
 import Controller.GameEvent;
-import Controller.GameEventListener;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
-import java.io.InputStream;
 
 /**
  * Quản lý trạng thái và logic của trò chơi.
@@ -22,7 +20,6 @@ import java.io.InputStream;
 public class GameplayModel implements UltilityValues {
     private Image background;
     private Paddle paddle;
-    private Paddle paddle2;
     private BallState currentBallState;
     private double currentVx;
     private String ballPath = "DefaultBall.png";

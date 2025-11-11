@@ -80,9 +80,9 @@ public class SavePlayerCmd implements GameCommand {
                 model.CreateGameplay();
                 model.setGstate(State.PLAYING);
             } else {
-                view.showSaveConfirmation();
                 model.setGstate(previousState);
             }
         }
+        view.setPlayerName("");
     }
 }
