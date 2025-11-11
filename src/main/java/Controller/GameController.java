@@ -294,8 +294,22 @@ public class GameController implements GameEventListener {
             break;
 
             // Player 2
-            case LEFT: left2Pressed = true; break;
-            case RIGHT: right2Pressed = true; break;
+            case LEFT: 
+            if (state == State.PLAYING) {
+                leftPressed = true;
+                break;
+            } else if (state == State.TWO_PLAYING) {
+                left2Pressed = true; 
+                break;
+            }
+            case RIGHT:
+            if (state == State.PLAYING) {
+                rightPressed = true;
+                break;
+            } else if (state == State.TWO_PLAYING) {
+                right2Pressed = true; 
+                break;
+            }
             case ENTER: {
                 if (state == State.TWO_PLAYING && model.getRightGame() != null)
                     model.getRightGame().launchBall();
@@ -306,10 +320,22 @@ public class GameController implements GameEventListener {
 
     private void handleKeyReleased(javafx.scene.input.KeyEvent e) {
         switch (e.getCode()) {
-            case A -> leftPressed = false;
-            case D -> rightPressed = false;
-            case LEFT -> left2Pressed = false;
-            case RIGHT -> right2Pressed = false;
+            case A: leftPressed = false; break;
+            case D: rightPressed = false; break;
+            case LEFT: 
+            if (model.getGstate() == State.PLAYING) {
+                leftPressed = false;
+            } else if (model.getGstate() == State.TWO_PLAYING) {
+                left2Pressed = false;
+            }
+            break;
+            case RIGHT: 
+            if (model.getGstate() == State.PLAYING) {
+                rightPressed = false;
+            } else if (model.getGstate() == State.TWO_PLAYING) {
+                right2Pressed = false;
+            }
+            break;
         }
     }
 }
