@@ -4,37 +4,22 @@ import Model.GameModel;
 import Model.GameplayModel;
 import Model.State;
 import View.GameView;
-import javafx.scene.input.MouseEvent;
-
+import javafx.scene.input.KeyCode;
 
 /**
- * Lớp điều khiển chính của trò chơi.
- * Lớp này chịu trách nhiệm xử lý các đầu vào từ người dùng (bàn phím, chuột),
- * cập nhật trạng thái của trò chơi (Model) và yêu cầu View vẽ lại giao diện.
- * Nó cũng hoạt động như một GameEventListener để xử lý các sự kiện từ GameplayModel.
+ * Bộ điều khiển chính cho game Arkanoid (1P & 2P).
+ * Xử lý input, điều phối state, cập nhật logic và View.
  */
 public class GameController implements GameEventListener {
-    private GameModel model;
-    private GameView view;
-    private MouseEvent e;
-    private boolean leftpressed;
-    private boolean rightpressed;
+    private final GameModel model;
+    private final GameView view;
     private long lastUpdateTime = 0;
-    // Bổ sung cho chế độ 2 người chơi
-    private boolean left2pressed;
-    private boolean right2pressed;
 
-    private static final double FADE_DURATION = 2.0;
+    private boolean leftPressed, rightPressed;     // Player 1
+    private boolean left2Pressed, right2Pressed;   // Player 2
 
-    private double leftFadeStart = -1;
-    private double rightFadeStart = -1;
+    private static final double FADE_DURATION = 1.1;
 
-
-    /**
-     * Khởi tạo một GameController mới với GameModel và GameView được cung cấp.
-     * @param gm Model của trò chơi, chứa dữ liệu và trạng thái game.
-     * @param gv View của trò chơi, chịu trách nhiệm hiển thị.
-     */
     public GameController(GameModel gm, GameView gv, SoundManager soundManager) {
         this.model = gm;
         this.view = gv;
@@ -44,145 +29,191 @@ public class GameController implements GameEventListener {
     }
 
     @Override
-    public void onGameEvent (GameEvent event) {
+    public void onGameEvent(GameEvent event) {
         switch (event) {
-            case GAME_WIN:
-                model.setGstate(State.VICTORY);
-                break;
-            case GAME_LOST:
-                model.setGstate(State.LOSS);
-                break;
-            case LEVEL_COMPLETE:
+            case GAME_WIN -> model.setGstate(State.VICTORY);
+            case GAME_LOST -> model.setGstate(State.LOSS);
+            case LEVEL_COMPLETE -> {
                 model.setFadeStartTime(System.nanoTime());
                 model.setGstate(State.FADE);
-                break;
+            }
         }
     }
 
-    /**
-     * Phương thức cập nhật chính của trò chơi, được gọi liên tục bởi AnimationTimer.
-     * Phương thức này tính toán delta time, yêu cầu view vẽ lại trạng thái hiện tại của model,
-     * và cập nhật logic của game dựa trên trạng thái (PLAYING, FADE, v.v.).
-     * @param now Thời gian hệ thống hiện tại tính bằng nano giây.
-     */
     public void update(long now) {
-        if (lastUpdateTime == 0) {
-            lastUpdateTime = now;
-        }
-
-        long elapsed = now - lastUpdateTime;
-        double deltaTime = elapsed / 1_000_000_000.0;
+        if (lastUpdateTime == 0) lastUpdateTime = now;
+        double deltaTime = (now - lastUpdateTime) / 1_000_000_000.0;
         lastUpdateTime = now;
 
+        switch (model.getGstate()) {
+            case PLAYING -> handleSinglePlayer(deltaTime);
+            case TWO_PLAYING -> handleTwoPlayer(now, deltaTime);
+            case FADE -> handleFade(now);
+            case VICTORY, LOSS -> { /* giữ nguyên kết quả */ }
+            default -> { /* menu hoặc setting không update logic */ }
+        }
+
         view.render(model);
-        if (model.getGstate() == State.PLAYING) {
-            this.model.getGameplayModel().update(leftpressed, rightpressed, deltaTime);
+    }
 
-        }  else if (model.getGstate() == State.TWO_PLAYING) {
-        GameplayModel leftGame = model.getLeftGame();
-        GameplayModel rightGame = model.getRightGame();
+    // ---------------- SINGLE PLAYER ----------------
+    private void handleSinglePlayer(double deltaTime) {
+        if (!(model.getCurrentView() instanceof View.GameplayView))
+            model.setCurrentView(new View.GameplayView(model));
 
-        if (leftGame != null) {
-            leftGame.update(leftpressed, rightpressed, deltaTime);
+        GameplayModel g = model.getGameplayModel();
+        if (g == null) return;
+
+        g.update(leftPressed, rightPressed, deltaTime);
+
+        // ✅ Khi người chơi thắng (hoàn tất tất cả level)
+        if (g.hasCompletedAllLevels()) {
+            model.setGstate(State.VICTORY);
+            model.setCurrentView(new View.VictoryView(model));
         }
-        if (rightGame != null) {
-            rightGame.update(left2pressed, right2pressed, deltaTime);
+
+        // ✅ Khi người chơi hết mạng
+        else if (g.getLives() <= 0) {
+            model.setGstate(State.LOSS);
+            model.setCurrentView(new View.LoseView(model));
         }
-        if (leftGame != null) {
-            if (leftGame.isLevelFinished() && !leftGame.isFading()) {
-                leftGame.startFade(now);
-            }
-            if (leftGame.isFading()) {
-                double Elapsed = (now - leftGame.getFadeStartTime()) / 1_000_000_000.0;
-                if (Elapsed >= FADE_DURATION) {
-                    leftGame.Initialize();
-                    leftGame.setLevelFinished(false);
-                    leftGame.stopFade();
-                }
-            }
-        }
-        if (rightGame != null) {
-            if (rightGame.isLevelFinished() && !rightGame.isFading()) {
-                rightGame.startFade(now);
+    }
+
+    // ---------------- TWO PLAYER ----------------
+    private void handleTwoPlayer(long now, double deltaTime) {
+        if (!(model.getCurrentView() instanceof View.TwoPlayerView))
+            model.setCurrentView(new View.TwoPlayerView(model));
+
+        GameplayModel left = model.getLeftGame(), right = model.getRightGame();
+        if (left == null || right == null) return;
+
+        boolean leftDead = left.getLives() <= 0;
+        boolean rightDead = right.getLives() <= 0;
+        boolean leftDone = left.hasCompletedAllLevels();
+        boolean rightDone = right.hasCompletedAllLevels();
+
+        boolean leftFinish = left.isLevelFinished() || leftDone;
+        boolean rightFinish = right.isLevelFinished() || rightDone;
+
+        boolean bothDead = leftDead && rightDead;
+        boolean bothDone = leftDone && rightDone;
+        boolean oneFinishOtherDead = (leftFinish && rightDead) || (rightFinish && leftDead);
+
+        if (bothDead || bothDone || oneFinishOtherDead) {
+            int leftScore = left.getScore(), rightScore = right.getScore();
+
+            if (leftScore > rightScore) {
+                left.setWinner(true); right.setLoser(true);
+            } else if (rightScore > leftScore) {
+                right.setWinner(true); left.setLoser(true);
+            } else {
+                left.setDraw(true); right.setDraw(true);
             }
 
-            if (rightGame.isFading()) {
-                double Elapsed = (now - rightGame.getFadeStartTime()) / 1_000_000_000.0;
-                if (Elapsed >= FADE_DURATION) {
-                    rightGame.Initialize();
-                    rightGame.setLevelFinished(false);
-                    rightGame.stopFade();
-                }
-            }
-        }
-        if (leftGame != null && rightGame != null
-                && leftGame.hasCompletedAllLevels()
-                && rightGame.hasCompletedAllLevels()) {
-                    model.setGstate(State.VICTORY);
-                }
-    } else if (model.getGstate() == State.FADE) {
-            double timeElapsed = (now - model.getFadeStartTime()) / 1_000_000_000.0;
-            final double FADE_DURATION = 2.0;
+            left.setWaitingForOtherPlayer(false);
+            right.setWaitingForOtherPlayer(false);
 
-            if (timeElapsed >= FADE_DURATION) {
-                if (model.getGameplayModel() != null) {
-                    model.getGameplayModel().Initialize();
-                    model.setGstate(State.PLAYING);
-                }
+            model.setTwoPlayerEnded(true);
+            model.setCurrentView(new View.TwoPlayerView(model));
+            return;
+        }
+
+        left.setWaitingForOtherPlayer((leftFinish || leftDead) && !(rightFinish || rightDead));
+        right.setWaitingForOtherPlayer((rightFinish || rightDead) && !(leftFinish || leftDead));
+
+        if (!leftDead && !leftDone && !left.isWaitingForOtherPlayer())
+            left.update(leftPressed, rightPressed, deltaTime);
+
+        if (!rightDead && !rightDone && !right.isWaitingForOtherPlayer())
+            right.update(left2Pressed, right2Pressed, deltaTime);
+
+        if (leftFinish && rightFinish) {
+            if (!left.isFading()) left.startFade(now);
+            if (!right.isFading()) right.startFade(now);
+
+            double leftFade = (now - left.getFadeStartTime()) / 1_000_000_000.0;
+            double rightFade = (now - right.getFadeStartTime()) / 1_000_000_000.0;
+
+            if (leftFade >= FADE_DURATION && rightFade >= FADE_DURATION) {
+                left.stopFade(); right.stopFade();
+                if (!leftDone) left.Initialize();
+                if (!rightDone) right.Initialize();
+                lastUpdateTime = now;
             }
         }
     }
 
-    /**
-     * Thiết lập các trình xử lý sự kiện cho đầu vào từ chuột và bàn phím.
-     * Các sự kiện này điều khiển các hành động khác nhau tùy thuộc vào trạng thái hiện tại của trò chơi
-     * (ví dụ: điều hướng menu, di chuyển thanh trượt, phóng bóng).
-     */
+    // ---------------- FADE ----------------
+    private void handleFade(long now) {
+        double elapsed = (now - model.getFadeStartTime()) / 1_000_000_000.0;
+        if (elapsed >= FADE_DURATION && model.getGameplayModel() != null) {
+            model.getGameplayModel().Initialize();
+            model.setGstate(State.PLAYING);
+        }
+    }
+
+    // ---------------- INPUT ----------------
     public void setInput() {
-        // Xử lý sự kiện di chuyển chuột để tạo hiệu ứng hover cho các nút
         view.getScene().setOnMouseMoved(e -> {
-            if (model.getCurrentView() != null) {
-                model.getCurrentView().checkHover(e);
-            }
+            if (model.getCurrentView() != null) model.getCurrentView().checkHover(e);
         });
+        view.getScene().setOnMouseClicked(this::handleMouseClick);
+        view.getScene().setOnKeyPressed(this::handleKeyPressed);
+        view.getScene().setOnKeyReleased(this::handleKeyReleased);
+    }
 
-        // Xử lý sự kiện nhấp chuột để tương tác với các nút trong các màn hình khác nhau
-        view.getScene().setOnMouseClicked(e -> {
-            if (model.getCurrentView() != null) {
-                model.getCurrentView().handleClick(e);
-            }
-        });
+    private void handleMouseClick(javafx.scene.input.MouseEvent e) {
+        if (model.getCurrentView() != null)
+            model.getCurrentView().handleClick(e);
+    }
 
-        // Xử lý sự kiện nhấn phím
-        view.getScene().setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case A -> leftpressed = true; // Di chuyển sang trái
-                case D -> rightpressed = true; // Di chuyển sang phải
-                case LEFT -> left2pressed = true;   // Player 2 sang trái
-                case RIGHT -> right2pressed = true; // Player 2 sang phải
-                case SPACE -> {
-                    if (model.getGstate() == State.TWO_PLAYING) {
-                        if (model.getLeftGame() != null)
-                            model.getLeftGame().launchBall(); // P1 bắn bóng
-                    } else {
-                        model.getGameplayModel().launchBall();
-                    }
-                }
-                case ENTER -> {
-                    if (model.getGstate() == State.TWO_PLAYING && model.getRightGame() != null)
-                        model.getRightGame().launchBall(); // P2 bắn bóng
-                }
-            }
-        });
+    private void handleKeyPressed(javafx.scene.input.KeyEvent e) {
+        State state = model.getGstate();
 
-        // Xử lý sự kiện nhả phím
-        view.getScene().setOnKeyReleased(e -> {
-            switch (e.getCode()) {
-                case A -> leftpressed = false; // Dừng di chuyển sang trái
-                case D -> rightpressed = false; // Dừng di chuyển sang phải
-                case LEFT -> left2pressed = false;
-                case RIGHT -> right2pressed = false;
+        // Xử lý 2 người chơi khi game kết thúc
+        if (model.isTwoPlayerEnded()) {
+            if (e.getCode() == KeyCode.ENTER) {
+                model.CreateTwoGameplay();
+                model.setTwoPlayerEnded(false);
+                model.setGstate(State.TWO_PLAYING);
+                model.setCurrentView(new View.TwoPlayerView(model));
+                return;
+            } else if (e.getCode() == KeyCode.ESCAPE) {
+                model.setTwoPlayerEnded(false);
+                model.setGstate(State.MENU);
+                model.setCurrentView(new View.MenuScene(model));
+                return;
             }
-        });
+        }
+
+        // Input di chuyển và phóng bóng
+        switch (e.getCode()) {
+            // Player 1
+            case A -> leftPressed = true;
+            case D -> rightPressed = true;
+            case SPACE -> {
+                if (state == State.TWO_PLAYING && model.getLeftGame() != null)
+                    model.getLeftGame().launchBall();
+                else if (state == State.PLAYING && model.getGameplayModel() != null)
+                    model.getGameplayModel().launchBall();
+            }
+
+            // Player 2
+            case LEFT -> left2Pressed = true;
+            case RIGHT -> right2Pressed = true;
+            case ENTER -> {
+                if (state == State.TWO_PLAYING && model.getRightGame() != null)
+                    model.getRightGame().launchBall();
+            }
+        }
+    }
+
+    private void handleKeyReleased(javafx.scene.input.KeyEvent e) {
+        switch (e.getCode()) {
+            case A -> leftPressed = false;
+            case D -> rightPressed = false;
+            case LEFT -> left2Pressed = false;
+            case RIGHT -> right2Pressed = false;
+        }
     }
 }

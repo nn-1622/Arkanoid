@@ -41,7 +41,40 @@ public class GameplayModel implements UltilityValues {
     private boolean levelFinished = false;
     private boolean fading = false;
     private long fadeStartTime;
+    private boolean waitingForOtherPlayer = false;
+    private boolean isWinner = false;
+    private boolean isLoser = false;
+    private boolean isDraw = false;
+    private boolean twoPlayerEnded = false;
 
+    public boolean isTwoPlayerEnded() { return twoPlayerEnded; }
+    public void setTwoPlayerEnded(boolean value) { this.twoPlayerEnded = value; }
+
+
+    public boolean isWaitingForOtherPlayer() {
+        return waitingForOtherPlayer;
+    }
+    public void setWaitingForOtherPlayer(boolean waiting) {
+        this.waitingForOtherPlayer = waiting;
+    }
+
+    public boolean isWinner() { return isWinner; }
+    public void setWinner(boolean winner) {
+        this.isWinner = winner;
+        if (winner) { this.isLoser = false; this.isDraw = false; }
+    }
+
+    public boolean isLoser() { return isLoser; }
+    public void setLoser(boolean loser) {
+        this.isLoser = loser;
+        if (loser) { this.isWinner = false; this.isDraw = false; }
+    }
+
+    public boolean isDraw() { return isDraw; }
+    public void setDraw(boolean draw) {
+        this.isDraw = draw;
+        if (draw) { this.isWinner = false; this.isLoser = false; }
+    }
     public boolean hasCompletedAllLevels() {
         return completedAllLevels;
     }
@@ -375,18 +408,66 @@ public class GameplayModel implements UltilityValues {
      * Khởi tạo cấp độ tiếp theo của trò chơi. Phương thức này tăng biến đếm cấp độ,
      * kết xuất bản đồ mới, đặt lại vị trí các đối tượng, và đặt lại số mạng và combo.
      */
+    /**
+     * Khởi tạo lại trạng thái khi qua màn mới.
+     * Reset các chỉ số tạm thời nhưng giữ nguyên điểm, mạng và tiến trình.
+     */
     public void Initialize() {
+        // Nếu đã hoàn tất tất cả level, đánh dấu game đã hoàn thành
+        if (level >= 5) {
+            completedAllLevels = true;
+            return;
+        }
+
+        // Tăng level (chỉ nếu chưa hết)
         level++;
-        if (level <= 5) {
-            renderMap();
-            resetPosition();
-            resetPowerUp();
-            currentVx++;
-            lives = 5;
-            setCombo(0);
-        } else {
-        completedAllLevels = true;}
+
+        // Tải lại bản đồ gạch mới cho level hiện tại
+        renderMap();
+
+        // Đặt lại paddle về giữa và kích thước mặc định
+        paddle.setX(canvasWidth / 2.0 - paddleLength / 2.0);
+        paddle.setY(canvasHeight - 140);
+        paddle.setLength(paddleLength);
+
+        // Đặt lại bóng (xóa toàn bộ và tạo lại)
+        balls.clear();
+        Ball newBall = new Ball(
+                paddle.getX() + paddle.getLength() / 2,
+                paddle.getY() - paddle.getHeight() / 2,
+                0, 0, 10
+        );
+        balls.add(newBall);
+        currentBallState = BallState.ATTACHED;
+
+        // Reset các danh sách tạm
+        fallingPowerUps.clear();
+        activePowerUps.clear();
+        lasers.clear();
+
+        // Reset chỉ số phụ
+        combo = 0;
+        scoreMultiplier = 1;
+        currentVx = 0;
+
+        // Reset trạng thái logic
+        levelFinished = false;
+        waitingForOtherPlayer = false;
+        fading = false;
+        fadeStartTime = -1;
+        twoPlayerEnded = false;
+        isWinner = false;
+        isLoser = false;
+        isDraw = false;
+
+        // Không reset điểm hoặc mạng — giữ nguyên
+        // lives = lives;
+        // score = score;
+
+        // Nếu cần hiệu ứng khi qua màn (âm thanh, sự kiện, ...), có thể gọi thêm:
+        // eventLoader.loadEvent(GameEvent.LEVEL_START);
     }
+
 
     public ArrayList<LaserShot> getLasers() {
         return lasers;
