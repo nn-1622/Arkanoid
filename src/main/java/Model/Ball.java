@@ -134,15 +134,15 @@ public class Ball extends MovableObject {
     public void checkPaddleCollision(Paddle paddle) {
         if (getEdgeBottom() >= paddle.getY() &&
                 getEdgeTop() <= paddle.getY() + paddle.getHeight() &&
-                getCenter() >= paddle.getX() &&
-                getCenter() <= paddle.getX() + paddle.getLength() &&
+                getEdgeRight() >= paddle.getX() &&
+                getEdgeLeft() <= paddle.getX() + paddle.getLength() &&
                 getVy() > 0) {
 
             double paddleCenter = paddle.getX() + paddle.getLength() / 2;
             double diff = (getCenter() - paddleCenter) / (paddle.getLength() / 2);
 
             double speed = Math.sqrt(getVx() * getVx() + getVy() * getVy());
-            double angle = diff * Math.toRadians(70);
+            double angle = diff * Math.toRadians(60);
 
             setVx(speed * Math.sin(angle));
             setVy(-speed * Math.cos(angle));
@@ -154,8 +154,8 @@ public class Ball extends MovableObject {
 
         for (Brick b : bricks) {
             if (!b.isDestroyed()) {
-                double dx = b.getX() - center.getX();
-                double dy = b.getY() - center.getY();
+                double dx = (b.getX() + b.getWidth() / 2) - (center.getX() + center.getWidth() / 2);
+                double dy = (b.getY() + b.getHeight() / 2) - (center.getY() + center.getHeight() / 2);
                 double dist = Math.sqrt(dx*dx + dy*dy);
 
                 if (dist <= blastRadius) {
