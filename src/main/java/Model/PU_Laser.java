@@ -5,6 +5,9 @@ import java.awt.*;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 
+/**
+ * Hiệu ứng bắn laser.
+ */
 public class PU_Laser extends MovableObject implements PowerUp {
     private static final int DURATION_MS = 5_000;
     private static final int SHOOT_INTERVAL_MS = 150;

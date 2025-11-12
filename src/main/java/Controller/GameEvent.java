@@ -1,5 +1,8 @@
 package Controller;
 
+/**
+ * Các trạng thái của game.
+ */
 public enum GameEvent {
     BALL_HIT,
     GAME_WIN,

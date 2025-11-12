@@ -3,6 +3,9 @@ package Model;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 
+/**
+ * hiệu ứng thêm 1 mạng.
+ */
 public class PU_ExtraLive extends MovableObject implements PowerUp {
     private final double radius;
     private final Image extralive;

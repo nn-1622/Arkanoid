@@ -11,6 +11,10 @@ import Controller.GameEvent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+/**
+ * quản lý toàn bộ logic và trạng thái của chế độ chơi chính.
+ * bao gồm xử lý bóng, gạch, vật phẩm, điểm, mạng, cấp độ, hiệu ứng và va chạm.
+ */
 public class GameplayModel implements UltilityValues {
     private Image background;
     private Paddle paddle;
@@ -51,6 +55,10 @@ public class GameplayModel implements UltilityValues {
     private static final String DEFAULT_PADDLE = "/DefaultPaddle.png";
     private String ballPath = "DefaultBall.png";
 
+    /**
+     * khởi tạo trò chơi 1 người chơi.
+     * tải hình nền, paddle, bóng và bản đồ đầu tiên.
+     */
     public GameplayModel(EventLoader eventLoader) {
         this.eventLoader = eventLoader;
         this.twoPlayerMode = false;
@@ -71,12 +79,18 @@ public class GameplayModel implements UltilityValues {
         renderMap();
     }
 
+    /**
+     * khởi tạo cho chế độ 2 người chơi.
+     */
     public GameplayModel(EventLoader eventLoader, double leftBound, double rightBound) {
         this.eventLoader = eventLoader;
         this.twoPlayerMode = true;
         paddle.setX((leftBound + rightBound - paddle.getLength()) / 2);
     }
 
+    /**
+     * khởi tạo gameplay có hoặc không ở chế độ 2 người.
+     */
     public GameplayModel(EventLoader eventLoader, boolean twoPlayerMode) {
         String paddlePath = loadPaddlePathFromFile();
 
@@ -110,6 +124,9 @@ public class GameplayModel implements UltilityValues {
         renderMap();
     }
 
+    /**
+     * tải đường dẫn paddle từ file cấu hình, trả về mặc định nếu không có.
+     */
     private String loadPaddlePathFromFile() {
         try {
             Path p = Path.of(PADDLE_CONFIG_FILE);
@@ -128,6 +145,9 @@ public class GameplayModel implements UltilityValues {
         return DEFAULT_PADDLE;
     }
 
+    /**
+     * tải hình nền.
+     */
     private Image loadBackgroundFromFile() {
         String path = DEFAULT_BG;
         try {
@@ -144,6 +164,9 @@ public class GameplayModel implements UltilityValues {
         return new Image(getClass().getResource(path).toExternalForm());
     }
 
+    /**
+     * tải đường dẫn bóng.
+     */
     private String loadBallPathFromFile() {
         try {
             Path path = Path.of(CONFIG_FILE);
@@ -157,6 +180,9 @@ public class GameplayModel implements UltilityValues {
         return DEFAULT_BALL;
     }
 
+    /**
+     * phóng bóng ra khỏi paddle
+     */
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
             this.currentBallState = BallState.LAUNCHED;
@@ -167,12 +193,18 @@ public class GameplayModel implements UltilityValues {
         }
     }
 
+    /**
+     * thêm một viên gạch vào bản đồ
+     */
     public void addBrickType(int type, double x, double y) {
         Brick newBrick = new Brick(x, y);
         newBrick.setBrickType(type);
         brick.add(newBrick);
     }
 
+    /**
+     * tạo lại bản đồ từ file map theo cấp độ hiện tại.
+     */
     public void renderMap() {
         this.brick = new ArrayList<>();
         try (InputStream map = getClass().getResourceAsStream(String.format("/map/%d.txt", level));
@@ -212,6 +244,9 @@ public class GameplayModel implements UltilityValues {
         }
     }
 
+    /**
+     * đặt lại ví trí của bóng khi mất mạng.
+     */
     public void resetPosition() {
         paddle.setX(canvasWidth / 2 - paddle.getLength() / 2);
         paddle.setY(canvasHeight - 140);
@@ -221,6 +256,9 @@ public class GameplayModel implements UltilityValues {
         currentBallState = BallState.ATTACHED;
     }
 
+    /**
+     * sinh ngẫu nhiên một vật phẩm tại vị trí chỉ định.
+     */
     public void spawnPowerUp(double x, double y) {
         Random rand = new Random();
         int type = rand.nextInt(7);
@@ -237,6 +275,9 @@ public class GameplayModel implements UltilityValues {
         fallingPowerUps.add(pu);
     }
 
+    /**
+     * kiểm tra va chạm.
+     */
     public void checkCollisions() {
         paddle.checkBoundary(canvasWidth);
         for (Ball ball : new ArrayList<>(balls)) {
@@ -253,6 +294,9 @@ public class GameplayModel implements UltilityValues {
         }
     }
 
+    /**
+     * xóa toàn bộ hiệu ứng và vật phẩm đang hoạt động.
+     */
     public void resetPowerUp() {
         for (PowerUp p : activePowerUps) {
             p.remove(this);
@@ -262,6 +306,9 @@ public class GameplayModel implements UltilityValues {
         lasers.clear();
     }
 
+    /**
+     * chuyển sang level kế tiếp và đặt lại trạng thái.
+     */
     public void Initialize() {
         if (level >= 5) {
             completedAllLevels = true;
@@ -303,6 +350,9 @@ public class GameplayModel implements UltilityValues {
         eventLoader.loadEvent(GameEvent.AUTO_SAVE_TRIGGER);
     }
 
+    /**
+     * cập nhật logic cho mỗi khung hình
+     */
     public void update(boolean left, boolean right, double deltaTime) {
         long frameTime = 16_666_667 / 1_000_000_000;
 
@@ -395,6 +445,9 @@ public class GameplayModel implements UltilityValues {
         }
     }
 
+    /**
+     * thiết lập lại trạng thái game từ dữ liệu lưu.
+     */
     public void configureFromSave(SaveState save) {
         this.level = save.level;
         this.lives = save.lives;
@@ -476,6 +529,9 @@ public class GameplayModel implements UltilityValues {
         }
     }
 
+    /**
+     * xử lý power up theo state
+     */
     private MovableObject createPowerUpByName(String name, double x, double y, double vx, double vy) {
         double radius = 15;
         return switch (name) {
@@ -493,7 +549,10 @@ public class GameplayModel implements UltilityValues {
         };
     }
 
-
+    /**
+     * Vẽ biểu tượng của các Power-Up đang hoạt động.
+     * @param g
+     */
     public void drawActivePowerUps(GraphicsContext g) {
         if (activePowerUps.isEmpty()) return;
 
@@ -525,7 +584,9 @@ public class GameplayModel implements UltilityValues {
         }
     }
 
-
+    /**
+     * Kiểm tra xem Power-Up có đang hoạt động hay không.
+     */
     public boolean hasActivePower(String name) {
         for (PowerUp p : activePowerUps) {
             if (p.getName().equalsIgnoreCase(name) && p.isActive()) {
@@ -535,6 +596,10 @@ public class GameplayModel implements UltilityValues {
         return false;
     }
 
+    /**
+     * Vẽ hiệu ứng hình ảnh của các Power-Up.
+     * @param g
+     */
     public void drawEffects(GraphicsContext g) {
         Paddle paddle = getPaddle();
 

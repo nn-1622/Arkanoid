@@ -6,6 +6,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * lệnh thay đổi hình nền của trò chơi.
+ * ghi đường dẫn hình nền mới vào file cấu hình.
+ */
 public class ChangeBackgroundCmd implements GameCommand {
     private static final String CONFIG_FILE = "background_config.txt";
     private final GameModel model;

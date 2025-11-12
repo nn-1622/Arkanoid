@@ -5,6 +5,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Lớp đại diện cho toàn bộ trạng thái của trò chơi
+ * tại thời điểm được lưu, cho phép khôi phục lại phiên chơi sau đó.
+ */
 public class SaveState implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;

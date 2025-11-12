@@ -3,6 +3,9 @@ package Controller;
 import Model.GameModel;
 import Model.State;
 
+/**
+ * lệnh thay đổi trạng thái của trò chơi.
+ */
 public class ChangeStateCmd implements GameCommand {
     private final State stateToChange;
     private final GameModel model;

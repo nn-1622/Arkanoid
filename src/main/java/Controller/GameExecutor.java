@@ -2,6 +2,10 @@ package Controller;
 
 import java.util.concurrent.ExecutorService;
 
+/**
+ * lớp quản lý luồng xử lý cho trò chơi.
+ * xử dụng singleton để chỉ tạo một thực thể
+ */
 public final class GameExecutor {
     private final ExecutorService logicExecutor;
     private final ExecutorService audioExecutor;

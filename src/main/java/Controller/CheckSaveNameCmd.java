@@ -4,6 +4,9 @@ import Model.GameModel;
 import Model.State;
 import View.PauseView;
 
+/**
+ * lệnh kiểm tra tên file lưu của trò chơi.
+ */
 public class CheckSaveNameCmd implements GameCommand {
     private final GameModel model;
     private final PauseView view;

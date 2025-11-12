@@ -1,5 +1,8 @@
 package Model;
-
+/**
+ * Lớp trừu tượng cung cấp các thuộc tính cơ bản
+ * về vị trí và kích thước cho các đối tượng trong trò chơi.
+ */
 public abstract class Utility {
     protected double x;
     protected double y;

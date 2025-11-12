@@ -2,6 +2,9 @@ package Model;
 
 import javafx.scene.image.Image;
 
+/**
+ * Lớp xử lý icon cho các hiệu ứng power up.
+ */
 public class PU_Icons {
     private static final Image LASER = new Image("/LaserPU.png");
     private static final Image EXPAND = new Image("/x2LengthPU.png");

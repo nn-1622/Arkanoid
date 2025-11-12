@@ -7,6 +7,9 @@ import javafx.scene.image.Image;
 
 import java.awt.*;
 
+/**
+ * hiệu ứng nhân nhiều số bóng.
+ */
 public class PU_MultiBall extends MovableObject implements PowerUp {
     private final double radius;
     private final Image multi_ball;

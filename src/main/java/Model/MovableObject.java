@@ -2,6 +2,10 @@ package Model;
 
 import javafx.scene.canvas.GraphicsContext;
 
+/**
+ * Lớp trừu tượng đại diện cho các đối tượng có thể di chuyển trong trò chơi,
+ * chẳng hạn như bóng, vật phẩm rơi, hoặc tia laser.
+ */
 public abstract class MovableObject extends GameObject {
     private double vx;
     private double vy;

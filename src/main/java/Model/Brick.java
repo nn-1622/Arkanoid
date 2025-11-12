@@ -3,6 +3,9 @@ package Model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+/**
+ * đối tượng gạch
+ */
 public class Brick extends GameObject {
     private static final double sx = 32, sy = 176, sw = 32, sh = 16;
 

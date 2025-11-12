@@ -3,6 +3,9 @@ package Model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+/**
+ * hiệu ứng tạo ra lá chắn.
+ */
 public class PU_Shield extends MovableObject implements PowerUp {
     private final Image icon = new Image("/shield.png");
     private final double radius;
