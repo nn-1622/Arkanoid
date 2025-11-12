@@ -9,9 +9,22 @@ package Model;
 public enum State {
     MENU,
     PLAYING,
+    TWO_PLAYING,
     PAUSED,
     SETTING,
     LOSS,
     VICTORY,
-    FADE
+    FADE,
+    PLAY_MODE,
+    LEADERBOARD,
+    THEME,
+    HOW_TO_PLAY,
+    CHOOSE_PADDLE,
+    CHOOSE_BALL,
+    CHOOSE_BACKGROUND,
+    SETTING_ACCOUNT,
+    SETTING_HOWTOPLAY,
+    READY_TO_PLAY,
+    LOAD_GAME,
+    TWO_PLAYER_PAUSED
 }

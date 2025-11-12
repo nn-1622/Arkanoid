@@ -8,114 +8,98 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-/**
- * Lớp View chính, chịu trách nhiệm quản lý và hiển thị các màn hình khác nhau của trò chơi.
- * Lớp này hoạt động như một bộ điều phối, quyết định màn hình nào (menu, game, cài đặt, v.v.)
- * sẽ được vẽ lên canvas dựa trên trạng thái hiện tại của {@link GameModel}.
- */
-public class GameView {
-    private Group root;
-    private Scene scene;
-    private MenuScene menuScene;
-    private GameModel gameModel;
-    private SettingScene settingScene;
-    private GameplayView gameplayView;
-    private LoseView loseView;
-    private VictoryView victoryView;
-    private GraphicsContext gc;
-    private Canvas canvas;
+public class GameView extends View {
+    private final Scene scene;
+    private final GraphicsContext gc;
+    private final Canvas canvas;
 
-    /**
-     * Khởi tạo GameView.
-     * Thiết lập các thành phần cơ bản của JavaFX như Scene, Group, Canvas và GraphicsContext.
-     * Đồng thời, khởi tạo tất cả các đối tượng view con (sub-views) cho các màn hình khác nhau.
-     */
-    public GameView() {
-        root = new Group();
-        scene = new Scene(root, 600,650);
-        canvas = new Canvas(600,650);
+    public GameView(GameModel gameModel) {
+        super(gameModel);
+        Group root = new Group();
+        scene = new Scene(root, 600, 650);
+        canvas = new Canvas(600, 650);
         root.getChildren().add(canvas);
-        gc  = canvas.getGraphicsContext2D();
-
-        menuScene = new MenuScene(canvas.getWidth(),canvas.getHeight());
-        settingScene = new SettingScene(canvas.getWidth(),canvas.getHeight());
-        gameplayView = new GameplayView();
-        loseView = new LoseView();
-        victoryView = new VictoryView();
+        gc = canvas.getGraphicsContext2D();
     }
 
-    /**
-     * Lấy đối tượng Scene chính của ứng dụng.
-     * @return Scene chính.
-     */
+    public void ensureSizeForState(State s) {
+        double targetW = (s == State.TWO_PLAYING || s == State.TWO_PLAYER_PAUSED) ? 1200 : 600;
+        double targetH = 650;
+
+        if (canvas.getWidth() != targetW || canvas.getHeight() != targetH) {
+            canvas.setWidth(targetW);
+            canvas.setHeight(targetH);
+
+            if (scene.getWindow() != null) {
+                scene.getWindow().setWidth(targetW + 16);
+                scene.getWindow().setHeight(targetH + 39);
+            }
+        }
+
+        if (scene.getWindow() != null) {
+            scene.getWindow().setWidth(targetW + 16);
+            scene.getWindow().setHeight(targetH + 39);
+            scene.getWindow().centerOnScreen();
+        }
+    }
+
+    public void render(GameModel model) {
+        ensureSizeForState(model.getGstate());
+        State currentState = model.getGstate();
+
+        if (model.getGstate() == State.FADE) {
+            final double fadeTime = 15.0;
+            double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;
+            double opacity = Math.min(1.0, (timeElapsed / fadeTime));
+
+            gc.setFill(new Color(0, 0, 0, opacity));
+            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            return;
+        }
+        if (model.getGstate() == State.PAUSED || model.getGstate() == State.READY_TO_PLAY || model.getGstate() == State.TWO_PLAYER_PAUSED) {
+            View backgroundView = model.getView(State.TWO_PLAYING);
+            if (backgroundView != null && model.getGameplayModel() != null) {
+                backgroundView.draw(gc, model.getGameplayModel());
+            }
+            View overlayView = model.getCurrentView();
+            if (overlayView != null) {
+                overlayView.draw(gc, model.getGameplayModel()); // Dùng model 1P
+            }
+            return;
+        }
+
+        if (currentState == State.TWO_PLAYER_PAUSED) {
+            View backgroundView = model.getView(State.TWO_PLAYING);
+            if (backgroundView != null) {
+                backgroundView.draw(gc, null);
+            }
+
+            View overlayView = model.getCurrentView();
+            if (overlayView != null) {
+                overlayView.draw(gc, null);
+            }
+            return;
+        }
+
+        try {
+            if (model.getCurrentView() != null) {
+                model.getCurrentView().draw(gc, model.getGameplayModel());
+            } else if (model.getGameplayModel() != null) {
+                new GameplayView(model).draw(gc, model.getGameplayModel());
+            } else {
+                gc.setFill(Color.BLACK);
+                gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            }
+        } catch (Exception e) {
+            System.err.println("[Render Warning] " + e.getMessage());
+            e.printStackTrace();
+            gc.setFill(Color.BLACK);
+            gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        }
+    }
+
     public Scene getScene() {
         return scene;
     }
 
-    /**
-     * Phương thức kết xuất (render) chính, được gọi liên tục trong vòng lặp game.
-     * Dựa vào trạng thái (State) từ GameModel, phương thức này gọi phương thức vẽ
-     * tương ứng từ các đối tượng view con.
-     * @param model Đối tượng GameModel chứa trạng thái hiện tại của game.
-     */
-    public void render(GameModel model) {
-        if(model.getGstate() == State.MENU){
-            menuScene.drawMenuScene(gc);
-        } else if(model.getGstate() == State.SETTING){
-            settingScene.drawSettingScene(gc);
-        } else if(model.getGstate() == State.PLAYING){
-            gameplayView.drawGameScene(gc, model.getGameplayModel());
-        } else if(model.getGstate() == State.LOSS){
-            loseView.drawLoseScene(gc);
-        } else if(model.getGstate() == State.VICTORY){
-            victoryView.drawWinScene(gc);
-        } else if(model.getGstate() == State.FADE){
-            // Xử lý hiệu ứng chuyển cảnh mờ dần
-            final double fadeTime = 2.0;
-            double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;
-            double opacity = Math.min(1.0, (timeElapsed / fadeTime));
-            gc.setFill(new Color(0,0,0,opacity));
-            gc.fillRect(0,0, canvas.getWidth(), canvas.getHeight());
-        }
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình menu.
-     * @return Đối tượng MenuScene.
-     */
-    public MenuScene getMenuScene() {
-        return menuScene;
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình cài đặt.
-     * @return Đối tượng SettingScene.
-     */
-    public SettingScene getSettingScene() {
-        return settingScene;
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình chơi game.
-     * @return Đối tượng GameplayView.
-     */
-    public GameplayView getGameScene() {
-        return gameplayView;
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình thua cuộc.
-     * @return Đối tượng LoseView.
-     */
-    public LoseView getLoseScene() {
-        return loseView;
-    }
-
-    /**
-     * Lấy đối tượng view của màn hình chiến thắng.
-     * @return Đối tượng VictoryView.
-     */
-    public  VictoryView getVictoryScene() {
-        return victoryView;
-    }
 }

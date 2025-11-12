@@ -1,50 +1,68 @@
 package Model;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
 
-import Controller.GameEventListener;
+import Controller.EventLoader;
+import Controller.GameEvent;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
-/**
- * Quản lý trạng thái và logic của trò chơi.
- * Lớp này chứa tất cả các đối tượng trong trò chơi như bóng, thanh trượt và gạch,
- * đồng thời chứa các cơ chế cốt lõi của trò chơi bao gồm phát hiện va chạm,
- * tính điểm và tiến trình qua các cấp độ.
- */
-public class GameplayModel {
+public class GameplayModel implements UltilityValues {
     private Image background;
-    private Ball ball;
     private Paddle paddle;
-    private double canvasWidth;
-    private double canvasHeight;
     private BallState currentBallState;
+
     private double currentVx;
+
     private ArrayList<Brick> brick;
+    private ArrayList<Ball> balls = new ArrayList<>();
+    private final ArrayList<MovableObject> fallingPowerUps = new ArrayList<>();
+    private final ArrayList<PowerUp> activePowerUps = new ArrayList<>();
+    private final ArrayList<LaserShot> lasers = new ArrayList<>();
+
     private int level;
     private int lives;
     private int score;
     private int combo;
+    private int scoreMultiplier = 1;
 
-    private GameEventListener gameEventListener;
+    private final EventLoader eventLoader;
 
-    /**
-     * Xây dựng một GameplayModel mới và khởi tạo trạng thái trò chơi.
-     * @param canvasWidth  Chiều rộng của khung vẽ trò chơi.
-     * @param canvasHeight Chiều cao của khung vẽ trò chơi.
-     */
-    public GameplayModel(double canvasWidth, double canvasHeight) {
-        this.canvasWidth = canvasWidth;
-        this.canvasHeight = canvasHeight;
-        double paddleLength = 110;
-        double paddleHeight = 20;
+    private boolean fading = false;
+    private long fadeStartTime;
 
-        paddle = new Paddle(canvasWidth / 2 - paddleLength / 2,
-                canvasHeight - 100, paddleLength, paddleHeight);
+    private final boolean twoPlayerMode;
+    private boolean completedAllLevels = false;
+    private boolean levelFinished = false;
+    private boolean waitingForOtherPlayer = false;
+    private boolean isWinner = false;
+    private boolean isLoser = false;
+    private boolean isDraw = false;
 
-        ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10);
+    private static final String CONFIG_FILE = "ball_config.txt";
+    private static final String DEFAULT_BALL = "DefaultBall.png";
+    private static final String BG_CONFIG_FILE = "background_config.txt";
+    private static final String DEFAULT_BG = "/GameBG.png";
+    private static final String PADDLE_CONFIG_FILE = "paddle_config.txt";
+    private static final String DEFAULT_PADDLE = "/DefaultPaddle.png";
+    private String ballPath = "DefaultBall.png";
+
+    public GameplayModel(EventLoader eventLoader) {
+        this.eventLoader = eventLoader;
+        this.twoPlayerMode = false;
+
+        this.ballPath = loadBallPathFromFile();
+        this.background = loadBackgroundFromFile();
+
+        paddle = Paddle.getPaddle(loadPaddlePathFromFile());
+
+        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10, ballPath);
         currentBallState = BallState.ATTACHED;
+        balls.add(ball);
         lives = 5;
         level = 1;
         score = 0;
@@ -53,38 +71,112 @@ public class GameplayModel {
         renderMap();
     }
 
-    /**
-     * Phóng quả bóng từ thanh trượt nếu nó hiện đang ở trạng thái ATTACHED (gắn liền).
-     * Quả bóng được cung cấp một vận tốc ban đầu theo chiều dọc.
-     */
+    public GameplayModel(EventLoader eventLoader, double leftBound, double rightBound) {
+        this.eventLoader = eventLoader;
+        this.twoPlayerMode = true;
+        paddle.setX((leftBound + rightBound - paddle.getLength()) / 2);
+    }
+
+    public GameplayModel(EventLoader eventLoader, boolean twoPlayerMode) {
+        String paddlePath = loadPaddlePathFromFile();
+
+        this.eventLoader = eventLoader;
+        this.twoPlayerMode = twoPlayerMode;
+        this.ballPath = loadBallPathFromFile();
+        this.background = loadBackgroundFromFile();
+        this.paddle = Paddle.getPaddle(loadPaddlePathFromFile());
+
+        this.paddle = Paddle.newInstance(
+                UltilityValues.canvasWidth / 2.0 - UltilityValues.paddleLength / 2.0,
+                UltilityValues.canvasHeight - 140,
+                UltilityValues.paddleLength,
+                UltilityValues.paddleHeight,
+                paddlePath
+        );
+
+        Ball ball = new Ball(
+                paddle.x + paddleLength / 2.0,
+                paddle.y - paddleHeight / 2.0,
+                0, 0, 10, ballPath
+        );
+
+        this.currentBallState = BallState.ATTACHED;
+        this.balls.add(ball);
+        this.lives = 5;
+        this.level = 1;
+        this.score = 0;
+        this.combo = 0;
+        this.currentVx = 0;
+        renderMap();
+    }
+
+    private String loadPaddlePathFromFile() {
+        try {
+            Path p = Path.of(PADDLE_CONFIG_FILE);
+            if (Files.exists(p)) {
+                String s = Files.readString(p, StandardCharsets.UTF_8).trim();
+                if (!s.isEmpty()) {
+                    System.out.println("Set paddle from config: " + s);
+                    return s;
+                }
+            } else {
+                System.out.println("Paddle config not found, use default");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DEFAULT_PADDLE;
+    }
+
+    private Image loadBackgroundFromFile() {
+        String path = DEFAULT_BG;
+        try {
+            Path p = Path.of(BG_CONFIG_FILE);
+            if (Files.exists(p)) {
+                String s = Files.readString(p, StandardCharsets.UTF_8).trim();
+                if (!s.isEmpty()) {
+                    path = s;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new Image(getClass().getResource(path).toExternalForm());
+    }
+
+    private String loadBallPathFromFile() {
+        try {
+            Path path = Path.of(CONFIG_FILE);
+            if (Files.exists(path)) {
+                String data = Files.readString(path, StandardCharsets.UTF_8).trim();
+                if (!data.isEmpty()) return data;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return DEFAULT_BALL;
+    }
+
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
             this.currentBallState = BallState.LAUNCHED;
-            ball.setVx(0);
-            ball.setVy(-5 - currentVx);
+            for (Ball ball : balls) {
+                ball.setVx(0);
+                ball.setVy(-3 - currentVx);
+            }
         }
     }
 
-    /**
-     * Thêm một viên gạch thuộc loại được chỉ định vào trò chơi tại một vị trí nhất định.
-     * @param type Loại của viên gạch, quyết định các thuộc tính của nó.
-     * @param x Tọa độ x cho vị trí của viên gạch.
-     * @param y Tọa độ y cho vị trí của viên gạch.
-     */
     public void addBrickType(int type, double x, double y) {
         Brick newBrick = new Brick(x, y);
         newBrick.setBrickType(type);
         brick.add(newBrick);
     }
 
-    /**
-     * Đọc bố cục bản đồ cho cấp độ hiện tại từ một tệp tài nguyên
-     * và điền vào danh sách gạch tương ứng.
-     */
     public void renderMap() {
         this.brick = new ArrayList<>();
         try (InputStream map = getClass().getResourceAsStream(String.format("/map/%d.txt", level));
-            Scanner scan = new Scanner(map)) {
+             Scanner scan = new Scanner(map)) {
             double spawnX = 0;
             double spawnY = 0;
             while (scan.hasNextLine()) {
@@ -92,23 +184,23 @@ public class GameplayModel {
                 for (char num : line.toCharArray()) {
                     switch (num) {
                         case '0':
-                        break;
+                            break;
 
                         case '1':
-                        addBrickType(1, spawnX * 50, spawnY * 25);
-                        break;
+                            addBrickType(1, spawnX * 50, spawnY * 25);
+                            break;
 
                         case '2':
-                        addBrickType(2, spawnX * 50, spawnY * 25);
-                        break;
+                            addBrickType(2, spawnX * 50, spawnY * 25);
+                            break;
 
                         case '3':
-                        addBrickType(3, spawnX * 50, spawnY * 25);
-                        break;
+                            addBrickType(3, spawnX * 50, spawnY * 25);
+                            break;
 
                         case '4':
-                        addBrickType(4, spawnX * 50, spawnY * 25);
-                        break;
+                            addBrickType(4, spawnX * 50, spawnY * 25);
+                            break;
                     }
                     spawnX++;
                 }
@@ -120,236 +212,500 @@ public class GameplayModel {
         }
     }
 
-    /**
-     * Đặt lại quả bóng và thanh trượt về vị trí xuất phát ban đầu.
-     * Trạng thái của quả bóng được đặt thành ATTACHED (gắn liền).
-     */
     public void resetPosition() {
         paddle.setX(canvasWidth / 2 - paddle.getLength() / 2);
-        paddle.setY(canvasHeight - 100);
-        ball.setX(paddle.getX() + paddle.getLength() / 2);
-        ball.setY(paddle.getY() - paddle.getHeight() / 2);
-        ball.setVx(0);
-        ball.setVy(0);
+        paddle.setY(canvasHeight - 140);
+        balls.clear();
+        Ball ball = new Ball(paddle.x + paddleLength / 2, paddle.y - paddleHeight / 2, 0, 0, 10, ballPath);
+        balls.add(ball);
         currentBallState = BallState.ATTACHED;
     }
 
-    /**
-     * Lấy ảnh nền.
-     * @return Ảnh nền.
-     */
-    public Image getBackground() {
-        return background;
+    public void spawnPowerUp(double x, double y) {
+        Random rand = new Random();
+        int type = rand.nextInt(7);
+        MovableObject pu;
+        switch (type) {
+            case 1 -> pu = new PU_MultiBall(x, y, 0, 2, 15);
+            case 2 -> pu = new PU_Laser(x, y, 0, 2, 15);
+            case 3 -> pu = new PU_ExtraLive(x, y, 15);
+            case 4 -> pu = new PU_Shield(x, y, 0, 2, 15);
+            case 5 -> pu = new PU_BombBall(x, y, 0, 2, 15);
+            case 6 -> pu = new PU_ScoreX2(x, y, 0, 2, 15);
+            default -> pu = new PU_Expand(x, y, 0, 2, 15);
+        }
+        fallingPowerUps.add(pu);
     }
 
-    /**
-     * Lấy đối tượng thanh trượt.
-     * @return Thanh trượt của trò chơi.
-     */
-    public Paddle getPaddle() {
-        return paddle;
-    }
-
-    /**
-     * Lấy đối tượng bóng.
-     * @return Quả bóng của trò chơi.
-     */
-    public Ball getBall() {
-        return ball;
-    }
-
-    /**
-     * Lấy danh sách các viên gạch hiện có trong trò chơi.
-     * @return Một ArrayList chứa các đối tượng Brick.
-     */
-    public ArrayList<Brick> getBricks() {
-        return brick;
-    }
-
-    /**
-     * Lấy số mạng còn lại.
-     * @return Số mạng hiện tại.
-     */
-    public int getLives() {
-        return lives;
-    }
-
-    /**
-     * Lấy điểm số hiện tại.
-     * @return Điểm của người chơi.
-     */
-    public int getScore() {
-        return score;
-    }
-
-    /**
-     * Cộng điểm vào tổng điểm, được nhân với combo hiện tại.
-     * @param points Số điểm cơ bản để cộng.
-     */
-    public void scorePoint(int points) {
-        score += points * combo;
-    }
-
-    /**
-     * Lấy hệ số nhân combo hiện tại.
-     * @return Giá trị combo.
-     */
-    public int getCombo() {
-        return combo;
-    }
-
-    /**
-     * Đặt hệ số nhân combo.
-     * @param combo Giá trị combo mới.
-     */
-    public void setCombo(int combo) {
-        this.combo = combo;
-    }
-
-    /**
-     * Tăng hệ số nhân combo lên một.
-     */
-    public void comboHit() {
-        combo++;
-    }
-
-    /**
-     * Kiểm tra và xử lý tất cả các va chạm trong trò chơi. Điều này bao gồm
-     * va chạm giữa bóng-tường, bóng-thanh trượt, và bóng-gạch. Nó cũng thực thi
-     * các giới hạn di chuyển của thanh trượt.
-     */
     public void checkCollisions() {
-        if (paddle.getX() < 0) {
-            paddle.setX(0);
+        paddle.checkBoundary(canvasWidth);
+        for (Ball ball : new ArrayList<>(balls)) {
+            if (currentBallState == BallState.ATTACHED) {
+                ball.attachToPaddle(paddle);
+            } else if (currentBallState == BallState.LAUNCHED) {
+                ball.checkWallCollision(canvasWidth, canvasHeight, this);
+                ball.checkPaddleCollision(paddle);
+                ball.checkBrickCollision(brick, this);
+            }
         }
-        if (paddle.getX() >= canvasWidth - paddle.getLength()) {
-            paddle.setX(canvasWidth - paddle.getLength());
+        for (LaserShot l : lasers) {
+            l.checkLaser(this);
         }
-        if (currentBallState == BallState.ATTACHED) {
-            ball.setX(paddle.getX() + paddle.getLength() / 2);
-            ball.setY(paddle.getY() - paddle.getHeight() / 2);
-        } else if (currentBallState == BallState.LAUNCHED) {
-            if (ball.getEdgeLeft() <= 0 || ball.getEdgeRight() >= canvasWidth) {
-                ball.reverseVx();
+    }
+
+    public void resetPowerUp() {
+        for (PowerUp p : activePowerUps) {
+            p.remove(this);
+        }
+        activePowerUps.clear();
+        fallingPowerUps.clear();
+        lasers.clear();
+    }
+
+    public void Initialize() {
+        if (level >= 5) {
+            completedAllLevels = true;
+            return;
+        }
+
+        level++;
+        renderMap();
+
+        paddle.setX(canvasWidth / 2.0 - paddleLength / 2.0);
+        paddle.setY(canvasHeight - 140);
+        paddle.setLength(paddleLength);
+
+        balls.clear();
+        Ball newBall = new Ball(
+                paddle.getX() + paddle.getLength() / 2,
+                paddle.getY() - paddle.getHeight() / 2,
+                0, 0, 10, ballPath
+        );
+        balls.add(newBall);
+        currentBallState = BallState.ATTACHED;
+
+        fallingPowerUps.clear();
+        activePowerUps.clear();
+        lasers.clear();
+
+        combo = 0;
+        scoreMultiplier = 1;
+        currentVx = 0;
+
+        levelFinished = false;
+        waitingForOtherPlayer = false;
+        fading = false;
+        fadeStartTime = -1;
+        isWinner = false;
+        isLoser = false;
+        isDraw = false;
+
+        eventLoader.loadEvent(GameEvent.AUTO_SAVE_TRIGGER);
+    }
+
+    public void update(boolean left, boolean right, double deltaTime) {
+        long frameTime = 16_666_667 / 1_000_000_000;
+
+        if (deltaTime < frameTime) {
+            return;
+        }
+
+        this.paddle.move(left, right);
+        for (Ball x : balls) {
+            x.move();
+        }
+
+        paddle.update(deltaTime);
+
+        for (Brick b : brick) {
+            b.update(deltaTime);
+            if (b.isDestroyed()) {
+                if (Math.random() <= 0.3) {
+                    double dropX = b.getX() + b.getWidth() / 2;
+                    double dropY = b.getY() + b.getHeight() / 2;
+                    spawnPowerUp(dropX, dropY);
+                }
+            }
+        }
+
+        checkCollisions();
+        brick.removeIf(Brick::isDestroyed);
+
+        for (int i = 0; i < fallingPowerUps.size(); i++) {
+            MovableObject pu = fallingPowerUps.get(i);
+            pu.move();
+
+            boolean overlapX = pu.getX() + pu.getWidth() >= paddle.getX() &&
+                    pu.getX() <= paddle.getX() + paddle.getLength();
+            boolean overlapY = pu.getY() + pu.getHeight() >= paddle.getY() &&
+                    pu.getY() <= paddle.getY() + paddle.getHeight();
+
+            if (overlapX && overlapY && pu instanceof PowerUp powerUp) {
+                powerUp.apply(this);
+                getEventLoader().loadEvent(GameEvent.POWER_UP);
+                activePowerUps.add(powerUp);
+                fallingPowerUps.remove(i);
+                i--;
+                continue;
             }
 
-            if (ball.getEdgeTop() <= 0) {
-                ball.reverseVy();
+            if (pu.getY() > canvasHeight) {
+                fallingPowerUps.remove(i);
+                i--;
             }
+        }
 
-            if (ball.getEdgeBottom() >= canvasHeight) {
-                resetPosition();
-                lives--;
-                setCombo(0);
+        if (!lasers.isEmpty()) {
+            for (int i = 0; i < lasers.size(); i++) {
+                LaserShot l = lasers.get(i);
+                l.update();
+                l.checkLaser(this);
+                if (l.isDestroyed()) {
+                    lasers.remove(i);
+                    i--;
+                }
             }
+        }
 
-            if (ball.getEdgeBottom() >= paddle.getY() &&
-                ball.getEdgeTop() <= paddle.getY() + paddle.getHeight() &&
-                ball.getCenter() >= paddle.getX() &&
-                ball.getCenter() <= paddle.getX() + paddle.getLength() &&
-                ball.getVy() > 0) {
-
-                double paddleCenter = paddle.getX() + paddle.getLength() / 2;
-                double diff = (ball.getCenter() - paddleCenter) / (paddle.getLength() / 2);
-
-                double speed = Math.sqrt(ball.getVx() * ball.getVx() + ball.getVy() * ball.getVy());
-                double angle = diff * Math.toRadians(75);
-
-                ball.setVx(speed * Math.sin(angle));
-                ball.setVy(-speed * Math.cos(angle));
+        for (int i = 0; i < activePowerUps.size(); i++) {
+            PowerUp p = activePowerUps.get(i);
+            p.update(this, deltaTime);
+            if (!p.isActive()) {
+                p.remove(this);
+                activePowerUps.remove(i);
+                i--;
             }
-            
-            for (Brick b : brick) {
-                if(b.isBreaking()) continue;
-                if (b.getEdgeBottom() > ball.getEdgeTop() &&
-                    b.getEdgeTop() < ball.getEdgeBottom() && 
-                    b.getEdgeRight() > ball.getEdgeLeft() && 
-                    b.getEdgeLeft() < ball.getEdgeRight()) {
+        }
 
-                    double overlapX = Math.min(ball.getEdgeRight() - b.getEdgeLeft(), b.getEdgeRight() - ball.getEdgeLeft());
-                    double overlapY = Math.min(ball.getEdgeBottom() - b.getEdgeTop(), b.getEdgeBottom() - ball.getEdgeTop());
+        if (brick.isEmpty()) {
+            if (twoPlayerMode) {
+                levelFinished = true;
+            } else {
+                eventLoader.loadEvent(GameEvent.LEVEL_COMPLETE);
+            }
+        }
 
-                    b.hit();
-                    comboHit();
-                    scorePoint(1);
-                    if(gameEventListener != null) {
-                        gameEventListener.onBrickHit();
+        if (!twoPlayerMode) {
+            if (hasCompletedAllLevels()) {
+                eventLoader.loadEvent(GameEvent.GAME_WIN);
+            }
+            if (lives <= 0) {
+                eventLoader.loadEvent(GameEvent.GAME_LOST);
+            }
+        }
+    }
+
+    public void configureFromSave(SaveState save) {
+        this.level = save.level;
+        this.lives = save.lives;
+        this.score = save.score;
+        this.combo = save.combo;
+
+        renderMap();
+
+        Paddle p = getPaddle();
+        p.setX(save.paddleX);
+        p.setLength(save.paddleLength);
+        p.setShield(save.paddleShield);
+
+        balls.clear();
+        for (SaveState.BallData ballData : save.balls) {
+            Ball b = new Ball(ballData.x, ballData.y, ballData.vx, ballData.vy, 10, "/DefaultBall.png");
+            b.setBomb(ballData.isBomb);
+            balls.add(b);
+        }
+
+        if (!balls.isEmpty() && balls.get(0).getVy() != 0) {
+            currentBallState = BallState.LAUNCHED;
+        } else {
+            currentBallState = BallState.ATTACHED;
+        }
+
+        ArrayList<Brick> loadedBricks = new ArrayList<>();
+
+        for (Brick templateBrick : this.brick) {
+            boolean foundInSave = false;
+            for (SaveState.BrickData savedBrick : save.bricks) {
+                if (templateBrick.getX() == savedBrick.x && templateBrick.getY() == savedBrick.y) {
+                    templateBrick.setBrickType(savedBrick.brickType);
+                    templateBrick.frameTimer = savedBrick.frameTimer;
+
+                    if (savedBrick.isBreaking) {
+                        templateBrick.hit();
                     }
 
-                    if (overlapX < overlapY) {
-                        if (ball.getX() < b.getX()) {
-                            ball.setX(b.getEdgeLeft() - ball.getRadius());
-                        } else {
-                            ball.setX(b.getEdgeRight() + ball.getRadius());
-                        }
-                        ball.reverseVx();
-                    } else if (overlapY < overlapX) {
-                        if (ball.getY() < b.getY()) {
-                            ball.setY(b.getEdgeTop() - ball.getRadius());
-                        } else {
-                            ball.setY(b.getEdgeBottom() + ball.getRadius());
-                        }
-                        ball.reverseVy();
+                    if (templateBrick.getBrickType() > 0) {
+                        loadedBricks.add(templateBrick);
                     }
+
+                    foundInSave = true;
                     break;
+                }
+            }
+
+            if (!foundInSave && templateBrick.getBrickType() > 0) {
+                loadedBricks.add(templateBrick);
+            }
+        }
+        this.brick = loadedBricks;
+
+        activePowerUps.clear();
+        fallingPowerUps.clear();
+        lasers.clear();
+
+        if (save.fallingPowerUps != null) {
+            for (SaveState.FallingPowerUpData puData : save.fallingPowerUps) {
+                MovableObject puObj = createPowerUpByName(puData.name, puData.x, puData.y, puData.vx, puData.vy);
+                if (puObj != null) {
+                    fallingPowerUps.add(puObj);
+                }
+            }
+        }
+
+        if (save.activePowerUps != null) {
+            for (SaveState.ActivePowerUpData puData : save.activePowerUps) {
+                MovableObject puObj = createPowerUpByName(puData.name, 0, 0, 0, 0);
+                if (puObj instanceof PowerUp pu) {
+
+                    pu.apply(this);
+                    pu.setElapsedMs(puData.elapsedMs);
+
+                    activePowerUps.add(pu);
                 }
             }
         }
     }
 
-    /**
-     * Khởi tạo cấp độ tiếp theo của trò chơi. Phương thức này tăng biến đếm cấp độ,
-     * kết xuất bản đồ mới, đặt lại vị trí các đối tượng, và đặt lại số mạng và combo.
-     */
-    public void Initialize(){
-        level++;
-        if (level <= 5) {
-            renderMap();
-            resetPosition();
-            currentVx++;
-            lives = 5;
-            setCombo(0);
+    private MovableObject createPowerUpByName(String name, double x, double y, double vx, double vy) {
+        double radius = 15;
+        return switch (name) {
+            case "Expand" -> new PU_Expand(x, y, vx, vy, radius);
+            case "Multi Ball" -> new PU_MultiBall(x, y, vx, vy, radius);
+            case "Laser" -> new PU_Laser(x, y, vx, vy, radius);
+            case "Extra Live" -> new PU_ExtraLive(x, y, radius);
+            case "Shield" -> new PU_Shield(x, y, vx, vy, radius);
+            case "BombBall" -> new PU_BombBall(x, y, vx, vy, radius);
+            case "Score x2" -> new PU_ScoreX2(x, y, vx, vy, radius);
+            default -> {
+                System.err.println("CẢNH BÁO: Không nhận diện được tên Power-up khi tải: " + name);
+                yield null;
+            }
+        };
+    }
+
+
+    public void drawActivePowerUps(GraphicsContext g) {
+        if (activePowerUps.isEmpty()) return;
+
+        double iconSize = 32;
+        double spacing = 10;
+        double startX = 25;
+        double startY = canvasHeight - 105;
+
+        Set<String> drawn = new HashSet<>();
+
+        for (PowerUp p : activePowerUps) {
+            if (!p.isActive()) continue;
+            String name = p.getName();
+            if (drawn.contains(name)) continue;
+
+            Image icon = PU_Icons.getIcon(name);
+            g.drawImage(icon, startX, startY, iconSize, iconSize);
+
+            if (p.getDurationMs() > 0) {
+                double remaining = Math.max(0, p.getDurationMs() - p.getElapsedMs()) / 1000.0;
+                g.setFill(javafx.scene.paint.Color.WHITE);
+                g.setFont(javafx.scene.text.Font.font("Consolas", 10));
+                g.fillText(String.format("%.1fs", remaining),
+                        startX + 2, startY + iconSize + 12);
+            }
+
+            startX += iconSize + spacing;
+            drawn.add(name);
         }
     }
 
-    /**
-     * Cập nhật trạng thái trò chơi cho mỗi khung hình. Phương thức này di chuyển thanh trượt và bóng,
-     * cập nhật hoạt ảnh của gạch, kiểm tra va chạm, loại bỏ các viên gạch đã bị phá hủy,
-     * và kiểm tra các thay đổi trạng thái trò chơi như hoàn thành cấp độ hoặc thua cuộc.
-     * @param left      true nếu phím di chuyển sang trái được nhấn.
-     * @param right     true nếu phím di chuyển sang phải được nhấn.
-     * @param deltaTime Thời gian đã trôi qua kể từ khung hình cuối cùng.
-     */
-    public void update(boolean left, boolean right, double deltaTime) {
-        this.getPaddle().move(left, right);
-        ball.move();
-        for (Brick b : brick) {
-            b.update(deltaTime);
-        }
-        checkCollisions();
-        brick.removeIf(Brick::isDestroyed);
-        if (brick.isEmpty()) {
-            if(gameEventListener != null) {
-                gameEventListener.onLevelCompleted();
+
+    public boolean hasActivePower(String name) {
+        for (PowerUp p : activePowerUps) {
+            if (p.getName().equalsIgnoreCase(name) && p.isActive()) {
+                return true;
             }
         }
-        if (level == 6) {
-            if(gameEventListener != null) {
-                gameEventListener.onVictory();
-            }
+        return false;
+    }
+
+    public void drawEffects(GraphicsContext g) {
+        Paddle paddle = getPaddle();
+
+        if (hasActivePower("Score x2")) {
+            g.setGlobalAlpha(0.3);
+            g.setFill(javafx.scene.paint.Color.GOLD);
+            g.fillRoundRect(paddle.getX() - 5, paddle.getY() - 5,
+                    paddle.getLength() + 10, paddle.getHeight() + 10, 15, 15);
+            g.setGlobalAlpha(1.0);
         }
-        if (lives <= 0) {
-            if(gameEventListener != null) {
-                gameEventListener.onGameOver();
-            }
+
+        if (hasActivePower("Shield")) {
+            g.setStroke(javafx.scene.paint.Color.CYAN);
+            g.setLineWidth(3);
+            g.strokeRoundRect(paddle.getX() - 5,
+                    paddle.getY() + paddle.getHeight() + 5,
+                    paddle.getLength() + 10, 10, 10, 10);
         }
     }
 
-    /**
-     * Đặt bộ lắng nghe cho các sự kiện của trò chơi.
-     * @param gameEventListener Bộ lắng nghe sẽ được thông báo về các sự kiện của trò chơi.
-     */
-    public void setGameEventListener(GameEventListener gameEventListener) {
-        this.gameEventListener = gameEventListener;
+
+    public int getLevel() {
+        return level;
+    }
+
+    public String getBallPath() {
+        return ballPath;
+    }
+
+    public boolean isWaitingForOtherPlayer() {
+        return waitingForOtherPlayer;
+    }
+
+    public void setWaitingForOtherPlayer(boolean waiting) {
+        this.waitingForOtherPlayer = waiting;
+    }
+
+    public void setWinner(boolean winner) {
+        this.isWinner = winner;
+        if (winner) {
+            this.isLoser = false;
+            this.isDraw = false;
+        }
+    }
+
+    public void setLoser(boolean loser) {
+        this.isLoser = loser;
+        if (loser) {
+            this.isWinner = false;
+            this.isDraw = false;
+        }
+    }
+
+    public void setDraw(boolean draw) {
+        this.isDraw = draw;
+        if (draw) {
+            this.isWinner = false;
+            this.isLoser = false;
+        }
+    }
+
+    public boolean hasCompletedAllLevels() {
+        return completedAllLevels;
+    }
+
+    public boolean isFading() {
+        return fading;
+    }
+
+    public long getFadeStartTime() {
+        return fadeStartTime;
+    }
+
+    public void startFade(long nowNano) {
+        this.fading = true;
+        this.fadeStartTime = nowNano;
+    }
+
+    public void stopFade() {
+        this.fading = false;
+    }
+
+    public boolean isLevelFinished() {
+        return levelFinished;
+    }
+
+    public boolean isWinner() {
+        return isWinner;
+    }
+
+    public boolean isLoser() {
+        return isLoser;
+    }
+
+    public boolean isDraw() {
+        return isDraw;
+    }
+
+    public void addLaserBullet(double x, double y) {
+        lasers.add(new LaserShot(x, y));
+    }
+
+    public Image getBackground() {
+        return background;
+    }
+
+    public Paddle getPaddle() {
+        return paddle;
+    }
+
+    public ArrayList<MovableObject> getFallingPowerUps() {
+        return fallingPowerUps;
+    }
+
+    public ArrayList<PowerUp> getActivePowerUps() {
+        return activePowerUps;
+    }
+
+    public ArrayList<Ball> getBalls() {
+        return balls;
+    }
+
+    public void setBalls(ArrayList<Ball> x) {
+        this.balls = x;
+    }
+
+    public ArrayList<Brick> getBricks() {
+        return brick;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
+
+    public void setScoreMultiplier(int multiplier) {
+        this.scoreMultiplier = multiplier;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void scorePoint(int points) {
+        score += points * combo * scoreMultiplier;
+    }
+
+    public int getCombo() {
+        return combo;
+    }
+
+    public EventLoader getEventLoader() {
+        return eventLoader;
+    }
+
+    public void setCombo(int combo) {
+        this.combo = combo;
+    }
+
+    public void comboHit() {
+        combo++;
+    }
+
+    public ArrayList<LaserShot> getLasers() {
+        return lasers;
+    }
+
+    public void decreaseLives() {
+        lives--;
     }
 }

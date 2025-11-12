@@ -1,91 +1,187 @@
 package Controller;
 
-
 import javafx.scene.media.AudioClip;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
-/**
- * Quản lý tất cả các hiệu ứng âm thanh trong trò chơi.
- * Lớp này chịu trách nhiệm tải, phát và điều chỉnh âm lượng
- * của các đoạn âm thanh ngắn (AudioClip) như tiếng va chạm, thắng, thua.
- */
-public class SoundManager {
-    private AudioClip hitSound;
-    private AudioClip winSound;
-    private AudioClip loseSound;
-    private AudioClip testSound;
-    private double masterVolume = 0.5;
-    private double volStep = 0.2;
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
 
-    /**
-     * Khởi tạo SoundManager.
-     * Tải tất cả các tệp âm thanh cần thiết từ thư mục tài nguyên (resources)
-     * và chuẩn bị chúng để phát.
-     */
+public class SoundManager implements GameEventListener {
+
+    private static SoundManager instance;
+
+    public static synchronized SoundManager getInstance() {
+        if (instance == null) {
+            instance = new SoundManager();
+        }
+        return instance;
+    }
+
+    private static AudioClip hitSound;
+    private static AudioClip winSound;
+    private static AudioClip loseSound;
+    private static AudioClip testSound;
+    private static AudioClip lostBall;
+    private static AudioClip powerUp;
+    private static AudioClip finishLevel;
+    private static AudioClip button;
+    private static MediaPlayer menuBgm;
+    private static MediaPlayer gameplayBgm;
+    private static double masterVolume = 0.5;
+    private static final double volStep = 0.2;
+    private final ExecutorService audioExecutor;
+
     public SoundManager() {
-        hitSound = new AudioClip(getClass().getResource("/sound/hit.wav").toExternalForm());
-        winSound = new AudioClip(getClass().getResource("/sound/win.wav").toExternalForm());
-        loseSound = new AudioClip(getClass().getResource("/sound/lose.wav").toExternalForm());
-        testSound = new AudioClip(getClass().getResource("/sound/test.wav").toExternalForm());
+        // Lấy ExecutorService từ GameExecutor để xử lý âm thanh
+        this.audioExecutor = GameExecutor.getInstance().getAudioExecutor();
+        hitSound = new AudioClip(Objects.requireNonNull(getClass().getResource("/sound/hit.wav")).toExternalForm());
+        winSound = new AudioClip(Objects.requireNonNull(getClass().getResource("/sound/win.wav")).toExternalForm());
+        loseSound = new AudioClip(Objects.requireNonNull(getClass().getResource("/sound/lose.wav")).toExternalForm());
+        testSound = new AudioClip(Objects.requireNonNull(getClass().getResource("/sound/test.wav")).toExternalForm());
+        finishLevel = new AudioClip(Objects.requireNonNull(getClass().getResource("/sound/FinishALevel.wav")).toExternalForm());
+        powerUp = new AudioClip(Objects.requireNonNull(getClass().getResource("/sound/PowerUp.wav")).toExternalForm());
+        lostBall = new AudioClip(Objects.requireNonNull(getClass().getResource("/sound/BallLost.wav")).toExternalForm());
+        button = new AudioClip(Objects.requireNonNull(getClass().getResource("/sound/button.wav")).toExternalForm());
+        menuBgm = createLoopPlayer("/sound/MainTheme.mp3");
+        gameplayBgm = createLoopPlayer("/sound/GameTheme.mp3");
+        setMasterVolume(masterVolume);
     }
 
-    /**
-     * Phát âm thanh va chạm (khi bóng trúng gạch).
-     */
-    public void playHitSound() {
-        hitSound.play();
+    private MediaPlayer createLoopPlayer(String path) {
+        try {
+            var url = getClass().getResource(path);
+            if (url == null) {
+                System.err.println("BGM not found: " + path);
+                return null;
+            }
+            Media media = new Media(url.toExternalForm());
+            MediaPlayer player = new MediaPlayer(media);
+            player.setCycleCount(MediaPlayer.INDEFINITE);
+            return player;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    /**
-     * Phát âm thanh chiến thắng (khi hoàn thành một cấp độ hoặc cả trò chơi).
-     */
-    public void playWinSound() {
-        winSound.play();
+    @Override
+    public void onGameEvent(GameEvent event) {
+        audioExecutor.submit(() -> {
+            switch (event) {
+                case GAME_WIN:
+                    if (winSound != null) winSound.play();
+                    break;
+                case GAME_LOST:
+                    if (loseSound != null) loseSound.play();
+                    break;
+                case BALL_HIT:
+                    if (hitSound != null) hitSound.play();
+                    break;
+                case BALL_LOST:
+                    if (lostBall != null) lostBall.play();
+                    break;
+                case POWER_UP:
+                    if (powerUp != null) powerUp.play();
+                    break;
+                case LEVEL_COMPLETE:
+                    if (finishLevel != null) finishLevel.play();
+                    break;
+                case CLICK:
+                    if (button != null) button.play();
+                    break;
+            }
+        });
     }
 
-    /**
-     * Phát âm thanh thua cuộc (khi người chơi hết mạng).
-     */
-    public void playLoseSound() {
-        loseSound.play();
+    public void playMenuBgm() {
+        audioExecutor.submit(() -> {
+            if (gameplayBgm != null) gameplayBgm.stop();
+            if (menuBgm != null) menuBgm.play();
+        });
     }
 
-    /**
-     * Phát một âm thanh thử nghiệm, thường được sử dụng khi điều chỉnh âm lượng trong menu cài đặt.
-     */
-    public void playTestSound() {
-        testSound.play();
+    public void stopMenuBgm() {
+        audioExecutor.submit(() -> {
+            if (menuBgm != null) menuBgm.stop();
+        });
     }
 
-    /**
-     * Đặt âm lượng chính cho tất cả các hiệu ứng âm thanh.
-     * Âm lượng được giới hạn trong khoảng từ 0.0 (tắt tiếng) đến 1.0 (tối đa).
-     * @param volume Giá trị âm lượng mới (từ 0.0 đến 1.0).
-     */
+    public void stopGameplayBgm() {
+        audioExecutor.submit(() -> {
+            if (gameplayBgm != null) gameplayBgm.stop();
+        });
+    }
+
+    public void stopAll() {
+        audioExecutor.submit(() -> {
+            if (menuBgm != null) menuBgm.stop();
+            if (gameplayBgm != null) gameplayBgm.stop();
+        });
+    }
+
+    public void playGameplayBgm() {
+        audioExecutor.submit(() -> {
+            if (menuBgm != null) menuBgm.stop();
+            if (gameplayBgm != null) gameplayBgm.play();
+        });
+    }
+
+    public void pauseGameplayBgm() {
+        audioExecutor.submit(() -> {
+            if (gameplayBgm != null && gameplayBgm.getStatus() == MediaPlayer.Status.PLAYING) {
+                gameplayBgm.pause();
+            }
+        });
+    }
+
+    public void resumeGameplayBgm() {
+        audioExecutor.submit(() -> {
+            if (gameplayBgm != null && gameplayBgm.getStatus() == MediaPlayer.Status.PAUSED) {
+                gameplayBgm.play();
+            }
+        });
+    }
+
     public void setMasterVolume(double volume) {
-        this.masterVolume = Math.max(0.0, Math.min(1.0, volume));
-
-        hitSound.setVolume(masterVolume);
-        winSound.setVolume(masterVolume);
-        loseSound.setVolume(masterVolume);
-        testSound.setVolume(masterVolume);
+        audioExecutor.submit(() -> {
+            masterVolume = Math.max(0.0, Math.min(1.0, volume));
+            applyMasterVolume();
+        });
     }
 
-    /**
-     * Tăng âm lượng chính lên một bậc.
-     * Lượng tăng được xác định bởi biến {@code volStep}.
-     */
     public void increaseVolume() {
-        setMasterVolume(masterVolume + volStep);
+        audioExecutor.submit(() -> {
+            masterVolume = Math.min(1.0, masterVolume + volStep);
+            applyMasterVolume();
+            playTest();
+        });
     }
 
-    /**
-     * Giảm âm lượng chính xuống một bậc.
-     * Lượng giảm được xác định bởi biến {@code volStep}.
-     */
     public void decreaseVolume() {
-        setMasterVolume(masterVolume - volStep);
+        audioExecutor.submit(() -> {
+            masterVolume = Math.max(0.0, masterVolume - volStep);
+            applyMasterVolume();
+            playTest();
+        });
     }
 
+    private void playTest() {
+        if (testSound != null) {
+            testSound.play();
+        }
+    }
+
+    private static void applyMasterVolume() {
+        if (hitSound != null) hitSound.setVolume(masterVolume);
+        if (winSound != null) winSound.setVolume(masterVolume);
+        if (loseSound != null) loseSound.setVolume(masterVolume);
+        if (testSound != null) testSound.setVolume(masterVolume);
+        if (powerUp != null) powerUp.setVolume(masterVolume);
+        if (lostBall != null) lostBall.setVolume(masterVolume);
+        if (finishLevel != null) finishLevel.setVolume(masterVolume);
+
+        if (menuBgm != null) menuBgm.setVolume(masterVolume);
+        if (gameplayBgm != null) gameplayBgm.setVolume(masterVolume);
+    }
 }
