@@ -89,7 +89,7 @@ public class GameplayView extends View {
             double comboY = scoreY - 30;
             gc.setFont(Font.font("Consolas", FontWeight.BOLD, 24));
             gc.setFill(Color.YELLOW);
-            gc.fillText("Streak: x" + model.getCombo(), comboX, comboY);
+            gc.fillText("Combo: x" + model.getCombo(), comboX, comboY);
         }
     }
 

@@ -61,6 +61,7 @@ It demonstrates object-oriented design and the application of multiple design pa
 ### Multithreading
 | Thread | Description |
 |---------|-------------|
+| **Game UI** | Process UI in JavaFx Application Thread |
 | **Game Loop Timer** | Updates logic every frame (≈60 FPS) |
 | **Audio Thread** | Plays SFX asynchronously |
 
@@ -114,7 +115,7 @@ Volume adjustable in **Settings** (step ±0.2).
 |---------|--------|
 | Strong brick | +300 |
 | Consecutive hits | Combo ×2, ×3, ×4... |
-|Laser| Scores won't be accumulated|
+|Laser| Provides Scorepoints but does not contribute to Combo multiplier |
 
 ---
 
