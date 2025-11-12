@@ -2,7 +2,6 @@ package View;
 
 import Controller.ChangeStateCmd;
 import Controller.CheckSaveNameCmd;
-import Controller.GameCommand;
 import Controller.ResumeGameCmd;
 import Model.Button;
 import Model.GameModel;
@@ -11,10 +10,8 @@ import Model.State;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import Controller.GameCommand;
+
+import java.util.Objects;
 
 public class PauseView extends View {
     Button resume;
@@ -25,7 +22,7 @@ public class PauseView extends View {
     public PauseView(GameModel model) {
         super(model);
 
-        background = new Image(getClass().getResource("/Pause.png").toExternalForm());
+        background = new Image(Objects.requireNonNull(getClass().getResource("/Pause.png")).toExternalForm());
 
         resume = new Button(152.2, 351.6, 295.6, 73.9, new ResumeGameCmd(model));
         resume.setImgButton("/Continue.png");
@@ -53,10 +50,6 @@ public class PauseView extends View {
         menu.draw(render);
     }
 
-    /**
-     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
-     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
-     */
     @Override
     public void checkHover(MouseEvent e) {
         for (Button b : buttons) {

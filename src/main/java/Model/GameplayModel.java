@@ -11,98 +11,46 @@ import Controller.GameEvent;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
-/**
- * Quản lý trạng thái và logic của trò chơi.
- * Lớp này chứa tất cả các đối tượng trong trò chơi như bóng, thanh trượt và gạch,
- * đồng thời chứa các cơ chế cốt lõi của trò chơi bao gồm phát hiện va chạm,
- * tính điểm và tiến trình qua các cấp độ.
- */
 public class GameplayModel implements UltilityValues {
     private Image background;
     private Paddle paddle;
     private BallState currentBallState;
+
     private double currentVx;
-    private String ballPath = "DefaultBall.png";
-    private String paddlePath = "DefaultPaddle.png";
+
     private ArrayList<Brick> brick;
     private ArrayList<Ball> balls = new ArrayList<>();
-    private ArrayList<MovableObject> fallingPowerUps = new ArrayList<>();
-    private ArrayList<PowerUp> activePowerUps = new ArrayList<>();
-    private ArrayList<LaserShot> lasers = new ArrayList<>();
+    private final ArrayList<MovableObject> fallingPowerUps = new ArrayList<>();
+    private final ArrayList<PowerUp> activePowerUps = new ArrayList<>();
+    private final ArrayList<LaserShot> lasers = new ArrayList<>();
+
     private int level;
     private int lives;
     private int score;
     private int combo;
     private int scoreMultiplier = 1;
-    private EventLoader eventLoader;
-    private double areaLeft = 0;
-    private double areaRight = canvasWidth;
-    private double playWidth;
+
+    private final EventLoader eventLoader;
+
+    private boolean fading = false;
+    private long fadeStartTime;
+
     private final boolean twoPlayerMode;
     private boolean completedAllLevels = false;
     private boolean levelFinished = false;
-    private boolean fading = false;
-    private long fadeStartTime;
     private boolean waitingForOtherPlayer = false;
     private boolean isWinner = false;
     private boolean isLoser = false;
     private boolean isDraw = false;
-    private boolean twoPlayerEnded = false;
+
     private static final String CONFIG_FILE = "ball_config.txt";
     private static final String DEFAULT_BALL = "DefaultBall.png";
-    private static final String BG_CONFIG_FILE   = "background_config.txt";
-    private static final String DEFAULT_BG   = "/GameBG.png";
+    private static final String BG_CONFIG_FILE = "background_config.txt";
+    private static final String DEFAULT_BG = "/GameBG.png";
     private static final String PADDLE_CONFIG_FILE = "paddle_config.txt";
-    private static final String DEFAULT_PADDLE    = "/DefaultPaddle.png";
+    private static final String DEFAULT_PADDLE = "/DefaultPaddle.png";
+    private String ballPath = "DefaultBall.png";
 
-    public boolean isTwoPlayerEnded() { return twoPlayerEnded; }
-    public void setTwoPlayerEnded(boolean value) { this.twoPlayerEnded = value; }
-
-
-    public boolean isWaitingForOtherPlayer() {
-        return waitingForOtherPlayer;
-    }
-    public void setWaitingForOtherPlayer(boolean waiting) {
-        this.waitingForOtherPlayer = waiting;
-    }
-
-    public boolean isWinner() { return isWinner; }
-    public void setWinner(boolean winner) {
-        this.isWinner = winner;
-        if (winner) { this.isLoser = false; this.isDraw = false; }
-    }
-
-    public boolean isLoser() { return isLoser; }
-    public void setLoser(boolean loser) {
-        this.isLoser = loser;
-        if (loser) { this.isWinner = false; this.isDraw = false; }
-    }
-
-    public boolean isDraw() { return isDraw; }
-    public void setDraw(boolean draw) {
-        this.isDraw = draw;
-        if (draw) { this.isWinner = false; this.isLoser = false; }
-    }
-    public boolean hasCompletedAllLevels() {
-        return completedAllLevels;
-    }
-    public boolean isFading() { return fading; }
-    public long getFadeStartTime() { return fadeStartTime; }
-
-    public void startFade(long nowNano) {
-        this.fading = true;
-        this.fadeStartTime = nowNano;
-    }
-
-    public void stopFade() {
-        this.fading = false;
-    }
-    public boolean isLevelFinished() { return levelFinished; }
-    public void setLevelFinished(boolean finished) { this.levelFinished = finished; }
-
-    /**
-     * Xây dựng một GameplayModel mới và khởi tạo trạng thái trò chơi.
-     */
     public GameplayModel(EventLoader eventLoader) {
         this.eventLoader = eventLoader;
         this.twoPlayerMode = false;
@@ -121,21 +69,18 @@ public class GameplayModel implements UltilityValues {
         combo = 0;
         currentVx = 0;
         renderMap();
-
-        this.playWidth = UltilityValues.canvasWidth;
     }
 
     public GameplayModel(EventLoader eventLoader, double leftBound, double rightBound) {
         this.eventLoader = eventLoader;
         this.twoPlayerMode = true;
-        this.areaLeft = leftBound;
-        this.areaRight = rightBound;
-        paddle.setX((areaLeft + areaRight - paddle.getLength()) / 2);
+        paddle.setX((leftBound + rightBound - paddle.getLength()) / 2);
     }
 
     public GameplayModel(EventLoader eventLoader, boolean twoPlayerMode) {
+        String paddlePath = loadPaddlePathFromFile();
+
         this.eventLoader = eventLoader;
-        this.paddlePath = loadPaddlePathFromFile();
         this.twoPlayerMode = twoPlayerMode;
         this.ballPath = loadBallPathFromFile();
         this.background = loadBackgroundFromFile();
@@ -148,11 +93,13 @@ public class GameplayModel implements UltilityValues {
                 UltilityValues.paddleHeight,
                 paddlePath
         );
+
         Ball ball = new Ball(
                 paddle.x + paddleLength / 2.0,
                 paddle.y - paddleHeight / 2.0,
                 0, 0, 10, ballPath
         );
+
         this.currentBallState = BallState.ATTACHED;
         this.balls.add(ball);
         this.lives = 5;
@@ -210,45 +157,26 @@ public class GameplayModel implements UltilityValues {
         return DEFAULT_BALL;
     }
 
-
-    /**
-     * Phóng quả bóng từ thanh trượt nếu nó hiện đang ở trạng thái ATTACHED (gắn liền).
-     * Quả bóng được cung cấp một vận tốc ban đầu theo chiều dọc.
-     */
     public void launchBall() {
         if (this.currentBallState == BallState.ATTACHED) {
             this.currentBallState = BallState.LAUNCHED;
-            for (Ball ball: balls) {
+            for (Ball ball : balls) {
                 ball.setVx(0);
                 ball.setVy(-3 - currentVx);
             }
         }
     }
 
-    /**
-     * Thêm một viên gạch thuộc loại được chỉ định vào trò chơi tại một vị trí nhất định.
-     * @param type Loại của viên gạch, quyết định các thuộc tính của nó.
-     * @param x Tọa độ x cho vị trí của viên gạch.
-     * @param y Tọa độ y cho vị trí của viên gạch.
-     */
     public void addBrickType(int type, double x, double y) {
         Brick newBrick = new Brick(x, y);
         newBrick.setBrickType(type);
         brick.add(newBrick);
     }
 
-    public void addLaserBullet(double x, double y) {
-        lasers.add(new LaserShot(x, y));
-    }
-
-    /**
-     * Đọc bố cục bản đồ cho cấp độ hiện tại từ một tệp tài nguyên
-     * và điền vào danh sách gạch tương ứng.
-     */
     public void renderMap() {
         this.brick = new ArrayList<>();
         try (InputStream map = getClass().getResourceAsStream(String.format("/map/%d.txt", level));
-            Scanner scan = new Scanner(map)) {
+             Scanner scan = new Scanner(map)) {
             double spawnX = 0;
             double spawnY = 0;
             while (scan.hasNextLine()) {
@@ -256,23 +184,23 @@ public class GameplayModel implements UltilityValues {
                 for (char num : line.toCharArray()) {
                     switch (num) {
                         case '0':
-                        break;
+                            break;
 
                         case '1':
-                        addBrickType(1, spawnX * 50, spawnY * 25);
-                        break;
+                            addBrickType(1, spawnX * 50, spawnY * 25);
+                            break;
 
                         case '2':
-                        addBrickType(2, spawnX * 50, spawnY * 25);
-                        break;
+                            addBrickType(2, spawnX * 50, spawnY * 25);
+                            break;
 
                         case '3':
-                        addBrickType(3, spawnX * 50, spawnY * 25);
-                        break;
+                            addBrickType(3, spawnX * 50, spawnY * 25);
+                            break;
 
                         case '4':
-                        addBrickType(4, spawnX * 50, spawnY * 25);
-                        break;
+                            addBrickType(4, spawnX * 50, spawnY * 25);
+                            break;
                     }
                     spawnX++;
                 }
@@ -281,19 +209,6 @@ public class GameplayModel implements UltilityValues {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Đặt lại quả bóng và thanh trượt về vị trí xuất phát ban đầu.
-     * Trạng thái của quả bóng được đặt thành ATTACHED (gắn liền).
-     */
-    public void setBallPosition() {
-        for (Ball ball : balls) {
-            ball.setX(paddle.getX() + paddle.getLength() / 2);
-            ball.setY(paddle.getY() - paddle.getHeight() / 2);
-            ball.setVx(0);
-            ball.setVy(0);
         }
     }
 
@@ -306,129 +221,14 @@ public class GameplayModel implements UltilityValues {
         currentBallState = BallState.ATTACHED;
     }
 
-    /**
-     * Lấy ảnh nền.
-     * @return Ảnh nền.
-     */
-    public Image getBackground() {
-        return background;
-    }
-
-    /**
-     * Lấy đối tượng thanh trượt.
-     * @return Thanh trượt của trò chơi.
-     */
-    public Paddle getPaddle() {
-        return paddle;
-    }
-
-    public ArrayList<MovableObject> getFallingPowerUps() {
-        return fallingPowerUps;
-    }
-
-    public ArrayList<PowerUp> getActivePowerUps() {
-        return activePowerUps;
-    }
-
-    /**
-     * Lấy đối tượng bóng.
-     * @return Quả bóng của trò chơi.
-     */
-
-
-    public ArrayList<Ball> getBalls() {
-        return balls;
-    }
-
-    public void setBalls(ArrayList<Ball> x) {
-        this.balls = x;
-    }
-
-    /**
-     * Lấy danh sách các viên gạch hiện có trong trò chơi.
-     * @return Một ArrayList chứa các đối tượng Brick.
-     */
-    public ArrayList<Brick> getBricks() {
-        return brick;
-    }
-
-    /**
-     * Lấy số mạng còn lại.
-     * @return Số mạng hiện tại.
-     */
-    public int getLives() {
-        return lives;
-    }
-
-    public void setLives(int lives) {
-        this.lives = lives;
-    }
-
-    /**
-     * Lấy điểm số hiện tại.
-     * @return Điểm của người chơi.
-     */
-
-    public int getScoreMultiplier() {
-        return scoreMultiplier;
-    }
-
-    public void setScoreMultiplier(int multiplier) {
-        this.scoreMultiplier = multiplier;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    /**
-     * Cộng điểm vào tổng điểm, được nhân với combo hiện tại.
-     * @param points Số điểm cơ bản để cộng.
-     */
-    public void scorePoint(int points) {
-        score += points * combo * scoreMultiplier;
-    }
-
-    /**
-     * Lấy hệ số nhân combo hiện tại.
-     * @return Giá trị combo.
-     */
-    public int getCombo() {
-        return combo;
-    }
-
-    public EventLoader getEventLoader() {
-        return eventLoader;
-    }
-
-    /**
-     * Đặt hệ số nhân combo.
-     * @param combo Giá trị combo mới.
-     */
-    public void setCombo(int combo) {
-        this.combo = combo;
-    }
-
-    /**
-     * Tăng hệ số nhân combo lên một.
-     */
-    public void comboHit() {
-        combo++;
-    }
-
-    public double getPlayWidth() {
-        return playWidth;
-    }
-
     public void spawnPowerUp(double x, double y) {
         Random rand = new Random();
         int type = rand.nextInt(7);
         MovableObject pu;
         switch (type) {
-            case 0 -> pu = new PU_Expand(x, y, 0, 2, 15);
             case 1 -> pu = new PU_MultiBall(x, y, 0, 2, 15);
             case 2 -> pu = new PU_Laser(x, y, 0, 2, 15);
-            case 3 -> pu = new PU_ExtraLive(x, y, 0, 2, 15);
+            case 3 -> pu = new PU_ExtraLive(x, y, 15);
             case 4 -> pu = new PU_Shield(x, y, 0, 2, 15);
             case 5 -> pu = new PU_BombBall(x, y, 0, 2, 15);
             case 6 -> pu = new PU_ScoreX2(x, y, 0, 2, 15);
@@ -437,17 +237,9 @@ public class GameplayModel implements UltilityValues {
         fallingPowerUps.add(pu);
     }
 
-
-    /**
-     * Kiểm tra và xử lý tất cả các va chạm trong trò chơi. Điều này bao gồm
-     * va chạm giữa bóng-tường, bóng-thanh trượt, và bóng-gạch. Nó cũng thực thi
-     * các giới hạn di chuyển của thanh trượt.
-     */
-
     public void checkCollisions() {
         paddle.checkBoundary(canvasWidth);
-        int check = 0;
-        for (Ball ball: new ArrayList<>(balls)) {
+        for (Ball ball : new ArrayList<>(balls)) {
             if (currentBallState == BallState.ATTACHED) {
                 ball.attachToPaddle(paddle);
             } else if (currentBallState == BallState.LAUNCHED) {
@@ -470,14 +262,6 @@ public class GameplayModel implements UltilityValues {
         lasers.clear();
     }
 
-    /**
-     * Khởi tạo cấp độ tiếp theo của trò chơi. Phương thức này tăng biến đếm cấp độ,
-     * kết xuất bản đồ mới, đặt lại vị trí các đối tượng, và đặt lại số mạng và combo.
-     */
-    /**
-     * Khởi tạo lại trạng thái khi qua màn mới.
-     * Reset các chỉ số tạm thời nhưng giữ nguyên điểm, mạng và tiến trình.
-     */
     public void Initialize() {
         if (level >= 5) {
             completedAllLevels = true;
@@ -485,7 +269,6 @@ public class GameplayModel implements UltilityValues {
         }
 
         level++;
-
         renderMap();
 
         paddle.setX(canvasWidth / 2.0 - paddleLength / 2.0);
@@ -513,7 +296,6 @@ public class GameplayModel implements UltilityValues {
         waitingForOtherPlayer = false;
         fading = false;
         fadeStartTime = -1;
-        twoPlayerEnded = false;
         isWinner = false;
         isLoser = false;
         isDraw = false;
@@ -521,25 +303,13 @@ public class GameplayModel implements UltilityValues {
         eventLoader.loadEvent(GameEvent.AUTO_SAVE_TRIGGER);
     }
 
-
-    public ArrayList<LaserShot> getLasers() {
-        return lasers;
-    }
-
-    /**
-     * Cập nhật trạng thái trò chơi cho mỗi khung hình. Phương thức này di chuyển thanh trượt và bóng,
-     * cập nhật hoạt ảnh của gạch, kiểm tra va chạm, loại bỏ các viên gạch đã bị phá hủy,
-     * và kiểm tra các thay đổi trạng thái trò chơi như hoàn thành cấp độ hoặc thua cuộc.
-     * @param left      true nếu phím di chuyển sang trái được nhấn.
-     * @param right     true nếu phím di chuyển sang phải được nhấn.
-     * @param deltaTime Thời gian đã trôi qua kể từ khung hình cuối cùng.
-     */
     public void update(boolean left, boolean right, double deltaTime) {
         long frameTime = 16_666_667 / 1_000_000_000;
 
         if (deltaTime < frameTime) {
             return;
         }
+
         this.paddle.move(left, right);
         for (Ball x : balls) {
             x.move();
@@ -557,6 +327,7 @@ public class GameplayModel implements UltilityValues {
                 }
             }
         }
+
         checkCollisions();
         brick.removeIf(Brick::isDestroyed);
 
@@ -584,7 +355,7 @@ public class GameplayModel implements UltilityValues {
             }
         }
 
-        if (lasers != null && !lasers.isEmpty()) {
+        if (!lasers.isEmpty()) {
             for (int i = 0; i < lasers.size(); i++) {
                 LaserShot l = lasers.get(i);
                 l.update();
@@ -613,6 +384,7 @@ public class GameplayModel implements UltilityValues {
                 eventLoader.loadEvent(GameEvent.LEVEL_COMPLETE);
             }
         }
+
         if (!twoPlayerMode) {
             if (hasCompletedAllLevels()) {
                 eventLoader.loadEvent(GameEvent.GAME_WIN);
@@ -623,11 +395,6 @@ public class GameplayModel implements UltilityValues {
         }
     }
 
-
-    /**
-     * Cấu hình lại toàn bộ GameplayModel dựa trên 1 file save.
-     * @param save Đối tượng SaveState đã đọc từ file
-     */
     public void configureFromSave(SaveState save) {
         this.level = save.level;
         this.lives = save.lives;
@@ -662,12 +429,15 @@ public class GameplayModel implements UltilityValues {
                 if (templateBrick.getX() == savedBrick.x && templateBrick.getY() == savedBrick.y) {
                     templateBrick.setBrickType(savedBrick.brickType);
                     templateBrick.frameTimer = savedBrick.frameTimer;
+
                     if (savedBrick.isBreaking) {
                         templateBrick.hit();
                     }
+
                     if (templateBrick.getBrickType() > 0) {
                         loadedBricks.add(templateBrick);
                     }
+
                     foundInSave = true;
                     break;
                 }
@@ -695,8 +465,7 @@ public class GameplayModel implements UltilityValues {
         if (save.activePowerUps != null) {
             for (SaveState.ActivePowerUpData puData : save.activePowerUps) {
                 MovableObject puObj = createPowerUpByName(puData.name, 0, 0, 0, 0);
-                if (puObj instanceof PowerUp) {
-                    PowerUp pu = (PowerUp) puObj;
+                if (puObj instanceof PowerUp pu) {
 
                     pu.apply(this);
                     pu.setElapsedMs(puData.elapsedMs);
@@ -705,40 +474,25 @@ public class GameplayModel implements UltilityValues {
                 }
             }
         }
-
     }
 
-    /**
-     * Tái tạo một đối tượng Power-up từ tên và vị trí
-     * Dùng để tải game
-     */
     private MovableObject createPowerUpByName(String name, double x, double y, double vx, double vy) {
         double radius = 15;
-        switch (name) {
-            case "Expand":
-                return new PU_Expand(x, y, vx, vy, radius);
-            case "Multi Ball":
-                return new PU_MultiBall(x, y, vx, vy, radius);
-            case "Laser":
-                return new PU_Laser(x, y, vx, vy, radius);
-            case "Extra Live":
-                return new PU_ExtraLive(x, y, vx, vy, radius);
-            case "Shield":
-                return new PU_Shield(x, y, vx, vy, radius);
-            case "BombBall":
-                return new PU_BombBall(x, y, vx, vy, radius);
-            case "Score x2":
-                return new PU_ScoreX2(x, y, vx, vy, radius);
-            default:
+        return switch (name) {
+            case "Expand" -> new PU_Expand(x, y, vx, vy, radius);
+            case "Multi Ball" -> new PU_MultiBall(x, y, vx, vy, radius);
+            case "Laser" -> new PU_Laser(x, y, vx, vy, radius);
+            case "Extra Live" -> new PU_ExtraLive(x, y, radius);
+            case "Shield" -> new PU_Shield(x, y, vx, vy, radius);
+            case "BombBall" -> new PU_BombBall(x, y, vx, vy, radius);
+            case "Score x2" -> new PU_ScoreX2(x, y, vx, vy, radius);
+            default -> {
                 System.err.println("CẢNH BÁO: Không nhận diện được tên Power-up khi tải: " + name);
-                return null;
-        }
+                yield null;
+            }
+        };
     }
 
-
-    public void decreaseLives() {
-        lives--;
-    }
 
     public void drawActivePowerUps(GraphicsContext g) {
         if (activePowerUps.isEmpty()) return;
@@ -808,5 +562,150 @@ public class GameplayModel implements UltilityValues {
 
     public String getBallPath() {
         return ballPath;
+    }
+
+    public boolean isWaitingForOtherPlayer() {
+        return waitingForOtherPlayer;
+    }
+
+    public void setWaitingForOtherPlayer(boolean waiting) {
+        this.waitingForOtherPlayer = waiting;
+    }
+
+    public void setWinner(boolean winner) {
+        this.isWinner = winner;
+        if (winner) {
+            this.isLoser = false;
+            this.isDraw = false;
+        }
+    }
+
+    public void setLoser(boolean loser) {
+        this.isLoser = loser;
+        if (loser) {
+            this.isWinner = false;
+            this.isDraw = false;
+        }
+    }
+
+    public void setDraw(boolean draw) {
+        this.isDraw = draw;
+        if (draw) {
+            this.isWinner = false;
+            this.isLoser = false;
+        }
+    }
+
+    public boolean hasCompletedAllLevels() {
+        return completedAllLevels;
+    }
+
+    public boolean isFading() {
+        return fading;
+    }
+
+    public long getFadeStartTime() {
+        return fadeStartTime;
+    }
+
+    public void startFade(long nowNano) {
+        this.fading = true;
+        this.fadeStartTime = nowNano;
+    }
+
+    public void stopFade() {
+        this.fading = false;
+    }
+
+    public boolean isLevelFinished() {
+        return levelFinished;
+    }
+
+    public boolean isWinner() {
+        return isWinner;
+    }
+
+    public boolean isLoser() {
+        return isLoser;
+    }
+
+    public boolean isDraw() {
+        return isDraw;
+    }
+
+    public void addLaserBullet(double x, double y) {
+        lasers.add(new LaserShot(x, y));
+    }
+
+    public Image getBackground() {
+        return background;
+    }
+
+    public Paddle getPaddle() {
+        return paddle;
+    }
+
+    public ArrayList<MovableObject> getFallingPowerUps() {
+        return fallingPowerUps;
+    }
+
+    public ArrayList<PowerUp> getActivePowerUps() {
+        return activePowerUps;
+    }
+
+    public ArrayList<Ball> getBalls() {
+        return balls;
+    }
+
+    public void setBalls(ArrayList<Ball> x) {
+        this.balls = x;
+    }
+
+    public ArrayList<Brick> getBricks() {
+        return brick;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public void setLives(int lives) {
+        this.lives = lives;
+    }
+
+    public void setScoreMultiplier(int multiplier) {
+        this.scoreMultiplier = multiplier;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void scorePoint(int points) {
+        score += points * combo * scoreMultiplier;
+    }
+
+    public int getCombo() {
+        return combo;
+    }
+
+    public EventLoader getEventLoader() {
+        return eventLoader;
+    }
+
+    public void setCombo(int combo) {
+        this.combo = combo;
+    }
+
+    public void comboHit() {
+        combo++;
+    }
+
+    public ArrayList<LaserShot> getLasers() {
+        return lasers;
+    }
+
+    public void decreaseLives() {
+        lives--;
     }
 }

@@ -4,21 +4,16 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 public class PU_Shield extends MovableObject implements PowerUp {
+    private final Image icon = new Image("/shield.png");
+    private final double radius;
     private static final int DURATION_MS = 10000;
     private boolean effectActive = false;
     private int elapsedMs;
-    private Image icon = new Image("/shield.png");
-    private double radius;
 
     public PU_Shield(double x, double y, double vx, double vy, double radius) {
         super(x, y, vx, vy);
         this.radius = radius;
     }
-
-    @Override
-    public String getName() { return "Shield"; }
-    @Override
-    public int getDurationMs() { return DURATION_MS; }
 
     @Override
     public void draw(GraphicsContext g) {
@@ -35,7 +30,7 @@ public class PU_Shield extends MovableObject implements PowerUp {
     @Override
     public void update(GameplayModel game, double deltaTime) {
         if (!effectActive) return;
-        elapsedMs += deltaTime * 1000;
+        elapsedMs += (int) (deltaTime * 1000);
         if (elapsedMs >= DURATION_MS) remove(game);
     }
 
@@ -50,14 +45,17 @@ public class PU_Shield extends MovableObject implements PowerUp {
         return effectActive;
     }
 
-    @Override public double getWidth() {
+    @Override
+    public double getWidth() {
         return radius * 2;
     }
 
-    @Override public double getHeight() {
+    @Override
+    public double getHeight() {
         return radius * 2;
 
     }
+
     @Override
     public int getElapsedMs() {
         return elapsedMs;
@@ -66,5 +64,15 @@ public class PU_Shield extends MovableObject implements PowerUp {
     @Override
     public void setElapsedMs(int ms) {
         this.elapsedMs = ms;
+    }
+
+    @Override
+    public String getName() {
+        return "Shield";
+    }
+
+    @Override
+    public int getDurationMs() {
+        return DURATION_MS;
     }
 }

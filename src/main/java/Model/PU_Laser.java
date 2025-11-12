@@ -1,16 +1,16 @@
 package Model;
 
 import java.awt.*;
+
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 
 public class PU_Laser extends MovableObject implements PowerUp {
-
     private static final int DURATION_MS = 5_000;
     private static final int SHOOT_INTERVAL_MS = 150;
 
-    private double radius;
-    private Image Laser;
+    private final double radius;
+    private final Image Laser;
 
     private boolean active;
     private boolean effectActive;
@@ -26,16 +26,6 @@ public class PU_Laser extends MovableObject implements PowerUp {
     }
 
     @Override
-    public String getName() {
-        return "Laser";
-    }
-
-    @Override
-    public int getDurationMs() {
-        return DURATION_MS;
-    }
-
-    @Override
     public void draw(GraphicsContext g) {
         // dùng khi còn là icon rơi
         if (active && !effectActive) {
@@ -48,12 +38,11 @@ public class PU_Laser extends MovableObject implements PowerUp {
         if (elapsedMs < 0) elapsedMs = 0;
     }
 
-
     @Override
     public void apply(GameplayModel game) {
         for (PowerUp p : game.getActivePowerUps()) {
             if (p instanceof PU_Laser && p.isActive()) {
-                ((PU_Laser)p).extendDuration(2500);
+                ((PU_Laser) p).extendDuration(2500);
                 return;
             }
         }
@@ -63,7 +52,6 @@ public class PU_Laser extends MovableObject implements PowerUp {
         this.elapsedMs = 0;
         this.timeSinceLastShotMs = 0;
     }
-
 
     @Override
     public void update(GameplayModel game, double deltaTime) {
@@ -120,5 +108,15 @@ public class PU_Laser extends MovableObject implements PowerUp {
     @Override
     public void setElapsedMs(int ms) {
         this.elapsedMs = ms;
+    }
+
+    @Override
+    public String getName() {
+        return "Laser";
+    }
+
+    @Override
+    public int getDurationMs() {
+        return DURATION_MS;
     }
 }

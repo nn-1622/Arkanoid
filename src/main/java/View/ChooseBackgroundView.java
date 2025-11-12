@@ -22,7 +22,7 @@ public class ChooseBackgroundView extends View {
 
     public ChooseBackgroundView(GameModel model) {
         super(model);
-        background = new Image(getClass().getResource("/chooseBgBg.png").toExternalForm());
+        background = new Image(Objects.requireNonNull(getClass().getResource("/chooseBgBg.png")).toExternalForm());
 
         bg1 = new Button(60, 156.9, 155.2, 168.1, new ChangeBackgroundCmd(model, "/GameBG.png"));
         bg1.setImgButton("/GameBG.png");
@@ -61,10 +61,6 @@ public class ChooseBackgroundView extends View {
         bg4.draw(render);
     }
 
-    /**
-     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
-     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
-     */
     @Override
     public void checkHover(MouseEvent e) {
         for (Button b : buttons) {

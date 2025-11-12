@@ -8,75 +8,30 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+
 import View.LoadGameView;
 import View.View;
 import View.TwoPlayerPauseView;
 
-/**
- * Lớp model chính của toàn bộ ứng dụng trò chơi.
- * Quản lý trạng thái tổng thể (MENU, PLAYING, TWO_PLAYING, SETTING, v.v.)
- * và chứa các GameplayModel riêng cho 1P hoặc 2P.
- */
 public class GameModel implements UltilityValues {
+    private static final String HIGH_SCORE_FILE = "highscores.dat";
+
     private final EventLoader eventLoader;
     private static GameModel model;
     private volatile State gstate;
     private View currentView;
     private GameplayModel gameModel;
+
     private final Map<State, View> viewMap = new EnumMap<>(State.class);
     private long fadeStartTime = 0;
     private String currentSaveName = null;
     private State stateBeforeAccount;
-    private static final String HIGH_SCORE_FILE = "highscores.dat";
 
     private GameplayModel leftGame;
     private GameplayModel rightGame;
 
-    private long resultStartTime = -1;
-    private boolean resultTimerStarted = false;
-
     private volatile boolean twoPlayerEnded = false;
 
-    public boolean isTwoPlayerEnded() {
-        return twoPlayerEnded;
-    }
-
-    public void setTwoPlayerEnded(boolean value) {
-        this.twoPlayerEnded = value;
-    }
-
-
-    /** Bắt đầu bộ đếm thời gian kết quả */
-    public void startResultTimer() {
-        resultStartTime = System.nanoTime();
-        resultTimerStarted = true;
-    }
-
-    /** Kiểm tra xem đã bắt đầu bộ đếm kết quả chưa */
-    public boolean isResultTimerStarted() {
-        return resultTimerStarted;
-    }
-
-    /**
-     * Kiểm tra đã trôi qua bao lâu kể từ khi bắt đầu kết quả
-     * @param durationMillis số mili-giây chờ (ví dụ 5000 = 5 giây)
-     */
-    public boolean hasResultTimeElapsed(long durationMillis) {
-        if (!resultTimerStarted) return false;
-        long elapsed = (System.nanoTime() - resultStartTime) / 1_000_000;
-        return elapsed >= durationMillis;
-    }
-
-    /** Reset bộ đếm kết quả (nếu cần dùng lại) */
-    public void resetResultTimer() {
-        resultTimerStarted = false;
-        resultStartTime = -1;
-    }
-
-    /**
-     * Khởi tạo một đối tượng GameModel mới.
-     * Trạng thái ban đầu là MENU.
-     */
     private GameModel() {
         eventLoader = new EventLoader();
 
@@ -104,7 +59,6 @@ public class GameModel implements UltilityValues {
         setGstate(State.MENU);
     }
 
-    /** Singleton: chỉ có một GameModel duy nhất */
     public static GameModel getGameModel() {
         if (model == null) {
             model = new GameModel();
@@ -112,28 +66,16 @@ public class GameModel implements UltilityValues {
         return model;
     }
 
-    /**
-     * Tạo và khởi tạo một phiên chơi 1 người.
-     */
     public void CreateGameplay() {
         gameModel = new GameplayModel(eventLoader);
         leftGame = null;
         rightGame = null;
     }
 
-    /**
-     * Tạo và khởi tạo hai phiên chơi riêng biệt cho chế độ 2 người.
-     */
     public void CreateTwoGameplay() {
         leftGame = new GameplayModel(eventLoader, true);
         rightGame = new GameplayModel(eventLoader, true);
-        resetResultTimer();
     }
-
-    public GameplayModel getLeftGame() { return leftGame; }
-    public GameplayModel getRightGame() { return rightGame; }
-
-    public GameplayModel getGameplayModel() { return gameModel; }
 
     public void setGstate(State gstate) {
         if (gstate == State.LOAD_GAME) {
@@ -151,9 +93,6 @@ public class GameModel implements UltilityValues {
         this.gstate = gstate;
         this.currentView = viewMap.get(gstate);
     }
-    public String getCurrentSaveName() {
-        return currentSaveName;
-    }
 
     public void setCurrentSaveName(String name) {
         if (name == null) {
@@ -165,18 +104,6 @@ public class GameModel implements UltilityValues {
         }
     }
 
-    public State getStateBeforeAccount() {
-        return (stateBeforeAccount != null) ? stateBeforeAccount : State.MENU;
-    }
-
-    public void setStateBeforeAccount(State state) {
-        this.stateBeforeAccount = state;
-    }
-
-    /**
-     * Thu thập dữ liệu từ GameplayModel và lưu vào file.
-     * @param fileName Tên file (ví dụ: "player1.sav")
-     */
     public void saveGame(String fileName) {
         if (gameModel == null) {
             System.err.println("Không có game để save!");
@@ -189,8 +116,7 @@ public class GameModel implements UltilityValues {
         SaveState save = new SaveState();
 
         save.hasGameProgress = true;
-        String baseName = fileName.replace(".sav", "");
-        save.playerName = baseName;
+        save.playerName = fileName.replace(".sav", "");
         save.level = gameModel.getLevel();
         save.lives = gameModel.getLives();
         save.score = gameModel.getScore();
@@ -222,8 +148,7 @@ public class GameModel implements UltilityValues {
         }
 
         for (MovableObject puObj : gameModel.getFallingPowerUps()) {
-            if (puObj instanceof PowerUp) {
-                PowerUp pu = (PowerUp) puObj;
+            if (puObj instanceof PowerUp pu) {
                 SaveState.FallingPowerUpData puData = new SaveState.FallingPowerUpData();
                 puData.name = pu.getName();
                 puData.x = puObj.getX();
@@ -248,11 +173,6 @@ public class GameModel implements UltilityValues {
         }
     }
 
-    /**
-     * Đọc file save và cấu hình GameplayModel
-     * @param fileName Tên file (ví dụ: "player1.sav")
-     * @return true nếu load thành công
-     */
     public boolean loadGame(String fileName) {
         SaveState save;
 
@@ -280,6 +200,85 @@ public class GameModel implements UltilityValues {
         return true;
     }
 
+    public void autoSave() {
+        if (currentSaveName != null && gameModel != null) {
+            System.out.println("Auto-saving progress to: " + currentSaveName);
+            saveGame(currentSaveName);
+        } else {
+            System.out.println("Currently in a 'New Game' slot, auto-save skipped.");
+        }
+    }
+
+    public synchronized void recordFinalScore() {
+        if (gameModel == null || currentSaveName == null) {
+            System.out.println("Không lưu điểm: Không có tên hoặc không có game.");
+            return;
+        }
+
+        int finalScore = gameModel.getScore();
+        String playerName = currentSaveName.replace(".sav", "");
+
+        List<HighScoreEntry> scores = loadHighScores();
+
+        scores.add(new HighScoreEntry(playerName, finalScore));
+
+        saveHighScores(scores);
+        System.out.println("Đã lưu điểm cao: " + playerName + " - " + finalScore);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<HighScoreEntry> loadHighScores() {
+        File file = new File(HIGH_SCORE_FILE);
+        if (file.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                return (List<HighScoreEntry>) ois.readObject();
+            } catch (Exception e) {
+                System.err.println("Lỗi khi đọc highscores.dat: " + e.getMessage());
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    private void saveHighScores(List<HighScoreEntry> scores) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(HIGH_SCORE_FILE))) {
+            oos.writeObject(scores);
+        } catch (IOException e) {
+            System.err.println("lỗi khi ghi highscores.dat " + e.getMessage());
+        }
+    }
+
+    public boolean isTwoPlayerEnded() {
+        return twoPlayerEnded;
+    }
+
+    public void setTwoPlayerEnded(boolean value) {
+        this.twoPlayerEnded = value;
+    }
+
+    public GameplayModel getLeftGame() {
+        return leftGame;
+    }
+
+    public GameplayModel getRightGame() {
+        return rightGame;
+    }
+
+    public GameplayModel getGameplayModel() {
+        return gameModel;
+    }
+
+    public String getCurrentSaveName() {
+        return currentSaveName;
+    }
+
+    public State getStateBeforeAccount() {
+        return (stateBeforeAccount != null) ? stateBeforeAccount : State.MENU;
+    }
+
+    public void setStateBeforeAccount(State state) {
+        this.stateBeforeAccount = state;
+    }
+
     public State getGstate() {
         return gstate;
     }
@@ -304,69 +303,7 @@ public class GameModel implements UltilityValues {
         return fadeStartTime;
     }
 
-
     public View getView(State state) {
         return viewMap.get(state);
-    }
-
-    public void autoSave() {
-        if (currentSaveName != null && gameModel != null) {
-            System.out.println("Auto-saving progress to: " + currentSaveName);
-            saveGame(currentSaveName);
-        } else {
-            System.out.println("Currently in a 'New Game' slot, auto-save skipped.");
-        }
-    }
-
-    public void CreateNewGame() {
-        currentSaveName = null;
-        CreateGameplay();
-    }
-
-    /**
-     * Ghi lại điểm số cuối cùng khi game kết thúc (Thắng hoặc Thua).
-     */
-    public synchronized void recordFinalScore() {
-        if (gameModel == null || currentSaveName == null) {
-            System.out.println("Không lưu điểm: Không có tên hoặc không có game.");
-            return;
-        }
-
-        int finalScore = gameModel.getScore();
-        String playerName = currentSaveName.replace(".sav", "");
-
-        List<HighScoreEntry> scores = loadHighScores();
-
-        scores.add(new HighScoreEntry(playerName, finalScore));
-
-        saveHighScores(scores);
-        System.out.println("Đã lưu điểm cao: " + playerName + " - " + finalScore);
-    }
-
-    /**
-     * Đọc danh sách điểm từ file highscores.dat
-     */
-    @SuppressWarnings("unchecked")
-    private List<HighScoreEntry> loadHighScores() {
-        File file = new File(HIGH_SCORE_FILE);
-        if (file.exists()) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                return (List<HighScoreEntry>) ois.readObject();
-            } catch (Exception e) {
-                System.err.println("Lỗi khi đọc highscores.dat: " + e.getMessage());
-            }
-        }
-        return new ArrayList<>();
-    }
-
-    /**
-     * Hàm hỗ trợ: Ghi (ghi đè) danh sách điểm vào file highscores.dat
-     */
-    private void saveHighScores(List<HighScoreEntry> scores) {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(HIGH_SCORE_FILE))) {
-            oos.writeObject(scores);
-        } catch (IOException e) {
-            System.err.println("lỗi khi ghi highscores.dat " + e.getMessage());
-        }
     }
 }

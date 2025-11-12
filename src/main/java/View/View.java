@@ -17,17 +17,18 @@ public class View implements UltilityValues, SceneActions {
     public View(GameModel model) {
         this.model = model;
         buttons = new ArrayList<>();
-    };
+    }
 
-    public void draw(GraphicsContext gc, GameplayModel gameplayModel) {};
+    public void draw(GraphicsContext gc, GameplayModel gameplayModel) {
+    }
 
-    public void checkHover(MouseEvent e) {};
+    public void checkHover(MouseEvent e) {
+    }
 
     @Override
     public void handleClick(MouseEvent e) {
         for (Button button : buttons) {
-            if(button.isClicked(e)) {
-                System.out.println("clicked");
+            if (button.isClicked(e)) {
                 button.activate();
                 Controller.SoundManager.getInstance().onGameEvent(Controller.GameEvent.CLICK);
                 return;
@@ -37,6 +38,9 @@ public class View implements UltilityValues, SceneActions {
 
     public void handleKeyInput(KeyEvent e) {
     }
-    public GameModel getModel() { return model; }
+
+    public GameModel getModel() {
+        return model;
+    }
 
 }

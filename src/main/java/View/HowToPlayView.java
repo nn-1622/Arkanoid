@@ -9,14 +9,17 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
+import java.util.Objects;
+
 public class HowToPlayView extends View {
-    private Image background;
+    private final Image background;
     Button exit;
+
     public HowToPlayView(GameModel model) {
         super(model);
 
-        background = new Image(getClass().getResource("/HowtoplayBg.png").toExternalForm());
-        exit = new Button( 412.4, 26.4, 175, 67.3, new ChangeStateCmd(model, State.SETTING));
+        background = new Image(Objects.requireNonNull(getClass().getResource("/HowtoplayBg.png")).toExternalForm());
+        exit = new Button(412.4, 26.4, 175, 67.3, new ChangeStateCmd(model, State.SETTING));
         exit.setImgButton("/Exit.png");
         exit.setImgHoverButton("/ExitHover.png");
 
@@ -29,10 +32,6 @@ public class HowToPlayView extends View {
         exit.draw(render);
     }
 
-    /**
-     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
-     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
-     */
     @Override
     public void checkHover(MouseEvent e) {
         for (Button b : buttons) {

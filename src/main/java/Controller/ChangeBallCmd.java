@@ -1,15 +1,15 @@
 package Controller;
 
 import Model.GameModel;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
 
 public class ChangeBallCmd implements GameCommand {
+    private static final String CONFIG_FILE = "ball_config.txt";
     private final GameModel model;
     private final String path;
-
-    private static final String CONFIG_FILE = "ball_config.txt";
 
     public ChangeBallCmd(GameModel model, String path) {
         this.model = model;

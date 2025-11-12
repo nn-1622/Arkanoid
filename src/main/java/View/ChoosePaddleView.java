@@ -10,6 +10,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
+import java.util.Objects;
+
 public class ChoosePaddleView extends View {
     Image background;
     Button pd1;
@@ -21,7 +23,7 @@ public class ChoosePaddleView extends View {
     public ChoosePaddleView(GameModel model) {
         super(model);
 
-        background = new Image(getClass().getResource("/choosePaddleBg.png").toExternalForm());
+        background = new Image(Objects.requireNonNull(getClass().getResource("/choosePaddleBg.png")).toExternalForm());
 
         pd1 = new Button(142.3, 176.2, 315.4, 70.1, new ChangePaddleCmd(model, "/DefaultPaddle.png"));
         pd1.setImgButton("/DefaultPaddle.png");
@@ -59,11 +61,7 @@ public class ChoosePaddleView extends View {
         pd3.draw(render);
         pd4.draw(render);
     }
-
-    /**
-     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
-     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
-     */
+    
     @Override
     public void checkHover(MouseEvent e) {
         for (Button b : buttons) {

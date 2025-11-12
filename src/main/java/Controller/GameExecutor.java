@@ -1,31 +1,23 @@
 package Controller;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 public final class GameExecutor {
-    private GameExecutor() {
-        logicExecutor = newSingle("game-logic", true);
-        audioExecutor = newSingle("game-audio", true);
-    }
-
-    private static ExecutorService newSingle(String name, boolean daemon) {
-        return java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
-            Thread t = new Thread(r, name);
-            t.setDaemon(daemon);
-            return t;
-        });
-    }
-
-    private static class Holder { static final GameExecutor I = new GameExecutor(); }
-    public static GameExecutor getInstance() { return Holder.I; }
-
     private final ExecutorService logicExecutor;
     private final ExecutorService audioExecutor;
 
-    public ExecutorService getLogicExecutor() { return logicExecutor; }
-    public ExecutorService getAudioExecutor() { return audioExecutor; }
+    private GameExecutor() {
+        logicExecutor = newSingle("game-logic");
+        audioExecutor = newSingle("game-audio");
+    }
+
+    private static ExecutorService newSingle(String name) {
+        return java.util.concurrent.Executors.newSingleThreadExecutor(r -> {
+            Thread t = new Thread(r, name);
+            t.setDaemon(true);
+            return t;
+        });
+    }
 
     public void shutdown() {
         shutdownExecutor(audioExecutor);
@@ -44,5 +36,21 @@ public final class GameExecutor {
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    private static class Holder {
+        static final GameExecutor I = new GameExecutor();
+    }
+
+    public static GameExecutor getInstance() {
+        return Holder.I;
+    }
+
+    public ExecutorService getLogicExecutor() {
+        return logicExecutor;
+    }
+
+    public ExecutorService getAudioExecutor() {
+        return audioExecutor;
     }
 }

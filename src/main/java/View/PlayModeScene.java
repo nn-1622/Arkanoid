@@ -1,7 +1,6 @@
 package View;
 
 import Controller.ChangeStateCmd;
-import Controller.ExitCmd;
 import Model.Button;
 import Model.GameModel;
 import Model.GameplayModel;
@@ -13,14 +12,14 @@ import javafx.scene.input.MouseEvent;
 import java.util.Objects;
 
 public class PlayModeScene extends View implements SceneActions {
-    private Image background;
+    private final Image background;
     Button One_Player;
     Button Two_Player;
-    private Button exitButton;
+    private final Button exitButton;
 
     public PlayModeScene(GameModel model) {
         super(model);
-        exitButton = new Button( 200.1, 523.8, 199.8, 41.9, new ChangeStateCmd(model, State.MENU));
+        exitButton = new Button(200.1, 523.8, 199.8, 41.9, new ChangeStateCmd(model, State.MENU));
         exitButton.setImgButton("/Exit.png");
         exitButton.setImgHoverButton("/ExitHover.png");
 
@@ -47,10 +46,6 @@ public class PlayModeScene extends View implements SceneActions {
         exitButton.draw(render);
     }
 
-    /**
-     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
-     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
-     */
     @Override
     public void checkHover(MouseEvent e) {
         for (Button b : buttons) {

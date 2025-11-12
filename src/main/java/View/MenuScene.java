@@ -10,41 +10,34 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
-/**
- * Lớp chịu trách nhiệm quản lý và hiển thị màn hình menu chính của trò chơi.
- * Lớp này bao gồm ảnh nền và các nút tương tác như "Bắt đầu", "Cài đặt" và "Thoát".
- */
+import java.util.Objects;
+
 public class MenuScene extends View implements SceneActions {
-    private Image background;
+    private final Image background;
     Button start;
     Button settings;
     Button exit;
     Button lead;
 
-    /**
-     * Khởi tạo một đối tượng MenuScene mới.
-     * Tải ảnh nền và khởi tạo các nút (Start, Settings, Exit) với vị trí,
-     * kích thước và hình ảnh tương ứng cho trạng thái bình thường và khi di chuột qua.
-     */
     public MenuScene(GameModel model) {
         super(model);
 
 
-        background = new Image(getClass().getResource("/bg.png").toExternalForm());
+        background = new Image(Objects.requireNonNull(getClass().getResource("/bg.png")).toExternalForm());
 
-        start = new Button( 177.9, 274.5, 244.2, 61, new ChangeStateCmd(model, State.PLAY_MODE));
+        start = new Button(177.9, 274.5, 244.2, 61, new ChangeStateCmd(model, State.PLAY_MODE));
         start.setImgButton("/Start.png");
         start.setImgHoverButton("/StartHover.png");
 
-        settings = new Button( 184, 346.8, 231.9, 64.4, new ChangeStateCmd(model, State.SETTING));
+        settings = new Button(184, 346.8, 231.9, 64.4, new ChangeStateCmd(model, State.SETTING));
         settings.setImgButton("/Setting.png");
         settings.setImgHoverButton("/SettingHover.png");
 
-        exit = new Button( 212.5, 411.2, 175, 67.3, new ExitCmd());
+        exit = new Button(212.5, 411.2, 175, 67.3, new ExitCmd());
         exit.setImgButton("/Exit.png");
         exit.setImgHoverButton("/ExitHover.png");
 
-        lead = new Button(422.1, 259.6, 90.8, 90.8, new  ChangeStateCmd(model, State.LEADERBOARD));
+        lead = new Button(422.1, 259.6, 90.8, 90.8, new ChangeStateCmd(model, State.LEADERBOARD));
         lead.setImgButton("/Lead.png");
         lead.setImgHoverButton("/LeadHover.png");
 
@@ -54,13 +47,6 @@ public class MenuScene extends View implements SceneActions {
         buttons.add(lead);
     }
 
-    /**
-     * Vẽ toàn bộ màn hình menu lên canvas.
-     * Phương thức này sẽ vẽ ảnh nền trước, sau đó vẽ các nút lên trên.
-     *
-     * @param render        Đối tượng GraphicsContext được sử dụng để thực hiện các thao tác vẽ.
-     * @param gameplayModel
-     */
     @Override
     public void draw(GraphicsContext render, GameplayModel gameplayModel) {
         render.drawImage(background, 0, 0, 600, 650);
@@ -70,10 +56,6 @@ public class MenuScene extends View implements SceneActions {
         lead.draw(render);
     }
 
-    /**
-     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
-     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
-     */
     @Override
     public void checkHover(MouseEvent e) {
         for (Button b : buttons) {

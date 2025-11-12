@@ -4,29 +4,17 @@ import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 
 public class PU_BombBall extends MovableObject implements PowerUp {
-
     private static final int DURATION_MS = 6000;
     private boolean picked = false;
     private boolean active = false;
-    private double radius;
-    private Image icon;
-
+    private final double radius;
+    private final Image icon;
     private int elapsedMs = 0;
 
     public PU_BombBall(double x, double y, double vx, double vy, double radius) {
         super(x, y, vx, vy);
         this.radius = radius;
         icon = new Image("/bombball.png");
-    }
-
-    @Override
-    public String getName() {
-        return "BombBall";
-    }
-
-    @Override
-    public int getDurationMs() {
-        return DURATION_MS;
     }
 
     @Override
@@ -51,7 +39,7 @@ public class PU_BombBall extends MovableObject implements PowerUp {
     public void update(GameplayModel game, double deltaTime) {
         if (!active) return;
 
-        elapsedMs += (int)(deltaTime * 1000);
+        elapsedMs += (int) (deltaTime * 1000);
 
         if (elapsedMs >= DURATION_MS) {
             remove(game);
@@ -61,8 +49,6 @@ public class PU_BombBall extends MovableObject implements PowerUp {
     @Override
     public void remove(GameplayModel game) {
         active = false;
-
-        // tắt bomb cho bóng
         for (Ball b : game.getBalls()) {
             b.setBomb(false);
         }
@@ -73,16 +59,33 @@ public class PU_BombBall extends MovableObject implements PowerUp {
         return active;
     }
 
-    @Override public double getWidth() {
+    @Override
+    public double getWidth() {
         return radius * 2;
     }
-    @Override public double getHeight() {
+
+    @Override
+    public double getHeight() {
         return radius * 2;
     }
-    @Override public int getElapsedMs() {
+
+    @Override
+    public int getElapsedMs() {
         return elapsedMs;
     }
-    @Override public void setElapsedMs(int ms) {
+
+    @Override
+    public void setElapsedMs(int ms) {
         this.elapsedMs = ms;
+    }
+
+    @Override
+    public String getName() {
+        return "BombBall";
+    }
+
+    @Override
+    public int getDurationMs() {
+        return DURATION_MS;
     }
 }

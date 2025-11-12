@@ -1,36 +1,25 @@
 package Model;
 
-import java.util.List;
 import java.util.ArrayList;
+
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
+
 import java.awt.*;
 
 public class PU_MultiBall extends MovableObject implements PowerUp {
-    private double radius;
-    private Image multi_ball;
-    private boolean active = false;
-    private double originalWidth;
+    private final double radius;
+    private final Image multi_ball;
 
     public PU_MultiBall(double x, double y, double vx, double vy, double radius) {
         super(x, y, vx, vy);
         this.radius = radius;
-        this.multi_ball = new Image ("/MultiBallPU.png");
-    }
-
-    @Override
-    public String getName() {
-        return "Multi Ball";
-    }
-
-    @Override
-    public int getDurationMs() {
-        return 0;
+        this.multi_ball = new Image("/MultiBallPU.png");
     }
 
     @Override
     public void draw(GraphicsContext g) {
-        g.drawImage(multi_ball, x - radius, y - radius, radius *2, radius*2);
+        g.drawImage(multi_ball, x - radius, y - radius, radius * 2, radius * 2);
     }
 
     @Override
@@ -56,7 +45,7 @@ public class PU_MultiBall extends MovableObject implements PowerUp {
             double angle2 = angle - Math.toRadians(15);
 
             Ball ball1 = new Ball(x, y, speed * Math.cos(angle1), speed * Math.sin(angle1), r, game.getBallPath());
-            Ball ball2 = new Ball(x, y, speed * Math.cos(angle2), speed * Math.sin(angle2), r,  game.getBallPath());
+            Ball ball2 = new Ball(x, y, speed * Math.cos(angle2), speed * Math.sin(angle2), r, game.getBallPath());
 
             if (b.isBomb()) {
                 ball1.setBomb(true);
@@ -72,7 +61,7 @@ public class PU_MultiBall extends MovableObject implements PowerUp {
 
     @Override
     public void remove(GameplayModel game) {
-        active = false;
+        boolean active = false;
     }
 
     @Override
@@ -102,6 +91,16 @@ public class PU_MultiBall extends MovableObject implements PowerUp {
 
     @Override
     public void setElapsedMs(int ms) {
+
     }
 
+    @Override
+    public String getName() {
+        return "Multi Ball";
+    }
+
+    @Override
+    public int getDurationMs() {
+        return 0;
+    }
 }

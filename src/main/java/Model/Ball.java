@@ -7,99 +7,24 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 
-/**
- * Lớp đại diện cho đối tượng quả bóng trong trò chơi.
- * Kế thừa từ {@link MovableObject}, lớp Ball có thêm thuộc tính bán kính (radius)
- * và hình ảnh riêng để hiển thị.
- */
 public class Ball extends MovableObject {
-    private double radius;
-    private Image ballImg;
+    private final double radius;
+    private final Image ballImg;
     private boolean isBomb = false;
 
-    /**
-     * Khởi tạo một đối tượng Ball mới.
-     * @param x Tọa độ x ban đầu của tâm bóng.
-     * @param y Tọa độ y ban đầu của tâm bóng.
-     * @param vx Vận tốc ban đầu theo trục x.
-     * @param vy Vận tốc ban đầu theo trục y.
-     * @param radius Bán kính của quả bóng.
-     */
     public Ball(double x, double y, double vx, double vy, double radius, String path) {
-        super(x,y,vx,vy);
+        super(x, y, vx, vy);
         this.radius = radius;
         ballImg = new Image(path);
     }
 
-    /**
-     * Lấy tọa độ x của cạnh trái của quả bóng.
-     * @return Tọa độ x của cạnh trái.
-     */
-    public double getEdgeLeft() {
-        return x - radius;
-    }
-
-    /**
-     * Lấy tọa độ x của cạnh phải của quả bóng.
-     * @return Tọa độ x của cạnh phải.
-     */
-    public double getEdgeRight() {
-        return x + radius;
-    }
-
-    /**
-     * Lấy tọa độ y của cạnh trên của quả bóng.
-     * @return Tọa độ y của cạnh trên.
-     */
-    public double getEdgeTop() {
-        return y - radius;
-    }
-
-    /**
-     * Lấy tọa độ y của cạnh dưới của quả bóng.
-     * @return Tọa độ y của cạnh dưới.
-     */
-    public double getEdgeBottom() {
-        return y + radius;
-    }
-
-    /**
-     * Lấy bán kính của quả bóng.
-     * @return Bán kính.
-     */
-    public double getRadius() {
-        return radius;
-    }
-
-    /**
-     * Lấy tọa độ x của tâm quả bóng.
-     * @return Tọa độ x của tâm.
-     */
-    public double getCenter() {
-        return x;
-    }
-
-    public void setballImg(String ballImg) {
-        this.ballImg = new Image(ballImg);
-    }
-
-    public void setBomb(boolean val) { isBomb = val; }
-    public boolean isBomb() { return isBomb; }
-
-
-    /**
-     * {@inheritDoc}
-     * Vẽ hình ảnh của quả bóng lên canvas tại vị trí hiện tại.
-     * Hình ảnh được vẽ sao cho tâm của nó trùng với tọa độ (x, y) của đối tượng Ball.
-     */
     @Override
     public void draw(GraphicsContext render) {
         if (isBomb) {
             render.setFill(Color.ORANGE);
             render.fillOval(x - radius * 1.4, y - radius * 1.4, radius * 2.8, radius * 2.8);
         }
-
-        render.drawImage(ballImg, x - radius, y - radius, radius *2, radius*2);
+        render.drawImage(ballImg, x - radius, y - radius, radius * 2, radius * 2);
     }
 
     public void attachToPaddle(Paddle paddle) {
@@ -151,13 +76,13 @@ public class Ball extends MovableObject {
     }
 
     private void explodeBricksAround(ArrayList<Brick> bricks, Brick center, GameplayModel game) {
-        double blastRadius = 80; // bán kính nổ
+        double blastRadius = 80;
 
         for (Brick b : bricks) {
             if (!b.isDestroyed()) {
                 double dx = (b.getX() + b.getWidth() / 2) - (center.getX() + center.getWidth() / 2);
                 double dy = (b.getY() + b.getHeight() / 2) - (center.getY() + center.getHeight() / 2);
-                double dist = Math.sqrt(dx*dx + dy*dy);
+                double dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist <= blastRadius) {
                     b.hit();
@@ -209,5 +134,35 @@ public class Ball extends MovableObject {
         }
     }
 
+    public double getEdgeLeft() {
+        return x - radius;
+    }
 
+    public double getEdgeRight() {
+        return x + radius;
+    }
+
+    public double getEdgeTop() {
+        return y - radius;
+    }
+
+    public double getEdgeBottom() {
+        return y + radius;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public double getCenter() {
+        return x;
+    }
+
+    public void setBomb(boolean val) {
+        isBomb = val;
+    }
+
+    public boolean isBomb() {
+        return isBomb;
+    }
 }

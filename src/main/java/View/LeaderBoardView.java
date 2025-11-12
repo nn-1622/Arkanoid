@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class LeaderBoardView extends View {
-    private Image background;
+    private final Image background;
     Button exit;
 
     private List<HighScoreEntry> topScores = new ArrayList<>();
@@ -27,7 +27,7 @@ public class LeaderBoardView extends View {
 
     public LeaderBoardView(GameModel model) {
         super(model);
-        background = new Image(getClass().getResource("/LeaderBoard.png").toExternalForm());
+        background = new Image(Objects.requireNonNull(getClass().getResource("/LeaderBoard.png")).toExternalForm());
 
         exit = new Button(8.8, 582, 150.1, 57.7, new ChangeStateCmd(model, State.MENU));
         exit.setImgButton("/Exit.png");
@@ -36,9 +36,6 @@ public class LeaderBoardView extends View {
         buttons.add(exit);
     }
 
-    /**
-     * Đọc file highscores.dat sắp xếp và lấy top 3
-     */
     @SuppressWarnings("unchecked")
     public void refreshScores() {
         List<HighScoreEntry> allScores = new ArrayList<>();

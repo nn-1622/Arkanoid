@@ -1,9 +1,8 @@
 package Model;
 
 public interface UltilityValues {
-    public double canvasWidth = 600;
-    public final double canvasHeight = 650;
-    public double paddleLength = 110;
-    public double paddleHeight = 20;
-    public double playWidth = canvasWidth * 2;
+    double canvasWidth = 600;
+    double canvasHeight = 650;
+    double paddleLength = 110;
+    double paddleHeight = 20;
 }

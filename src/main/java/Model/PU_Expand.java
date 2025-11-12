@@ -7,26 +7,15 @@ public class PU_Expand extends MovableObject implements PowerUp {
 
     private static final int DURATION_MS = 5_000;
 
-    private double radius;
-    private Image expand_paddle;
+    private final double radius;
+    private final Image expand_paddle;
     private boolean effectActive;
-    private double originalWidth;
     private int elapsedMs;
 
     public PU_Expand(double x, double y, double vx, double vy, double radius) {
         super(x, y, vx, vy);
         this.radius = radius;
         this.expand_paddle = new Image("/x2LengthPU.png");
-    }
-
-    @Override
-    public String getName() {
-        return "Expand";
-    }
-
-    @Override
-    public int getDurationMs() {
-        return DURATION_MS;
     }
 
     @Override
@@ -40,12 +29,10 @@ public class PU_Expand extends MovableObject implements PowerUp {
         if (effectActive) return;
         Paddle paddle = game.getPaddle();
         if (paddle.getLength() > UltilityValues.paddleLength * Math.pow(1.5, 3)) return;
-        if (paddle != null) {
-            originalWidth = paddle.getLength();
-            paddle.setLength(originalWidth * 1.5);
-            effectActive = true;
-            elapsedMs = 0;
-        }
+        double originalWidth = paddle.getLength();
+        paddle.setLength(originalWidth * 1.5);
+        effectActive = true;
+        elapsedMs = 0;
     }
 
     @Override
@@ -90,5 +77,15 @@ public class PU_Expand extends MovableObject implements PowerUp {
     @Override
     public void setElapsedMs(int ms) {
         this.elapsedMs = ms;
+    }
+
+    @Override
+    public String getName() {
+        return "Expand";
+    }
+
+    @Override
+    public int getDurationMs() {
+        return DURATION_MS;
     }
 }

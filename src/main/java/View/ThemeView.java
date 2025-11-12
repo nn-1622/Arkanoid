@@ -9,6 +9,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 
+import java.util.Objects;
+
 public class ThemeView extends View {
     Button background;
     Button paddle;
@@ -18,7 +20,7 @@ public class ThemeView extends View {
 
     public ThemeView(GameModel model) {
         super(model);
-        backgroundIMG = new Image(getClass().getResource("/bg2.png").toExternalForm());
+        backgroundIMG = new Image(Objects.requireNonNull(getClass().getResource("/bg2.png")).toExternalForm());
 
         paddle = new Button(139.3, 161.1, 321.4, 80.3, new ChangeStateCmd(model, State.CHOOSE_PADDLE));
         paddle.setImgButton("/Spaddle.png");
@@ -51,10 +53,6 @@ public class ThemeView extends View {
         paddle.draw(render);
     }
 
-    /**
-     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
-     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
-     */
     @Override
     public void checkHover(MouseEvent e) {
         for (Button b : buttons) {

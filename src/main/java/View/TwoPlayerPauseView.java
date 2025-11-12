@@ -1,7 +1,6 @@
 package View;
 
 import Controller.ChangeStateCmd;
-import Controller.GameCommand;
 import Model.Button;
 import Model.GameModel;
 import Model.GameplayModel;
@@ -12,12 +11,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.scene.text.TextAlignment;
 
-/**
- * Màn hình Pause RÚT GỌN chỉ dành cho 2 người chơi.
- * Chỉ có nút Resume và Exit.
- */
 public class TwoPlayerPauseView extends View {
     private final Button resumeButton;
     private final Button exitButton;
@@ -30,12 +24,7 @@ public class TwoPlayerPauseView extends View {
         double btnHeight = 50;
 
         resumeButton = new Button(centerX - btnWidth / 2, 250, btnWidth, btnHeight,
-                new GameCommand() {
-                    @Override
-                    public void execute() {
-                        model.setGstate(State.TWO_PLAYING);
-                    }
-                });
+                () -> model.setGstate(State.TWO_PLAYING));
         resumeButton.setImgButton("/Continue.png");
         resumeButton.setImgHoverButton("/ContinueHover.png");
 
@@ -53,11 +42,6 @@ public class TwoPlayerPauseView extends View {
         drawOverlay(gc, true);
     }
 
-    /**
-     * Hàm vẽ chính, có khả năng vẽ cho 1P hoặc 2P.
-     * @param gc
-     * @param isTwoPlayer Chế độ 2 người chơi (vẽ gấp đôi chiều rộng)
-     */
     public void drawOverlay(GraphicsContext gc, boolean isTwoPlayer) {
         double canvasWidth = UltilityValues.canvasWidth * (isTwoPlayer ? 2 : 1);
         double canvasHeight = UltilityValues.canvasHeight;
@@ -73,7 +57,7 @@ public class TwoPlayerPauseView extends View {
 
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 50));
-        gc.fillText("PAUSED", centerX, 180);
+        gc.fillText("PAUSED", centerX - 80, 180);
 
         resumeButton.setX(centerX - resumeButton.getWidth() / 2);
         exitButton.setX(centerX - exitButton.getWidth() / 2);

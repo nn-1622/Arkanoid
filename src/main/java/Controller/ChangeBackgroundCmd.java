@@ -1,15 +1,15 @@
 package Controller;
 
 import Model.GameModel;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ChangeBackgroundCmd implements GameCommand {
+    private static final String CONFIG_FILE = "background_config.txt";
     private final GameModel model;
     private final String path;
-
-    private static final String CONFIG_FILE = "background_config.txt";
 
     public ChangeBackgroundCmd(GameModel model, String path) {
         this.model = model;

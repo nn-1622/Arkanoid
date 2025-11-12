@@ -1,15 +1,12 @@
 package Model;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Lớp này chứa tất cả dữ liệu cần thiết để lưu và tải lại 1 màn chơi.
- * Nó phải implement Serializable để có thể ghi/đọc từ file.
- */
 public class SaveState implements Serializable {
-
+    @Serial
     private static final long serialVersionUID = 1L;
 
     public boolean hasGameProgress = false;
@@ -25,31 +22,33 @@ public class SaveState implements Serializable {
     public boolean paddleShield;
 
     public List<BallData> balls;
-
     public List<BrickData> bricks;
-
     public List<FallingPowerUpData> fallingPowerUps;
     public List<ActivePowerUpData> activePowerUps;
 
     public static class FallingPowerUpData implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
         public String name;
         public double x, y, vx, vy;
     }
 
     public static class ActivePowerUpData implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
         public String name;
         public int elapsedMs;
     }
 
     public static class BallData implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
         public double x, y, vx, vy;
         public boolean isBomb;
     }
 
     public static class BrickData implements Serializable {
+        @Serial
         private static final long serialVersionUID = 1L;
         public double x, y;
         public int brickType;

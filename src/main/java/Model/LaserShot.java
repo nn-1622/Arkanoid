@@ -19,14 +19,6 @@ public class LaserShot extends MovableObject {
         g.fillRect(x, y, WIDTH, HEIGHT);
     }
 
-    @Override
-    public double getWidth() { return WIDTH; }
-
-    @Override
-    public double getHeight() { return HEIGHT; }
-
-    public boolean isDestroyed() { return destroyed; }
-
     public void update() {
         y += this.getVy();
         if (y + HEIGHT < 0) destroyed = true;
@@ -57,5 +49,19 @@ public class LaserShot extends MovableObject {
                 break;
             }
         }
+    }
+
+    @Override
+    public double getWidth() {
+        return WIDTH;
+    }
+
+    @Override
+    public double getHeight() {
+        return HEIGHT;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
     }
 }

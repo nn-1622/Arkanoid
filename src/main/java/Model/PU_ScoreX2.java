@@ -4,9 +4,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 public class PU_ScoreX2 extends MovableObject implements PowerUp {
-    private static final int DURATION_MS = 10000; // hiệu lực 10 giây
-    private double radius;
-    private Image img;
+    private static final int DURATION_MS = 10000;
+    private final double radius;
+    private final Image img;
     private boolean active = true;
     private boolean effectActive = false;
     private int elapsedMs = 0;
@@ -15,16 +15,6 @@ public class PU_ScoreX2 extends MovableObject implements PowerUp {
         super(x, y, vx, vy);
         this.radius = radius;
         this.img = new Image("/x2.png");
-    }
-
-    @Override
-    public String getName() {
-        return "Score x2";
-    }
-
-    @Override
-    public int getDurationMs() {
-        return DURATION_MS;
     }
 
     @Override
@@ -48,7 +38,7 @@ public class PU_ScoreX2 extends MovableObject implements PowerUp {
     @Override
     public void update(GameplayModel game, double deltaTime) {
         if (!effectActive) return;
-        elapsedMs += (int)(deltaTime * 1000);
+        elapsedMs += (int) (deltaTime * 1000);
 
         if (elapsedMs >= DURATION_MS) {
             remove(game);
@@ -84,6 +74,16 @@ public class PU_ScoreX2 extends MovableObject implements PowerUp {
     @Override
     public void setElapsedMs(int ms) {
         this.elapsedMs = ms;
+    }
+
+    @Override
+    public String getName() {
+        return "Score x2";
+    }
+
+    @Override
+    public int getDurationMs() {
+        return DURATION_MS;
     }
 
 }

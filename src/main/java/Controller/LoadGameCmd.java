@@ -12,8 +12,6 @@ public class LoadGameCmd implements GameCommand {
         this.fileName = fileName;
     }
 
-    public String getFileName() { return fileName; }
-
     @Override
     public void execute() {
         if (model.loadGame(fileName)) {
@@ -21,5 +19,9 @@ public class LoadGameCmd implements GameCommand {
         } else {
             System.err.println("Lỗi: Không thể tải file " + fileName);
         }
+    }
+
+    public String getFileName() {
+        return fileName;
     }
 }

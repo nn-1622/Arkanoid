@@ -12,7 +12,7 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
-public class ChooseBallView extends View{
+public class ChooseBallView extends View {
     Image background;
     Button ball1;
     Button ball2;
@@ -23,7 +23,7 @@ public class ChooseBallView extends View{
     public ChooseBallView(GameModel model) {
         super(model);
 
-        background = new Image(getClass().getResource("/chooseBallBg.png").toExternalForm());
+        background = new Image(Objects.requireNonNull(getClass().getResource("/chooseBallBg.png")).toExternalForm());
 
         ball1 = new Button(91.3, 176.6, 123.2, 123.2, new ChangeBallCmd(model, "/DefaultBall.png"));
         ball1.setImgButton("/DefaultBall.png");
@@ -62,10 +62,6 @@ public class ChooseBallView extends View{
         ball4.draw(render);
     }
 
-    /**
-     * Kiểm tra và cập nhật trạng thái di chuột (hover) cho tất cả các nút trên menu.
-     * @param e Sự kiện chuột (MouseEvent) chứa tọa độ hiện tại của con trỏ.
-     */
     @Override
     public void checkHover(MouseEvent e) {
         for (Button b : buttons) {

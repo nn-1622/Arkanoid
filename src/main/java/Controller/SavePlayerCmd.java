@@ -4,8 +4,6 @@ import Model.GameModel;
 import Model.SaveState;
 import Model.State;
 import View.AccountView;
-import View.PauseView;
-import View.View;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,19 +12,15 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
 public class SavePlayerCmd implements GameCommand {
-    private AccountView view;
-    private GameModel model;
+    private final AccountView view;
+    private final GameModel model;
 
     public SavePlayerCmd(AccountView view) {
         this.view = view;
         this.model = view.getModel();
     }
 
-    /**
-     * check xem trong file có quá 4 slot ko
-     * @param limit 4 slot được lưu
-     */
-    private void checkAndDeleteOldestSlot(int limit) {
+    private void checkAndDeleteOldestSlot() {
         File saveDir = new File("saves");
         if (!saveDir.exists()) {
             saveDir.mkdir();
@@ -35,7 +29,7 @@ public class SavePlayerCmd implements GameCommand {
 
         File[] saveFiles = saveDir.listFiles((dir, name) -> name.endsWith(".sav"));
 
-        if (saveFiles != null && saveFiles.length >= limit) {
+        if (saveFiles != null && saveFiles.length >= 4) {
             Arrays.sort(saveFiles, (f1, f2) -> Long.compare(f1.lastModified(), f2.lastModified()));
             File oldestFile = saveFiles[0];
             System.out.println("đã đạt giới hạn slot xóa slot cũ nhất " + oldestFile.getName());
@@ -55,14 +49,11 @@ public class SavePlayerCmd implements GameCommand {
         State previousState = model.getStateBeforeAccount();
 
         if (previousState == State.PAUSED) {
-
             model.setCurrentSaveName(fileName);
             model.saveGame(fileName);
             model.setGstate(State.PAUSED);
-
         } else {
-
-            checkAndDeleteOldestSlot(4);
+            checkAndDeleteOldestSlot();
 
             model.setCurrentSaveName(fileName);
             System.out.println("Creating new empty save slot: " + fileName);

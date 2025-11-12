@@ -8,40 +8,19 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-import java.util.ArrayList;
+public class GameView extends View {
+    private final Scene scene;
+    private final GraphicsContext gc;
+    private final Canvas canvas;
 
-/**
- * Lớp View chính, chịu trách nhiệm quản lý và hiển thị các màn hình khác nhau của trò chơi.
- * Lớp này hoạt động như một bộ điều phối, quyết định màn hình nào (menu, game, cài đặt, v.v.)
- * sẽ được vẽ lên canvas dựa trên trạng thái hiện tại của {@link GameModel}.
- */
-public class GameView {
-    private Group root;
-    private Scene scene;
-    private GraphicsContext gc;
-    private Canvas canvas;
-
-    /**
-     * Khởi tạo GameView.
-     * Thiết lập các thành phần cơ bản của JavaFX như Scene, Group, Canvas và GraphicsContext.
-     * Đồng thời, khởi tạo tất cả các đối tượng view con (sub-views) cho các màn hình khác nhau.
-     */
     public GameView(GameModel gameModel) {
-        root = new Group();
-        scene = new Scene(root, 600,650);
-        canvas = new Canvas(600,650);
+        super(gameModel);
+        Group root = new Group();
+        scene = new Scene(root, 600, 650);
+        canvas = new Canvas(600, 650);
         root.getChildren().add(canvas);
-        gc  = canvas.getGraphicsContext2D();
+        gc = canvas.getGraphicsContext2D();
     }
-
-    public Scene getScene() {
-        return scene;
-    }
-
-    public javafx.scene.Scene getScene_center() {
-        return scene;
-    }
-
 
     public void ensureSizeForState(State s) {
         double targetW = (s == State.TWO_PLAYING || s == State.TWO_PLAYER_PAUSED) ? 1200 : 600;
@@ -60,17 +39,10 @@ public class GameView {
         if (scene.getWindow() != null) {
             scene.getWindow().setWidth(targetW + 16);
             scene.getWindow().setHeight(targetH + 39);
-            ((javafx.stage.Stage) scene.getWindow()).centerOnScreen();
+            scene.getWindow().centerOnScreen();
         }
-
     }
 
-    /**
-     * Phương thức kết xuất (render) chính, được gọi liên tục trong vòng lặp game.
-     * Dựa vào trạng thái (State) từ GameModel, phương thức này gọi phương thức vẽ
-     * tương ứng từ các đối tượng view con.
-     * @param model Đối tượng GameModel chứa trạng thái hiện tại của game.
-     */
     public void render(GameModel model) {
         ensureSizeForState(model.getGstate());
         State currentState = model.getGstate();
@@ -126,6 +98,8 @@ public class GameView {
         }
     }
 
-
+    public Scene getScene() {
+        return scene;
+    }
 
 }
