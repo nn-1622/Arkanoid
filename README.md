@@ -12,7 +12,7 @@
 
 ---
 
-![Class Diagram](Arkanoid/src/main/resources/classDiagram.png)
+![Class Diagram](src/main/resources/classDiagram.png)
 
 ## Description
 This is a modern remake of the classic **Arkanoid** game built with **JavaFX**.
