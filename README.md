@@ -12,12 +12,14 @@
 
 ---
 
+![Class Diagram](Arkanoid/src/main/resources/classDiagram.png)
+
 ## Description
-This is a modern remake of the classic **Arkanoid** game built with **JavaFX**.  
+This is a modern remake of the classic **Arkanoid** game built with **JavaFX**.
 It demonstrates object-oriented design and the application of multiple design patterns.
 
 ### Key Features
-1. Built with **Java  25** and **JavaFX**.
+1. Built with **Java 25** and **JavaFX**.
 2. Implements core OOP principles: *Encapsulation, Inheritance, Polymorphism, Abstraction*.
 3. Applies patterns: **Singleton**, **Factory Method**, **Command**, **Observer**, **State**.
 4. Power-up system created via **Factory Pattern**.
