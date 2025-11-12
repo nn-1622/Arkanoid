@@ -3,6 +3,9 @@ package Model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+/**
+ * Đại diện cho tia laser được bắn ra từ thanh đỡ (paddle) trong trò chơi.
+ */
 public class LaserShot extends MovableObject {
     private static final double SPEED = -10;
     private static final double WIDTH = 4;

@@ -1,5 +1,8 @@
 package Model;
 
+/**
+ * Giao diện đại diện cho một hiệu ứng power up trong trò chơi.
+ */
 public interface PowerUp {
     String getName();
 

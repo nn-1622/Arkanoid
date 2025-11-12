@@ -16,6 +16,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
+/**
+ * bộ điều khiển chính của trò chơi
+ * xử lý logic, sự kiện, âm thanh, đầu vào và cập nhật giao diện
+ */
 public class GameController implements GameEventListener {
     private static final double FADE_DURATION = 1.1;
     private final GameModel model;
@@ -46,6 +50,10 @@ public class GameController implements GameEventListener {
         handleStateChange(lastState);
     }
 
+    /**
+     * xử lý các state trò chơi và điều chỉnh âm thanh
+     * @param newState new state
+     */
     private void handleStateChange(State newState) {
         if (newState == null) return;
 
@@ -67,6 +75,10 @@ public class GameController implements GameEventListener {
         }
     }
 
+    /**
+     * xử lý các sự kiện trò chơi (thắng, thua,..)
+     * @param event game event
+     */
     @Override
     public void onGameEvent(GameEvent event) {
         switch (event) {
@@ -86,6 +98,10 @@ public class GameController implements GameEventListener {
         }
     }
 
+    /**
+     * cập nhật logic game theo thời gian
+     * @param now thời gian hệ thống
+     */
     public void update(long now) {
         if (lastUpdateTime == 0) lastUpdateTime = now;
         double deltaTime = (now - lastUpdateTime) / 1_000_000_000.0;
@@ -134,6 +150,9 @@ public class GameController implements GameEventListener {
         }
     }
 
+    /**
+     * xử lý logic trong chế độ 1 player
+     */
     private void handleSinglePlayer(double deltaTime) {
         if (!(model.getCurrentView() instanceof GameplayView))
             Platform.runLater(() -> model.setCurrentView(new GameplayView(model)));
@@ -151,6 +170,9 @@ public class GameController implements GameEventListener {
         }
     }
 
+    /**
+     * xử lý logic trong chế độ 2 players
+     */
     private void handleTwoPlayer(long now, double deltaTime) {
         if (!(model.getCurrentView() instanceof TwoPlayerView)) {
             Platform.runLater(() -> {
@@ -224,6 +246,10 @@ public class GameController implements GameEventListener {
         }
     }
 
+    /**
+     * xử lý hiệu ứng mờ dần giữa các màn chơi
+     * @param now now
+     */
     private void handleFade(long now) {
         double elapsed = (now - model.getFadeStartTime()) / 1_000_000_000.0;
         if (elapsed >= FADE_DURATION && model.getGameplayModel() != null) {
@@ -232,6 +258,9 @@ public class GameController implements GameEventListener {
         }
     }
 
+    /**
+     * Nhận đầu vào từ bàn phím và chuột
+     */
     public void setInput() {
         view.getScene().setOnMouseMoved(e -> {
             if (model.getCurrentView() != null) model.getCurrentView().checkHover(e);
@@ -241,11 +270,19 @@ public class GameController implements GameEventListener {
         view.getScene().setOnKeyReleased(this::handleKeyReleased);
     }
 
+    /**
+     * xử lý click chuột
+     * @param e click chuột
+     */
     private void handleMouseClick(javafx.scene.input.MouseEvent e) {
         if (model.getCurrentView() != null)
             model.getCurrentView().handleClick(e);
     }
 
+    /**
+     * xử lý khi nhấn phím
+     * @param e nhấn phím
+     */
     private void handleKeyPressed(javafx.scene.input.KeyEvent e) {
         State state = model.getGstate();
         KeyCode code = e.getCode();
@@ -331,6 +368,10 @@ public class GameController implements GameEventListener {
         }
     }
 
+    /**
+     * xử lý nhả phím
+     * @param e nhả phím
+     */
     private void handleKeyReleased(javafx.scene.input.KeyEvent e) {
         switch (e.getCode()) {
             case A:

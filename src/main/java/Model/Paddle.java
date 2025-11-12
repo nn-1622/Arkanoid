@@ -3,6 +3,9 @@ package Model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+/**
+ * Đối tượng thanh đỡ
+ */
 public class Paddle extends MovableObject implements UltilityValues {
     private double length;
     private final double height;

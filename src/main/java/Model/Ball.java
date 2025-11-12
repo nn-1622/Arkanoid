@@ -7,6 +7,10 @@ import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 
+/**
+ * Đối tượng quả bóng
+ * xử lý di chuyển, va chạm.
+ */
 public class Ball extends MovableObject {
     private final double radius;
     private final Image ballImg;

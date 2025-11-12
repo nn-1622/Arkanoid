@@ -3,6 +3,9 @@ package Model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+/**
+ * hiệu ứng kéo dài paddle
+ */
 public class PU_Expand extends MovableObject implements PowerUp {
 
     private static final int DURATION_MS = 5_000;

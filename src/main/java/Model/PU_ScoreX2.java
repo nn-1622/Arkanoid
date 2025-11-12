@@ -3,6 +3,9 @@ package Model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+/**
+ * hiệu ứng x2 điểm.
+ */
 public class PU_ScoreX2 extends MovableObject implements PowerUp {
     private static final int DURATION_MS = 10000;
     private final double radius;

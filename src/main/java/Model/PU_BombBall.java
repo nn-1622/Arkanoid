@@ -3,6 +3,9 @@ package Model;
 import javafx.scene.image.Image;
 import javafx.scene.canvas.GraphicsContext;
 
+/**
+ * Hiệu ứng nổ bom.
+ */
 public class PU_BombBall extends MovableObject implements PowerUp {
     private static final int DURATION_MS = 6000;
     private boolean picked = false;

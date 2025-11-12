@@ -7,6 +7,9 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * đối tượng nút bấm.
+ */
 public class Button extends Utility {
     private Image imgButton;
     private Image imgHoverButton;

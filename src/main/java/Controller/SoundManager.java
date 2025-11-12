@@ -7,6 +7,10 @@ import javafx.scene.media.MediaPlayer;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 
+/**
+ * lớp quản lý âm thanh của trò chơi.
+ * sử dụng singleton để đảm bảo chỉ có một trình quản lý âm thanh duy nhất.
+ */
 public class SoundManager implements GameEventListener {
 
     private static SoundManager instance;
@@ -48,6 +52,11 @@ public class SoundManager implements GameEventListener {
         setMasterVolume(masterVolume);
     }
 
+    /**
+     * tạo media player phát lặp lại liên tục
+     * @param path file nhạc
+     * @return đối tượng media
+     */
     private MediaPlayer createLoopPlayer(String path) {
         try {
             var url = getClass().getResource(path);
@@ -65,6 +74,10 @@ public class SoundManager implements GameEventListener {
         }
     }
 
+    /**
+     * xử lý các sự kiện âm thanh trong trò chơi
+     * @param event game event
+     */
     @Override
     public void onGameEvent(GameEvent event) {
         audioExecutor.submit(() -> {

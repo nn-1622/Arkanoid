@@ -3,6 +3,9 @@ package Controller;
 import Model.GameModel;
 import Model.State;
 
+/**
+ * lệnh dùng để tải lại dữ liệu trò chơi từ một file lưu.
+ */
 public class LoadGameCmd implements GameCommand {
     private final GameModel model;
     private final String fileName;

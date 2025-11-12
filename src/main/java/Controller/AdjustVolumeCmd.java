@@ -1,5 +1,8 @@
 package Controller;
 
+/**
+ * lệnh điều chỉnh âm lượng của trò chơi.
+ */
 public class AdjustVolumeCmd implements GameCommand {
     private final boolean increase;
 

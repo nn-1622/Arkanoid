@@ -11,6 +11,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 
+/**
+ * lệnh lưu thông tin và dữ liệu trò chơi.
+ * quản lý các file lưu, xóa slot cũ nếu đã đạt giới hạn
+ * và tạo file lưu mới cho người chơi
+ */
 public class SavePlayerCmd implements GameCommand {
     private final AccountView view;
     private final GameModel model;
@@ -20,6 +25,10 @@ public class SavePlayerCmd implements GameCommand {
         this.model = view.getModel();
     }
 
+    /**
+     * kiểm tra số lượng file lưu, nếu đạt giới hạn
+     * thì xóa file cũ nhất để nhường chỗ cho slot mới.
+     */
     private void checkAndDeleteOldestSlot() {
         File saveDir = new File("saves");
         if (!saveDir.exists()) {

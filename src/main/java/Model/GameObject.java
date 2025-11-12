@@ -2,6 +2,10 @@ package Model;
 
 import javafx.scene.canvas.GraphicsContext;
 
+/**
+ * Lớp interface đại diện cho một đối tượng cơ bản trong trò chơi.
+ * các đối tượng như ball, brick ... đều kế thừa từ lớp này
+ */
 public abstract class GameObject {
     protected double x;
     protected double y;

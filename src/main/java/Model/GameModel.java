@@ -13,6 +13,12 @@ import View.LoadGameView;
 import View.View;
 import View.TwoPlayerPauseView;
 
+/**
+ * lớp trung tâm quản lý toàn bộ trạng thái của trò chơi,
+ * lưu giữ dữ liệu, điều khiển luồng logic, xử lý save/load game,
+ * và quản lý các view tương ứng với từng trạng thái
+ * sử dụng singleton để chỉ tồn tại duy nhất một instance trong toàn bộ chương trình.
+ */
 public class GameModel implements UltilityValues {
     private static final String HIGH_SCORE_FILE = "highscores.dat";
 
@@ -59,6 +65,10 @@ public class GameModel implements UltilityValues {
         setGstate(State.MENU);
     }
 
+    /**
+     * lấy instance duy nhất của game model
+     * @return game model.
+     */
     public static GameModel getGameModel() {
         if (model == null) {
             model = new GameModel();
@@ -66,17 +76,27 @@ public class GameModel implements UltilityValues {
         return model;
     }
 
+    /**
+     * tạo một game mới ở chế độ chơi đơn.
+     */
     public void CreateGameplay() {
         gameModel = new GameplayModel(eventLoader);
         leftGame = null;
         rightGame = null;
     }
 
+    /**
+     * tạo hai game song song cho chế độ hai người chơi.
+     */
     public void CreateTwoGameplay() {
         leftGame = new GameplayModel(eventLoader, true);
         rightGame = new GameplayModel(eventLoader, true);
     }
 
+    /**
+     * đặt trạng thái hiện tại của game, đồng thời cập nhật View tương ứng
+     * @param gstate new state
+     */
     public void setGstate(State gstate) {
         if (gstate == State.LOAD_GAME) {
             View view = viewMap.get(State.LOAD_GAME);
@@ -94,6 +114,10 @@ public class GameModel implements UltilityValues {
         this.currentView = viewMap.get(gstate);
     }
 
+    /**
+     * đặt tên file lưu hiện tại (file .sav).
+     * @param name tên file save
+     */
     public void setCurrentSaveName(String name) {
         if (name == null) {
             this.currentSaveName = null;
@@ -104,6 +128,10 @@ public class GameModel implements UltilityValues {
         }
     }
 
+    /**
+     * lưu trạng thái game hiện tại xuống file.
+     * @param fileName tên file
+     */
     public void saveGame(String fileName) {
         if (gameModel == null) {
             System.err.println("Không có game để save!");
@@ -173,6 +201,11 @@ public class GameModel implements UltilityValues {
         }
     }
 
+    /**
+     * tải game từ file save.
+     * @param fileName tên file save
+     * @return true or false nếu tải thành công hay không
+     */
     public boolean loadGame(String fileName) {
         SaveState save;
 
@@ -200,6 +233,9 @@ public class GameModel implements UltilityValues {
         return true;
     }
 
+    /**
+     * tự động lưu tiến trình hiện tại nếu có tên file save.
+     */
     public void autoSave() {
         if (currentSaveName != null && gameModel != null) {
             System.out.println("Auto-saving progress to: " + currentSaveName);
@@ -209,6 +245,9 @@ public class GameModel implements UltilityValues {
         }
     }
 
+    /**
+     * ghi điểm cuối cùng vào bảng xếp hạng.
+     */
     public synchronized void recordFinalScore() {
         if (gameModel == null || currentSaveName == null) {
             System.out.println("Không lưu điểm: Không có tên hoặc không có game.");

@@ -6,6 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * lệnh thay đổi thanh đỡ trong trò chơi.
+ */
 public class ChangePaddleCmd implements GameCommand {
     private static final String CONFIG_FILE = "paddle_config.txt";
     private final GameModel model;
