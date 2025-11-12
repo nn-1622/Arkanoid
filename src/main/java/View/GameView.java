@@ -8,11 +8,19 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
+/**
+ * Lớp xử lí hiển thị game.
+ */
 public class GameView extends View {
     private final Scene scene;
     private final GraphicsContext gc;
     private final Canvas canvas;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param gameModel gameModel gốc của game
+     */
     public GameView(GameModel gameModel) {
         super(gameModel);
         Group root = new Group();
@@ -22,6 +30,11 @@ public class GameView extends View {
         gc = canvas.getGraphicsContext2D();
     }
 
+    /**
+     * Hàm chuyển kích thước màn hình sang các chế độ của game.
+     *
+     * @param s trạng thái game
+     */
     public void ensureSizeForState(State s) {
         double targetW = (s == State.TWO_PLAYING || s == State.TWO_PLAYER_PAUSED) ? 1200 : 600;
         double targetH = 650;
@@ -43,6 +56,11 @@ public class GameView extends View {
         }
     }
 
+    /**
+     * Hàm vẽ màn hình của game.
+     *
+     * @param model model gốc của game
+     */
     public void render(GameModel model) {
         ensureSizeForState(model.getGstate());
         State currentState = model.getGstate();

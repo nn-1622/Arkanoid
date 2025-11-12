@@ -12,6 +12,9 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị chọn loại Paddle.
+ */
 public class ChoosePaddleView extends View {
     Image background;
     Button pd1;
@@ -20,6 +23,11 @@ public class ChoosePaddleView extends View {
     Button pd4;
     Button exit;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public ChoosePaddleView(GameModel model) {
         super(model);
 

@@ -10,18 +10,38 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.ArrayList;
 
+/**
+ * Lớp gốc hiển thị hình ảnh.
+ */
 public class View implements UltilityValues, SceneActions {
-    protected GameModel model;
-    protected ArrayList<Button> buttons;
+    protected GameModel model;// model gốc của game
+    protected ArrayList<Button> buttons;// danh sách nút bấm
 
+    /**
+     * Hàm khởi tạo, các class View về sau đều lấy từ View.
+     *
+     * @param model gốc của các view
+     */
     public View(GameModel model) {
         this.model = model;
         buttons = new ArrayList<>();
     }
 
+    /**
+     * Hàm vẽ các đối tượng trong View.
+     *
+     * @param gc biến giúp truyền ngữ cảnh
+     * @param gameplayModel model của gamePlay
+     */
     public void draw(GraphicsContext gc, GameplayModel gameplayModel) {
     }
 
+    /**
+     * Hàm kiểm tra chuột khi trong vùng chọn.
+     *
+     * @param e chuột
+     */
+    @Override
     public void checkHover(MouseEvent e) {
     }
 
@@ -36,6 +56,11 @@ public class View implements UltilityValues, SceneActions {
         }
     }
 
+    /**
+     * Kiểm tra bấm phím.
+     *
+     * @param e phím
+     */
     public void handleKeyInput(KeyEvent e) {
     }
 

@@ -12,11 +12,19 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * Lớp hiển thị màn hình thắng.
+ */
 public class VictoryView extends View {
     private final Image win = new Image("/win.png");
     private final Button replay;
     private final Button menu;
 
+    /**
+     * Hàm khởi tạo màn hình chơi khi Thắng.
+     *
+     * @param model model gốc của game
+     */
     public VictoryView(GameModel model) {
         super(model);
         replay = new Button(54.7, 559.3, 245.3, 61.3, new ChangeStateCmd(model, State.PLAYING));

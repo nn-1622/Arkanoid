@@ -11,12 +11,20 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
+/**
+ * Lớp hiển thị hình ảnh của Account.
+ */
 public class AccountView extends View {
     private final Button exitButton;
     private final Button saveButton;
     private String playerName;
     private boolean isTyping = false;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public AccountView(GameModel model) {
         super(model);
 

@@ -16,9 +16,17 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị màn loadGameView.
+ */
 public class LoadGameView extends View {
     private final Image background;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public LoadGameView(GameModel model) {
         super(model);
         background = new Image(Objects.requireNonNull(getClass().getResource("/bg2.png")).toExternalForm());
@@ -45,6 +53,9 @@ public class LoadGameView extends View {
         }
     }
 
+    /**
+     * Hàm refreshSavegame.
+     */
     public void refreshSaveSlots() {
         buttons.removeIf(button -> button.getCommand() instanceof LoadGameCmd);
         File saveDir = new File("saves");

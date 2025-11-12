@@ -12,6 +12,9 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị Chọn Background.
+ */
 public class ChooseBackgroundView extends View {
     Image background;
     Button bg1;
@@ -20,6 +23,11 @@ public class ChooseBackgroundView extends View {
     Button bg4;
     Button exit;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public ChooseBackgroundView(GameModel model) {
         super(model);
         background = new Image(Objects.requireNonNull(getClass().getResource("/chooseBgBg.png")).toExternalForm());

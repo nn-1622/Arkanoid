@@ -11,12 +11,20 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Chọn chế độ chơi.
+ */
 public class PlayModeScene extends View implements SceneActions {
     private final Image background;
     Button One_Player;
     Button Two_Player;
     private final Button exitButton;
 
+    /**
+     * Lớp khởi tạo.
+     *
+     * @param model gốc của game
+     */
     public PlayModeScene(GameModel model) {
         super(model);
         exitButton = new Button(200.1, 523.8, 199.8, 41.9, new ChangeStateCmd(model, State.MENU));

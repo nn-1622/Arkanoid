@@ -11,10 +11,18 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị Cách chơi của game.
+ */
 public class HowToPlayView extends View {
     private final Image background;
     Button exit;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public HowToPlayView(GameModel model) {
         super(model);
 

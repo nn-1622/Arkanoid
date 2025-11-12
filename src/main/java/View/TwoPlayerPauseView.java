@@ -12,10 +12,18 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * Lớp hiển thị màn hình dừng trong chế độ 2P.
+ */
 public class TwoPlayerPauseView extends View {
     private final Button resumeButton;
     private final Button exitButton;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc
+     */
     public TwoPlayerPauseView(GameModel model) {
         super(model);
 
@@ -42,6 +50,12 @@ public class TwoPlayerPauseView extends View {
         drawOverlay(gc, true);
     }
 
+    /**
+     * Hàm vẽ lớp phủ khi Pause.
+     *
+     * @param gc biến chuyển ngữ cảnh
+     * @param isTwoPlayer có phải chế độ 2P hay không.
+     */
     public void drawOverlay(GraphicsContext gc, boolean isTwoPlayer) {
         double canvasWidth = UltilityValues.canvasWidth * (isTwoPlayer ? 2 : 1);
         double canvasHeight = UltilityValues.canvasHeight;

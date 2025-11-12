@@ -10,6 +10,9 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * Lớp hiển thị màn hình chơi game.
+ */
 public class GameplayView extends View {
     public GameplayView(GameModel model) {
         super(model);
@@ -17,6 +20,12 @@ public class GameplayView extends View {
 
     public Image healthbar = new Image(Objects.requireNonNull(getClass().getResource("/healthbar.png")).toExternalForm());
 
+    /**
+     * Hàm vẽ màn hình chơi.
+     *
+     * @param gc biến giúp truyền ngữ cảnh
+     * @param model model của gamePlay
+     */
     public void draw(GraphicsContext gc, GameplayModel model) {
         Image background = model.getBackground();
         gc.drawImage(background, 0, 0, 600, 650);
@@ -48,6 +57,12 @@ public class GameplayView extends View {
         model.drawEffects(gc);
     }
 
+    /**
+     * Hàm vẽ Giao diện người dùng.
+     *
+     * @param gc biến đổi ngữ cảnh
+     * @param model model gốc
+     */
     public void drawUI(GraphicsContext gc, GameplayModel model) {
         double scoreX = UltilityValues.canvasWidth - 170;
         double scoreY = UltilityValues.canvasHeight - 30;

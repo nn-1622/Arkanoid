@@ -11,6 +11,9 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Lớp màn hình hiển thị chỉnh sửa đồ họa trong game.
+ */
 public class ThemeView extends View {
     Button background;
     Button paddle;
@@ -18,6 +21,11 @@ public class ThemeView extends View {
     Button exit;
     Image backgroundIMG;
 
+    /**
+     * Lớp khởi tạo.
+     *
+     * @param model model game gốc
+     */
     public ThemeView(GameModel model) {
         super(model);
         backgroundIMG = new Image(Objects.requireNonNull(getClass().getResource("/bg2.png")).toExternalForm());

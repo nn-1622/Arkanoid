@@ -12,6 +12,9 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị Setting Game.
+ */
 public class SettingScene extends View {
     private final Image settingBg;
     private Image settings;
@@ -21,6 +24,11 @@ public class SettingScene extends View {
     private final Button theme;
     private final Button how2play;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc
+     */
     public SettingScene(GameModel model) {
         super(model);
         settingBg = new Image(Objects.requireNonNull(getClass().getResource("/settingBg.png")).toExternalForm());

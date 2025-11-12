@@ -13,12 +13,20 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị Pause của 1P.
+ */
 public class PauseView extends View {
     Button resume;
     Button save;
     Button menu;
     Image background;
 
+    /**
+     * Hàm khởi tạo pause.
+     *
+     * @param model model gốc
+     */
     public PauseView(GameModel model) {
         super(model);
 

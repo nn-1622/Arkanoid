@@ -12,11 +12,19 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+/**
+ * Lớp hiển thị LoseView của 1P
+ */
 public class LoseView extends View {
     private final Image lose = new Image("/lose.png");
     private final Button replay;
     private final Button menu;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public LoseView(GameModel model) {
         super(model);
 

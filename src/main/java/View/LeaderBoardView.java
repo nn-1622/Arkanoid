@@ -18,6 +18,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị BXH của game.
+ */
 public class LeaderBoardView extends View {
     private final Image background;
     Button exit;
@@ -25,6 +28,11 @@ public class LeaderBoardView extends View {
     private List<HighScoreEntry> topScores = new ArrayList<>();
     private static final String HIGH_SCORE_FILE = "highscores.dat";
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public LeaderBoardView(GameModel model) {
         super(model);
         background = new Image(Objects.requireNonNull(getClass().getResource("/LeaderBoard.png")).toExternalForm());

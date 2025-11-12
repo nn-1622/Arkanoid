@@ -12,6 +12,9 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị Menu Game.
+ */
 public class MenuScene extends View implements SceneActions {
     private final Image background;
     Button start;
@@ -19,9 +22,13 @@ public class MenuScene extends View implements SceneActions {
     Button exit;
     Button lead;
 
+    /**
+     * Hàm hiển thị MenuScene.
+     *
+     * @param model model gốc của game
+     */
     public MenuScene(GameModel model) {
         super(model);
-
 
         background = new Image(Objects.requireNonNull(getClass().getResource("/bg.png")).toExternalForm());
 

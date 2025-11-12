@@ -8,8 +8,16 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.TextAlignment;
 
+/**
+ * Lớp hiển thị màn chuẩn bị gane.
+ */
 public class ReadyView extends View {
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public ReadyView(GameModel model) {
         super(model);
     }

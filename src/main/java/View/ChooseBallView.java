@@ -12,6 +12,9 @@ import javafx.scene.input.MouseEvent;
 
 import java.util.Objects;
 
+/**
+ * Lớp hiển thị chọn Bóng.
+ */
 public class ChooseBallView extends View {
     Image background;
     Button ball1;
@@ -20,6 +23,11 @@ public class ChooseBallView extends View {
     Button ball4;
     Button exit;
 
+    /**
+     * Hàm khởi tạo.
+     *
+     * @param model model gốc của game
+     */
     public ChooseBallView(GameModel model) {
         super(model);
 

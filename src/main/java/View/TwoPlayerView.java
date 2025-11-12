@@ -8,14 +8,28 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 
+/**
+ * Lớp hiển trị chế độ hai người chơi.
+ */
 public class TwoPlayerView extends View {
     private final GameplayView subView;
 
+    /**
+     * Hàm khởi tạo màn Hai người chơi.
+     *
+     * @param model model gốc
+     */
     public TwoPlayerView(GameModel model) {
         super(model);
         this.subView = new GameplayView(model);
     }
 
+    /**
+     * Hàm vẽ màn hình đợi người chơi khác hoàn thành màn.
+     *
+     * @param gc chuyển ngữ cảnh
+     * @param text Người chơi số...
+     */
     private void drawWaitingOverlay(GraphicsContext gc, String text) {
         gc.save();
         gc.setGlobalAlpha(0.6);
@@ -31,6 +45,14 @@ public class TwoPlayerView extends View {
         gc.restore();
     }
 
+    /**
+     * Hàm hiển thị kết quả chơi.
+     *
+     * @param gc biến chuyển ngữ cảnh
+     * @param text Người chơi số...
+     * @param color màu bên của người chơi
+     * @param score điểm số của người chơi
+     */
     private void drawResultOverlay(GraphicsContext gc, String text, Color color, int score) {
         gc.save();
         gc.setGlobalAlpha(0.85);
