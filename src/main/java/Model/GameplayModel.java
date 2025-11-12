@@ -126,11 +126,11 @@ public class GameplayModel implements UltilityValues {
     }
 
     public GameplayModel(EventLoader eventLoader, double leftBound, double rightBound) {
-        this.eventLoader = eventLoader; // Gọi constructor mặc định
+        this.eventLoader = eventLoader;
         this.twoPlayerMode = true;
         this.areaLeft = leftBound;
         this.areaRight = rightBound;
-        paddle.setX((areaLeft + areaRight - paddle.getLength()) / 2); // căn giữa vùng chơi
+        paddle.setX((areaLeft + areaRight - paddle.getLength()) / 2);
     }
 
     public GameplayModel(EventLoader eventLoader, boolean twoPlayerMode) {
@@ -479,24 +479,19 @@ public class GameplayModel implements UltilityValues {
      * Reset các chỉ số tạm thời nhưng giữ nguyên điểm, mạng và tiến trình.
      */
     public void Initialize() {
-        // Nếu đã hoàn tất tất cả level, đánh dấu game đã hoàn thành
         if (level >= 5) {
             completedAllLevels = true;
             return;
         }
 
-        // Tăng level (chỉ nếu chưa hết)
         level++;
 
-        // Tải lại bản đồ gạch mới cho level hiện tại
         renderMap();
 
-        // Đặt lại paddle về giữa và kích thước mặc định
         paddle.setX(canvasWidth / 2.0 - paddleLength / 2.0);
         paddle.setY(canvasHeight - 140);
         paddle.setLength(paddleLength);
 
-        // Đặt lại bóng (xóa toàn bộ và tạo lại)
         balls.clear();
         Ball newBall = new Ball(
                 paddle.getX() + paddle.getLength() / 2,
@@ -506,17 +501,14 @@ public class GameplayModel implements UltilityValues {
         balls.add(newBall);
         currentBallState = BallState.ATTACHED;
 
-        // Reset các danh sách tạm
         fallingPowerUps.clear();
         activePowerUps.clear();
         lasers.clear();
 
-        // Reset chỉ số phụ
         combo = 0;
         scoreMultiplier = 1;
         currentVx = 0;
 
-        // Reset trạng thái logic
         levelFinished = false;
         waitingForOtherPlayer = false;
         fading = false;
@@ -526,12 +518,6 @@ public class GameplayModel implements UltilityValues {
         isLoser = false;
         isDraw = false;
 
-        // Không reset điểm hoặc mạng — giữ nguyên
-        // lives = lives;
-        // score = score;
-
-        // Nếu cần hiệu ứng khi qua màn (âm thanh, sự kiện, ...), có thể gọi thêm:
-        // eventLoader.loadEvent(GameEvent.LEVEL_START);
         eventLoader.loadEvent(GameEvent.AUTO_SAVE_TRIGGER);
     }
 
@@ -576,9 +562,8 @@ public class GameplayModel implements UltilityValues {
 
         for (int i = 0; i < fallingPowerUps.size(); i++) {
             MovableObject pu = fallingPowerUps.get(i);
-            pu.move(); // rơi xuống
+            pu.move();
 
-            // Va chạm với paddle
             boolean overlapX = pu.getX() + pu.getWidth() >= paddle.getX() &&
                     pu.getX() <= paddle.getX() + paddle.getLength();
             boolean overlapY = pu.getY() + pu.getHeight() >= paddle.getY() &&
@@ -593,7 +578,6 @@ public class GameplayModel implements UltilityValues {
                 continue;
             }
 
-            // Nếu rơi khỏi màn hình thì xóa
             if (pu.getY() > canvasHeight) {
                 fallingPowerUps.remove(i);
                 i--;
@@ -645,76 +629,61 @@ public class GameplayModel implements UltilityValues {
      * @param save Đối tượng SaveState đã đọc từ file
      */
     public void configureFromSave(SaveState save) {
-        // 1. Tải dữ liệu Gameplay
         this.level = save.level;
         this.lives = save.lives;
         this.score = save.score;
         this.combo = save.combo;
 
-        // Tải lại map của level đó
-        renderMap(); // Hàm này sẽ tạo lại danh sách gạch (brick)
+        renderMap();
 
-        // 2. Tải dữ liệu Paddle
         Paddle p = getPaddle();
         p.setX(save.paddleX);
         p.setLength(save.paddleLength);
         p.setShield(save.paddleShield);
 
-        // 3. Tải dữ liệu Balls
-        balls.clear(); // Xóa bóng cũ
+        balls.clear();
         for (SaveState.BallData ballData : save.balls) {
             Ball b = new Ball(ballData.x, ballData.y, ballData.vx, ballData.vy, 10, "/DefaultBall.png");
             b.setBomb(ballData.isBomb);
             balls.add(b);
         }
-        // Nếu bóng đã được phóng, set state
+
         if (!balls.isEmpty() && balls.get(0).getVy() != 0) {
             currentBallState = BallState.LAUNCHED;
         } else {
             currentBallState = BallState.ATTACHED;
         }
 
-        // 4. Tải dữ liệu Bricks (Phần phức tạp nhất)
-        // Chúng ta so sánh danh sách gạch mới render (this.brick)
-        // với danh sách gạch đã lưu (save.bricks)
         ArrayList<Brick> loadedBricks = new ArrayList<>();
 
         for (Brick templateBrick : this.brick) {
             boolean foundInSave = false;
             for (SaveState.BrickData savedBrick : save.bricks) {
-                // So sánh bằng tọa độ
                 if (templateBrick.getX() == savedBrick.x && templateBrick.getY() == savedBrick.y) {
-
                     templateBrick.setBrickType(savedBrick.brickType);
                     templateBrick.frameTimer = savedBrick.frameTimer;
                     if (savedBrick.isBreaking) {
-                        templateBrick.hit(); // Kích hoạt lại trạng thái vỡ
+                        templateBrick.hit();
                     }
-
                     if (templateBrick.getBrickType() > 0) {
                         loadedBricks.add(templateBrick);
                     }
-                    // Nếu brickType <= 0 (đã bị phá),
-                    // chúng ta không add nó vào loadedBricks
-
                     foundInSave = true;
                     break;
                 }
             }
-            // Nếu gạch từ map không có trong file save
-            // (ví dụ: phiên bản cũ), cứ thêm vào
+
             if (!foundInSave && templateBrick.getBrickType() > 0) {
                 loadedBricks.add(templateBrick);
             }
         }
-        this.brick = loadedBricks; // Thay thế danh sách gạch
+        this.brick = loadedBricks;
 
         activePowerUps.clear();
         fallingPowerUps.clear();
         lasers.clear();
 
-        // 5a. Tải các Power-up đang RƠI
-        if (save.fallingPowerUps != null) { // Kiểm tra null phòng file save cũ
+        if (save.fallingPowerUps != null) {
             for (SaveState.FallingPowerUpData puData : save.fallingPowerUps) {
                 MovableObject puObj = createPowerUpByName(puData.name, puData.x, puData.y, puData.vx, puData.vy);
                 if (puObj != null) {
@@ -722,18 +691,17 @@ public class GameplayModel implements UltilityValues {
                 }
             }
         }
-        // 5b. Tải các Power-up đang KÍCH HOẠT
+
         if (save.activePowerUps != null) {
             for (SaveState.ActivePowerUpData puData : save.activePowerUps) {
-                // Tọa độ (0,0) không quan trọng vì nó không rơi
                 MovableObject puObj = createPowerUpByName(puData.name, 0, 0, 0, 0);
                 if (puObj instanceof PowerUp) {
                     PowerUp pu = (PowerUp) puObj;
 
-                    pu.apply(this); // Kích hoạt lại hiệu ứng (ví dụ: setShield(true))
-                    pu.setElapsedMs(puData.elapsedMs); // Rất quan trọng: đặt lại thời gian
+                    pu.apply(this);
+                    pu.setElapsedMs(puData.elapsedMs);
 
-                    activePowerUps.add(pu); // Thêm vào danh sách kích hoạt
+                    activePowerUps.add(pu);
                 }
             }
         }
@@ -745,7 +713,7 @@ public class GameplayModel implements UltilityValues {
      * Dùng để tải game
      */
     private MovableObject createPowerUpByName(String name, double x, double y, double vx, double vy) {
-        double radius = 15; // Bán kính tiêu chuẩn của Power-up
+        double radius = 15;
         switch (name) {
             case "Expand":
                 return new PU_Expand(x, y, vx, vy, radius);
@@ -777,8 +745,8 @@ public class GameplayModel implements UltilityValues {
 
         double iconSize = 32;
         double spacing = 10;
-        double startX = 25;                    // ✅ sát mép trái, ngang với tim
-        double startY = canvasHeight - 105;     // ✅ nằm ngay trên thanh máu (40 cao + 10 cách)
+        double startX = 25;
+        double startY = canvasHeight - 105;
 
         Set<String> drawn = new HashSet<>();
 
@@ -788,19 +756,8 @@ public class GameplayModel implements UltilityValues {
             if (drawn.contains(name)) continue;
 
             Image icon = PU_Icons.getIcon(name);
-
-            // Nền mờ nhẹ
-            /*
-            g.setGlobalAlpha(0.5);
-            g.setFill(javafx.scene.paint.Color.BLACK);
-            g.fillRoundRect(startX - 3, startY - 3, iconSize + 6, iconSize + 6, 8, 8);
-            g.setGlobalAlpha(1.0);
-             */
-
-            // Icon
             g.drawImage(icon, startX, startY, iconSize, iconSize);
 
-            // Thời gian còn lại (nếu có)
             if (p.getDurationMs() > 0) {
                 double remaining = Math.max(0, p.getDurationMs() - p.getElapsedMs()) / 1000.0;
                 g.setFill(javafx.scene.paint.Color.WHITE);
@@ -827,7 +784,6 @@ public class GameplayModel implements UltilityValues {
     public void drawEffects(GraphicsContext g) {
         Paddle paddle = getPaddle();
 
-        // Hiệu ứng X2 điểm (ánh sáng vàng quanh paddle)
         if (hasActivePower("Score x2")) {
             g.setGlobalAlpha(0.3);
             g.setFill(javafx.scene.paint.Color.GOLD);
@@ -836,7 +792,6 @@ public class GameplayModel implements UltilityValues {
             g.setGlobalAlpha(1.0);
         }
 
-        // Hiệu ứng Shield (tấm chắn năng lượng dưới paddle)
         if (hasActivePower("Shield")) {
             g.setStroke(javafx.scene.paint.Color.CYAN);
             g.setLineWidth(3);

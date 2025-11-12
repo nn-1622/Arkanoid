@@ -36,7 +36,6 @@ public class GameplayView extends View {
         Image background = model.getBackground();
         gc.drawImage(background, 0, 0, 600, 650);
 
-        // Vẽ các đối tượng trong game
         model.getPaddle().draw(gc);
         drawUI(gc, model);
         ArrayList<Brick> brickMap = model.getBricks();
@@ -75,7 +74,6 @@ public class GameplayView extends View {
         double w = UltilityValues.canvasWidth;
         double h = UltilityValues.canvasHeight;
 
-        // Ghi điểm & combo ở góc phải mỗi nửa
         double scoreX = w - 170;
         double scoreY = h - 30;
 
@@ -83,11 +81,9 @@ public class GameplayView extends View {
         gc.setFill(Color.WHITE);
         gc.fillText("Score: " + model.getScore(), scoreX, scoreY);
 
-        // Thanh máu
         gc.drawImage(healthbar, 0, 0, 40 * model.getLives(), 40,
                 23.7, 600, 40 * model.getLives(), 40);
 
-        // Combo
         if (model.getCombo() > 1) {
             double comboX = scoreX;
             double comboY = scoreY - 30;

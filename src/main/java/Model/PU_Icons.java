@@ -4,7 +4,6 @@ import javafx.scene.image.Image;
 
 public class PU_Icons {
 
-    // Load ảnh 1 lần duy nhất, dùng lại sau này
     private static final Image LASER       = new Image("/LaserPU.png");
     private static final Image EXPAND      = new Image("/x2LengthPU.png");
     private static final Image EXTRA_LIVE  = new Image("/extralive.png");

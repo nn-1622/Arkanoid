@@ -65,16 +65,13 @@ public class TwoPlayerView extends View {
         GameplayModel left = model.getLeftGame();
         GameplayModel right = model.getRightGame();
 
-        // Vẽ nền chung
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, UltilityValues.canvasWidth * 2, UltilityValues.canvasHeight);
 
-        // ====== LEFT PLAYER ======
         if (left != null) {
             gc.save();
             subView.draw(gc, left);
 
-            // Fade (chuyển màn)
             if (left.isFading()) {
                 double fadeTime = 2.0;
                 double elapsed = (System.nanoTime() - left.getFadeStartTime()) / 1_000_000_000.0;
@@ -83,12 +80,10 @@ public class TwoPlayerView extends View {
                 gc.fillRect(0, 0, UltilityValues.canvasWidth, UltilityValues.canvasHeight);
             }
 
-            // Waiting
             if (left.isWaitingForOtherPlayer() && !left.isWinner() && !left.isLoser() && !left.isDraw()) {
                 drawWaitingOverlay(gc, "WAITING FOR PLAYER 2...");
             }
 
-            // Result
             if (left.isWinner()) {
                 drawResultOverlay(gc, "PLAYER 1 WINS!", Color.LIMEGREEN, left.getScore());
             } else if (left.isLoser()) {
@@ -100,18 +95,15 @@ public class TwoPlayerView extends View {
             gc.restore();
         }
 
-        // ====== DIVIDER ======
         gc.setStroke(Color.GRAY);
         gc.setLineWidth(3);
         gc.strokeLine(UltilityValues.canvasWidth, 0, UltilityValues.canvasWidth, UltilityValues.canvasHeight);
 
-        // ====== RIGHT PLAYER ======
         if (right != null) {
             gc.save();
             gc.translate(UltilityValues.canvasWidth, 0);
             subView.draw(gc, right);
 
-            // Fade
             if (right.isFading()) {
                 double fadeTime = 2.0;
                 double elapsed = (System.nanoTime() - right.getFadeStartTime()) / 1_000_000_000.0;
@@ -120,12 +112,10 @@ public class TwoPlayerView extends View {
                 gc.fillRect(0, 0, UltilityValues.canvasWidth, UltilityValues.canvasHeight);
             }
 
-            // Waiting
             if (right.isWaitingForOtherPlayer() && !right.isWinner() && !right.isLoser() && !right.isDraw()) {
                 drawWaitingOverlay(gc, "WAITING FOR PLAYER 1...");
             }
 
-            // Result
             if (right.isWinner()) {
                 drawResultOverlay(gc, "PLAYER 2 WINS!", Color.LIMEGREEN, right.getScore());
             } else if (right.isLoser()) {
@@ -133,7 +123,6 @@ public class TwoPlayerView extends View {
             } else if (right.isDraw()) {
                 drawResultOverlay(gc, "DRAW!", Color.GOLD, right.getScore());
             }
-
             gc.restore();
         }
     }

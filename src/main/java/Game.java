@@ -32,7 +32,6 @@ public class Game extends Application {
      */
     @Override
     public void start(Stage stage) {
-        // Khởi tạo các thành phần Model, View, và Controller
         model = GameModel.getGameModel();
         soundManager = SoundManager.getInstance();
         view = new GameView(model);

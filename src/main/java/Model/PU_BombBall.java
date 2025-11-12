@@ -41,7 +41,6 @@ public class PU_BombBall extends MovableObject implements PowerUp {
         picked = true;
         active = true;
 
-        // bật chế độ Bomb cho tất cả bóng đang tồn tại
         for (Ball b : game.getBalls()) {
             b.setBomb(true);
         }

@@ -1,7 +1,5 @@
 package Controller;
 
-import java.sql.SQLOutput;
-
 public class AdjustVolumeCmd implements GameCommand {
     private final boolean increase;
 

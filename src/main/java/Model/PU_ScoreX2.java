@@ -7,14 +7,14 @@ public class PU_ScoreX2 extends MovableObject implements PowerUp {
     private static final int DURATION_MS = 10000; // hiệu lực 10 giây
     private double radius;
     private Image img;
-    private boolean active = true;      // đang rơi
-    private boolean effectActive = false; // đang kích hoạt
+    private boolean active = true;
+    private boolean effectActive = false;
     private int elapsedMs = 0;
 
     public PU_ScoreX2(double x, double y, double vx, double vy, double radius) {
         super(x, y, vx, vy);
         this.radius = radius;
-        this.img = new Image("/x2.png"); // ảnh vật phẩm (thay bằng ảnh bạn có)
+        this.img = new Image("/x2.png");
     }
 
     @Override
@@ -41,9 +41,8 @@ public class PU_ScoreX2 extends MovableObject implements PowerUp {
         effectActive = true;
         elapsedMs = 0;
 
-        // 🔥 bật chế độ nhân đôi điểm
-        game.setCombo(game.getCombo() + 1); // combo vẫn tính riêng
-        game.setScoreMultiplier(2); // ⚡ thêm biến multiplier trong GameplayModel
+        game.setCombo(game.getCombo() + 1);
+        game.setScoreMultiplier(2);
     }
 
     @Override
@@ -51,7 +50,6 @@ public class PU_ScoreX2 extends MovableObject implements PowerUp {
         if (!effectActive) return;
         elapsedMs += (int)(deltaTime * 1000);
 
-        // Khi hết thời gian
         if (elapsedMs >= DURATION_MS) {
             remove(game);
         }
@@ -60,7 +58,7 @@ public class PU_ScoreX2 extends MovableObject implements PowerUp {
     @Override
     public void remove(GameplayModel game) {
         effectActive = false;
-        game.setScoreMultiplier(1); // trở lại bình thường
+        game.setScoreMultiplier(1);
     }
 
     @Override

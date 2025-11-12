@@ -150,7 +150,6 @@ public class SoundManager implements GameEventListener {
         });
     }
 
-    // Tăng âm lượng
     public void increaseVolume() {
         audioExecutor.submit(() -> {
             masterVolume = Math.min(1.0, masterVolume + volStep);
@@ -159,7 +158,6 @@ public class SoundManager implements GameEventListener {
         });
     }
 
-    // Giảm âm lượng
     public void decreaseVolume() {
         audioExecutor.submit(() -> {
             masterVolume = Math.max(0.0, masterVolume - volStep);

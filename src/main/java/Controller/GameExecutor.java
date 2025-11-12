@@ -18,7 +18,6 @@ public final class GameExecutor {
         });
     }
 
-    // Holder idiom: thread-safe, không cần synchronized
     private static class Holder { static final GameExecutor I = new GameExecutor(); }
     public static GameExecutor getInstance() { return Holder.I; }
 

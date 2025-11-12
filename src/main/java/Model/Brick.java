@@ -149,10 +149,8 @@ public class Brick extends GameObject{
     @Override
     public void draw(GraphicsContext render) {
         if(!isBreaking()) {
-            // Cắt và vẽ sprite của loại gạch tương ứng từ spritesheet
             render.drawImage(image, sx, sy + (brickType-1) * 16, sw, sh, x, y, width, height);
         } else {
-            // Cắt và vẽ frame hiện tại của animation phá gạch từ spritesheet
             render.drawImage(image, sx + 32 * currentFrame, sy, sw, sh, x, y, width, height);
         }
     }

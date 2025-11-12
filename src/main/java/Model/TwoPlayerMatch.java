@@ -7,11 +7,9 @@ public class TwoPlayerMatch {
     private final GameplayModel player2;
 
     public TwoPlayerMatch(GameModel root) {
-        // tạo 2 gameplay model riêng biệt
         this.player1 = new GameplayModel(root.getEventLoader());
         this.player2 = new GameplayModel(root.getEventLoader());
 
-        // chỉnh vị trí 2 paddle
         player1.getPaddle().setX(100);
         player2.getPaddle().setX(UltilityValues.playWidth / 2 + 100);
     }
@@ -24,7 +22,6 @@ public class TwoPlayerMatch {
     public void draw(GraphicsContext g) {
         double midX = UltilityValues.playWidth / 2;
 
-        // vẽ vùng trái (player 1)
         g.save();
         g.beginPath();
         g.rect(0, 0, midX, UltilityValues.canvasHeight);
@@ -32,7 +29,6 @@ public class TwoPlayerMatch {
         player1.getPaddle().draw(g);
         g.restore();
 
-        // vẽ vùng phải (player 2)
         g.save();
         g.beginPath();
         g.rect(midX, 0, midX, UltilityValues.canvasHeight);

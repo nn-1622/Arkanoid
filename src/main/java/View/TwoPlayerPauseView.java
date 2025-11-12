@@ -25,24 +25,20 @@ public class TwoPlayerPauseView extends View {
     public TwoPlayerPauseView(GameModel model) {
         super(model);
 
-        // ✅ Dùng kích thước canvas từ UltilityValues
         double centerX = UltilityValues.canvasWidth;
         double btnWidth = 200;
         double btnHeight = 50;
 
-        // Nút Resume - Trở về trạng thái TWO_PLAYING
         resumeButton = new Button(centerX - btnWidth / 2, 250, btnWidth, btnHeight,
                 new GameCommand() {
                     @Override
                     public void execute() {
-                        // Chỉ chuyển trạng thái, không tạo game mới
                         model.setGstate(State.TWO_PLAYING);
                     }
                 });
         resumeButton.setImgButton("/Continue.png");
         resumeButton.setImgHoverButton("/ContinueHover.png");
 
-        // Nút Exit - Trở về MENU
         exitButton = new Button(centerX - btnWidth / 2, 390, btnWidth, btnHeight,
                 new ChangeStateCmd(model, State.MENU));
         exitButton.setImgButton("/Exit.png");
@@ -54,7 +50,6 @@ public class TwoPlayerPauseView extends View {
 
     @Override
     public void draw(GraphicsContext gc, GameplayModel gameplayModel) {
-        // Gọi hàm drawOverlay với mặc định là 2P (1200px)
         drawOverlay(gc, true);
     }
 
@@ -70,20 +65,16 @@ public class TwoPlayerPauseView extends View {
 
         gc.save();
 
-        // 🌌 Nền mờ trong suốt (giống WAITING FOR PLAYER)
         gc.setGlobalAlpha(0.6);
         gc.setFill(Color.BLACK);
         gc.fillRect(0, 0, canvasWidth, canvasHeight);
 
-        // 🔄 Khôi phục alpha = 1 để vẽ nút và chữ rõ ràng
         gc.setGlobalAlpha(1.0);
 
-        // --- Tiêu đề ---
         gc.setFill(Color.WHITE);
         gc.setFont(Font.font("Consolas", FontWeight.BOLD, 50));
         gc.fillText("PAUSED", centerX, 180);
 
-        // --- Nút ---
         resumeButton.setX(centerX - resumeButton.getWidth() / 2);
         exitButton.setX(centerX - exitButton.getWidth() / 2);
 
@@ -92,8 +83,6 @@ public class TwoPlayerPauseView extends View {
 
         gc.restore();
     }
-
-
 
     @Override
     public void checkHover(MouseEvent e) {

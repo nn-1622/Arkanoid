@@ -52,8 +52,8 @@ public class GameView {
             canvas.setHeight(targetH);
 
             if (scene.getWindow() != null) {
-                scene.getWindow().setWidth(targetW + 16);  // cộng viền, tránh cắt
-                scene.getWindow().setHeight(targetH + 39); // thanh tiêu đề
+                scene.getWindow().setWidth(targetW + 16);
+                scene.getWindow().setHeight(targetH + 39);
             }
         }
 
@@ -72,11 +72,9 @@ public class GameView {
      * @param model Đối tượng GameModel chứa trạng thái hiện tại của game.
      */
     public void render(GameModel model) {
-        // --- Tự động đổi kích thước khi vào 2 người chơi ---
         ensureSizeForState(model.getGstate());
         State currentState = model.getGstate();
 
-        // --- Nếu đang hiệu ứng FADE ---
         if (model.getGstate() == State.FADE) {
             final double fadeTime = 15.0;
             double timeElapsed = (System.nanoTime() - model.getFadeStartTime()) / 1_000_000_000.0;
@@ -97,43 +95,32 @@ public class GameView {
             }
             return;
         }
-        // --- Xử lý 2P PAUSE ---
+
         if (currentState == State.TWO_PLAYER_PAUSED) {
-            // 1. Vẽ nền (TwoPlayerView của 2P)
             View backgroundView = model.getView(State.TWO_PLAYING);
             if (backgroundView != null) {
-                // TwoPlayerView.draw không cần model, nó tự lấy left/right
                 backgroundView.draw(gc, null);
             }
 
-            // 2. Vẽ lớp phủ (TwoPlayerPauseView)
             View overlayView = model.getCurrentView();
             if (overlayView != null) {
-                // TwoPlayerPauseView.draw cũng không cần model
                 overlayView.draw(gc, null);
             }
-            return; // Đã vẽ xong
+            return;
         }
 
-        // --- Các trạng thái bình thường khác (MENU, PLAYING, TWO_PLAYING, v.v.) ---
         try {
             if (model.getCurrentView() != null) {
-                // Tự động gọi hàm draw chính xác:
-                // - PLAYING -> GameplayView.draw(gc, model.getGameplayModel())
-                // - TWO_PLAYING -> TwoPlayerView.draw(gc, null) (nó sẽ bỏ qua tham số null)
-                // - MENU -> MenuScene.draw(gc, null) (nó cũng bỏ qua)
                 model.getCurrentView().draw(gc, model.getGameplayModel());
             } else if (model.getGameplayModel() != null) {
-                // Fallback nếu state là PLAYING nhưng currentView bị null
                 new GameplayView(model).draw(gc, model.getGameplayModel());
             } else {
-                // Fallback cuối cùng: màn hình đen an toàn
                 gc.setFill(Color.BLACK);
                 gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
             }
         } catch (Exception e) {
             System.err.println("[Render Warning] " + e.getMessage());
-            e.printStackTrace(); // In ra stack trace để debug
+            e.printStackTrace();
             gc.setFill(Color.BLACK);
             gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
         }

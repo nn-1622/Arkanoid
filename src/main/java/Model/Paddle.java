@@ -30,7 +30,7 @@ public class Paddle extends MovableObject implements UltilityValues {
         this.length = length;
         this.height = height;
         this.paddleImg = new Image(path);
-        setVx(5); // Đặt tốc độ di chuyển mặc định
+        setVx(5);
     }
 
     public static Paddle getPaddle(String path) {

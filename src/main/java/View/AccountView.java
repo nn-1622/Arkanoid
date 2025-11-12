@@ -29,9 +29,6 @@ public class AccountView extends View {
     public AccountView(GameModel model) {
         super(model);
 
-        // Nút Save
-        // TODO: Bạn cần tạo ảnh /Save.png và /SaveHover.png
-        // Đặt nút Save (Tọa độ X, Y, Rộng, Cao)
         saveButton = new Button(202, 356.6, 196.1, 49, new SavePlayerCmd(this));
         saveButton.setImgButton("/Save.png");
         saveButton.setImgHoverButton("/SaveHover.png");
@@ -58,7 +55,6 @@ public class AccountView extends View {
 
     @Override
     public void handleClick(MouseEvent e) {
-        // Tọa độ của ô text
         double boxX = 100, boxY = 280, boxW = 400, boxH = 50;
 
         if (e.getX() >= boxX && e.getX() <= boxX + boxW &&

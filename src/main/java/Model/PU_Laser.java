@@ -12,8 +12,8 @@ public class PU_Laser extends MovableObject implements PowerUp {
     private double radius;
     private Image Laser;
 
-    private boolean active;          // đang tồn tại dưới dạng icon rơi (MovableObject)
-    private boolean effectActive;    // hiệu ứng đã được kích hoạt trên paddle
+    private boolean active;
+    private boolean effectActive;
 
     private int elapsedMs;
     private int timeSinceLastShotMs;
@@ -58,7 +58,6 @@ public class PU_Laser extends MovableObject implements PowerUp {
             }
         }
 
-        // Nếu chưa có laser nào → kích hoạt laser mới
         this.active = false;
         this.effectActive = true;
         this.elapsedMs = 0;
